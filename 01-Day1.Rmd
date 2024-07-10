@@ -1,0 +1,283 @@
+# Day1 - 到處看看
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(distill)
+xaringanExtra::use_panelset()
+library(rmarkdown)
+library(rextendr)
+```
+
+
+## 安裝rust
+
+這會安裝最新版本的Rust，並且會自動更新。
+
+```{}
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+```
+
+如果成功，會得到以下訊息：
+
+```{}
+Rust is installed now. Great!
+```
+
+檢查版本
+
+```{}
+rustc --version
+```
+
+### 相關工具
+
+安裝完Rust，我們來檢查其他三個相關的指令工具
+
+```{bash}
+cargo --version
+rustc --version
+rustdoc --version
+```
+
+如預期的，他應該要跟我們分別回報版本，而這三個工具分別用來:
+
+1. cargo是Rust專門的編譯管理器與萬能的工具包，例如建立新專案，組建專案與執行專案，之後我們會頻繁使用。
+
+2. rustc也是rust的編譯器，但我們通常都是透過cargo來為我們統一編譯及管理。
+
+3. rustdoc是文件工具，你以特定代碼在rs檔裡撰寫文件，rustdoc可以用它們來建立正確的HTML，但這件事我們同樣交由cargo處理。
+
+## hello.rs
+
+首先，執行以下指令，建立一個暫時新的專案：
+
+```{}
+mkdir tmp
+cd tmp
+```
+
+接著。寫入一個如下列的程式碼，並且儲存成 `hello.rs`：
+
+```{Rust}
+fn main() {
+    println!("Hello, world!");
+}
+```
+
+fn代表定義的函式，這裡的函式就是main()
+
+println!是顯示文字的巨集
+
+接著，讓我們來編譯這個代碼：
+
+```{terminal}
+rustc hello.rs
+./hello
+```
+
+```{extender}
+rprintln!("Hello, world!");
+```
+## 第一個專案-猜猜數字
+
+```{terminal}
+cargo new guess # create a new project
+```
+
+跳往新目錄並且檢視
+
+```{terminal}
+cd guess
+tree
+```
+
+新建成的專案目錄結構如下：
+
+```
+.
+├── Cargo.toml
+└── src
+    └── main.rs
+```
+
+Cargo.toml 是專案的設定檔，src/main.rs 是程式碼的檔案。
+
+使用指令創建的main.rs內容如下：
+
+```
+fn main() {
+    println!("Hello, world!");
+}
+```
+
+所有的執行黨都是從main函數開始執行的
+
+而所有函式都會回傳一個值，在rust中，我們以箭頭與型別名稱表示
+
+例如：-> u32 表示回傳一個無符號(unsigned integer)32位元整數
+
+而main函數的回傳值是()，表示沒有回傳值，因此回傳的是Rust unit type
+
+接著，我們來執行這個專案：
+
+```{terminal}
+cargo run
+```
+
+```{extendr, echo=FALSE}
+rprintln!("Hello, world!");
+```
+
+### 宣告變數
+
+Rust的變數型態是精華，我們會在明天討論它，但現在我們先來看看如何宣告變數。
+
+```{Rust}
+let x = 5;
+println!("The value of x is: {}", x);
+```
+
+接著，我們宣告一個隨機數，我們會用到rand crate
+
+所以，請打開Cargo.toml，並且加入rand依賴，讓編譯器知道我們要使用這個套件：
+
+```{toml}
+[package]
+name = "guess"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+rand = "0.8.4"
+```
+
+```{Rust}
+use rand::Rng;
+
+let secret_number = rand::thread_rng().gen_range(1..=10);
+println!("The secret number is: {}", secret_number);
+```
+
+
+現在有一個隨機數了！接下來，我們要處理如何讓使用者輸入數字。這裡我們會用到std::io這個標準程式庫，因此只需引用它，而不需要再cargo.toml中加入依賴。
+
+`use std::io;`
+
+在terminal接收任何輸入，會被預期是字串，思路是：先接收字串，並且用字串提供的方法轉換成數字。
+
+```{Rust}
+let mut guess = String::new();
+
+io::stdin().read_line(&mut guess)
+    .expect("閱讀失敗！請輸入數字");
+  
+let guess: u32 = match guess.trim().parse() {
+    Ok(num) => num,
+    Err(_) => continue,
+};
+
+```
+
+guess在第ㄧ次被宣告是一個字串，並且接受使用者的輸入
+
+接著，第二次將其宣告為u32整數，是透過將字串轉換成數字。
+
+parrse()會回傳一個Result型別，成功的OK(num)或是失敗的Err(_)，我們用match來處理這兩種情況。
+
+
+接著我們要比較使用者輸入的數字與隨機數，並且給予提示。你可以用if-else來處理這個問題。
+
+```{Rust}
+if guess < secret_number {
+    rprintln!("太小了！");
+} else if guess > secret_number {
+    rprintln!("太大了！");
+} else {
+    rprintln!("猜對了！");
+    break;
+}
+```
+
+或是用match與odering來處理(記得聲明引用程式庫`use std::cmp::Ordering;`)
+
+```{Rust}
+match guess.cmp(&secret_number){
+    Ordering:Less => rprintln!("太小了！"),
+    Ordering:Greater => rprintln!("太大了！"),
+    Ordering:Equal => {
+        rprintln!("猜對了！");
+        break;
+    }
+}
+```
+
+完整的程式碼與執行結果應該如下：
+
+::: panelset
+::: panel
+## 程式碼 {.panel-name}
+
+```{Rust}
+use rand::Rng;
+use std::cmp::Ordering;
+use std::io;
+
+fn main() {
+    println!("1~10猜數字！");
+
+    let secret_number = rand::thread_rng().gen_range(1..=10);
+
+    loop {
+        println!("請輸入數字");
+
+        let mut guess = String::new();
+
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("解析失敗");
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        println!("你猜的數字是: {guess}");
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("太小了!"),
+            Ordering::Greater => println!("太大了!"),
+            Ordering::Equal => {
+                println!("恭喜獲勝!");
+                break;
+            }
+        }
+    }
+}
+```
+:::
+
+::: panel
+## 結果 {.panel-name}
+
+1~10猜數字！<br>
+請輸入數字<br>
+1<br>
+你猜的數字是: 1<br>
+太小了!<br>
+請輸入數字<br>
+7<br>
+你猜的數字是: 7<br>
+太大了!<br>
+請輸入數字<br>
+5<br>
+你猜的數字是: 5<br>
+太小了!<br>
+請輸入數字<br>
+6<br>
+你猜的數字是: 6<br>
+恭喜獲勝!
+
+:::
+:::
+

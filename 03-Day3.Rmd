@@ -1,0 +1,322 @@
+# 所有權與移動
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(distill)
+library(rmarkdown)
+library(rextendr)
+```
+
+
+##  所有權與移動
+
+為了讓整個程式能更好的運用記憶體，我們指望程式能做到兩件事：
+
+1.指標絕對不能指向已釋出的物件，避免**未定義**行為造成安全漏洞
+
+2.用有自行決定記憶體何時釋放與速度的權利，減少無意義的損耗
+
+但想同時擁有這兩項優勢並不容易，尤其是高度的記憶體自由，由你掌控何時釋出，容易造成值的指標**懸空**。目前的程式可依者兩種優點而分為兩種陣營。
+
+安全派：使用**垃圾回收**的技術來管理記憶體，當所有指向該物件的指標消失時，它會自動釋放該物件，如此你不必為懸空指標憂慮，但同時你也失去了「自行決定何時將物件回收」的權利。目前幾乎所有程式都屬於這個派別，如C#、python、R、Java
+
+自由派：你能選擇何時釋出記憶體，但避免懸空指標的出現全都是你的責任。此派主流語言只有：C和C++
+
+而Rust生來就是要同時獲取兩種優勢，不然也沒必要學。因此，Rust用**限制指標**的使用來解決問題。這勢必會造成困擾，許多我們過去隨意使用的型態與寫法都將放棄。但也就是這些「困擾」，讓Rust能用編譯檢查機制來確保沒有安全混亂，如懸空指標、重複釋出、使用未初始化記憶體。
+
+這一套秩序也是並行設計的根基，如**執行緒基元(threading primitibve)**確保沒有資料爭用問題。
+
+在這些限制下寫出安全且靈活的程式，是你在學習Rust之路最大的挑戰，同時也是優勢。本章將帶你了解**所有權**的概念，比較不同語言的運作方式，進而學習如何處理與追蹤所有權的改變。
+
+
+## 所有權
+
+C++與C是由所有權人決定何時釋出物件，當所有權人銷毀時，物件也被毀滅。
+
+```{C}
+std :: string s = "hello";
+```
+
+在堆疊中，std::string的長是**3 word**，分別裝的是**緩衝區**、**容量**、**長度**，他們都會指向heap，而hello就被放在heap中。
+
+當字串被銷毀時，字串的解構式(destructor)會被呼叫，這時std::string會釋放heap中的記憶體。你可以建立臨時指標來指向他人擁有的記憶體(如s擁有的h字元)，但當s字串被註銷時，指標就會無效，不得再使用。
+
+這種**賦予所有權人絕對性的權利決定擁有物件的生命週期**的方式，也是Rust的核心概念。每個值都需有決定期生命週期的所有權人，當所有權人被釋出(dropped)時，值也會被釋出。讓編譯器可以ㄧ眼看穿每一個值的生命週期，並以此檢測漏洞。
+
+在Rust中，當控制離開宣告該變數的區塊時，變數銷毀，同時卸除值。
+
+以Rust的Box為例，Box<T>**指向heap裡T型態值的指標**。當你呼叫Box::new(v)的時候，系統會配置空間將v塞入，並且回傳一個指向該空間的Box。當box銷毀時，空間釋出。
+
+```{extendr}
+{
+   let point = Box::new((11, 13));  //ponit在此配置
+   let label = format!("{:?}", point); //label在此配置
+   println!("label：{}", label);
+   println!("point：{:?}", point);
+}  //point與label在此銷毀
+```
+
+堆疊框本身保有變數(point、label)，兩個Box指向個別的heap空間。
+
+而在變數被卸除時，他們擁有的空間也會被釋放。
+
+舉另外一個複雜的例子，同時有tuple、struct、String、向量
+
+```{Rust}
+strut Person {
+    name: String,
+    birth: i32,
+}
+
+let mut composers = Vec::new();
+composers.push(Person {name: "Palestrina".to_string(), birth: 1525});
+composers.push(Person {name: "Dowland".to_string(), birth: 1563});
+composers.push(Person {name: "Lully".to_string(), birth: 1632});
+
+for composer in &composers {
+    println!("{}, born {}", composer.name, composer.birth);
+}
+```
+
+在這個結構中，最上層的堆疊匡是composers，擁有一個向量，而緩衝區則指向放有各個以Person為型態的heap空間。接著，如birth：i32的定寬數字直接配置在heap中，而string則有其容量、長度、緩衝區指向heap中的字串。當控制離開宣告composers的作用域後，composers會被卸除，連帶地卸除整個配置。
+
+如前所述，Rust會強迫每個值都有**一個**所有權人，但每一個所有人可以擁有多個值，如composers擁有3個Person元素。並且在複雜的架構中，會形成樹狀的架構，成為**父子關係**。當父親被銷毀時，他的子女也會被銷毀。如composers是3個元素的父輩，而3個元素又有個別的String子輩。因此在Rust中，你不會看到雜亂的架構，每一個值都是某棵樹的一分子。
+
+上述講述的例子可能讓你覺得Rust是一個僵化語言，但實作上可以作出靈活的延伸
+
+- 透過所有權的移動，重新排列樹狀結構，
+
+- 使用整數、浮點數、字元等簡單的型態，他們不受所有權的限制，稱為Copy型態
+
+- 透過借用一個值的**參考**，使用這種**無所有權、具有限生命週期的指標**
+
+- 利用標準程式庫提供的參考計數(reference-counted)指標型態Rc與Arc，在特殊情況下讓值有多個所有權人
+
+## 移動
+
+在Rust中，大多數型態下，諸如將值指派給變數、將值回傳函式、從函式回傳值、將值傳遞給函式等操作，都不是**複製**，而是**移動**。當值被移動時，原本的變數為**未初始化**，該值的所有權被轉移。
+
+因此在以下例子，s1的所有權被轉移給s2，s1變成未初始化，無法再使用，當你再嘗試把s1傳給s3時，編譯器會報錯。
+
+
+```{Rust}
+let s1 = vec!["aaa".to_string(), "bbb".to_string()];
+let s2 = s1;
+let s3 = s1;
+```
+✖ error[E0382]: use of moved value: `s1`
+ --> src/lib.rs:7:10
+  |
+5 |     let s1 = vec!["aaa".to_string(), "bbb".to_string()];
+  |         -- move occurs because `s1` has type `Vec<String>`, which does not implement the `Copy` trait
+6 | let s2 = s1;
+  |          -- value moved here
+7 | let s3 = s1;
+  |          ^^ value used here after move
+
+為什麽要有這種特性呢？我們可以先看兩個主流陣營的做法，比較優缺。
+
+### python
+
+```{python}
+s1 = ['aaa', 'bbb']
+s2 = s1
+s3 = s1
+```
+
+python的每個物件都有一個參考數量，以此來記錄有多少值引用他。ㄧ開始初始化s1時，PyListObject的參考數量為1，當s2=s1時，參考數量變為2，s3=s1時，參考數量變為3。這讓python的賦值成本很低，但因為每次都會建立新參考，也代表著必須紀錄參考數才能知道何時釋出。
+
+### C++
+
+```{C}
+using namespace std;
+vector<string> s1 = {"aaa", "bbb"};
+vector<string> s2 = s1;
+vector<string> s3 = s1;
+```
+
+在C++中，當你將s1指派給s2時，會將整個副本都複製給s2。因此s1與s2都是獨立的，短短的幾行已經有3個向量、6個字串，如此的深度複製會造成損耗，但程式也容易決定何時釋出所有記憶體。
+
+### Rust
+
+如果你想要像C++一樣進行深複製，而不是移動，你應該呼叫向量的clone方法。
+
+```{extendr}
+let s1 = vec!["aaa".to_string(), "bbb".to_string()];
+let s2 = s1.clone();
+let s3 = s1.clone();
+```
+
+你也可以使用我們前面提到的參考計數指標來模仿python的行為，也就是共享所有權。
+
+### 移動與控制
+
+因為Rust會移動值，因此在預到控制流程時，你必須把握「**如果值可能被移動，則必須考慮初始化的風險**」
+
+```{Rust}
+let s1 = vec!["aaa".to_string(), "bbb".to_string()];
+if c {
+    let s2 = s1;
+} else {
+    let s3 = s1;
+}
+s4 = s1;// 錯誤，s1可能已經被移動
+```
+
+迴圈也會有類似的問題，有可能在回圈中s1就會被移動，導致s2會被賦予未初始化的值(空的s)。
+
+```{Rust}
+let s1 = vec!["aaa".to_string(), "bbb".to_string()];
+while c {
+    let s2 = s1;
+    break;
+}
+```
+
+### 移動與檢索
+
+一般來說，移動會將值的來源端變成未初始化，但許多情況下，所有權人會阻止隨意地移動。
+
+```{Rust}
+let mut v = Vec::new();
+for i in 101..106 {
+    v.push(i.to_string());
+}
+
+let third = v[2];
+let fifth = v[4];
+```
+
+以上這段程式會出錯，並建議你改用參考，如果你還是想要將向量的值移出，你可以參考以下的寫法。
+
+```{extendr}
+let mut v = Vec::new();
+for i in 101..106 {
+    v.push(i.to_string());
+}
+
+//1.pop method
+//移出向量的最後一個值
+let fifth = v.pop().expect("no fifth element");
+rprintln!("fifth: {}", fifth);
+
+//2. swap_remove method
+//移出向量的指定位置值
+let second = v.swap_remove(1);
+rprintln!("second: {}", second);
+
+// 3.replace method
+// 用一個值來做交換
+
+let third = std::mem::replace(&mut v[2], "substitute".to_string());
+rprintln!("third: {}", third);
+
+rprintln!("v: {:?}", v);
+```
+
+再以上面Person的例子中，編譯器無法追蹤以struct包裝的string的所有權的移動狀況，但可以考慮用Option來動態追蹤。
+
+```{extendr}
+ #[derive(Debug)]
+struct Person {
+    name: Option<String>,
+    birth: i32,
+}
+
+let mut composers = Vec::new();
+composers.push(Person {name: Some("Palestrina".to_string()), birth: 1525});
+composers.push(Person {name: Some("Dowland".to_string()), birth: 1563});
+
+let first_name = std::mem::replace(&mut composers[0].name, None);
+rprintln!("first_name: {:?}", first_name);
+rprintln!("composers: {:?}", composers);
+
+// option提供給你take方法，，讓整體更簡潔
+let second_name = composers[1].name.take();
+rprintln!("second_name: {:?}", second_name);
+rprintln!("composers: {:?}", composers);
+```
+
+### 複製型態
+
+剛剛我們提過**Copy型態**，他們不受所有權的限制，可以隨意複製，例如整數、浮點數、字元，這些型態不會像字串、向量等佔用大量的記憶體，以下例子比較：
+
+```{Rust}
+let s1 = "hello".to_string();
+let s1 = s2;
+
+let x = 5;
+let y = x;
+```
+
+
+在上面的例子中，s1被賦值時，會在heap中配置一個字串。相反x不會在heap中配置，而是直接在堆疊匡裡配置。
+
+另外，當s1給s2時，hello字串的所有權被移轉。而x給y時，不會發生所有權的轉移，而是產生一個完全獨立的副本。
+
+這樣的區分除了在為記憶體空間的考量外，非Copy型態的值在被卸除時**都要做某些特別的事**。例如前面所述的Vec，卸除時須要讓元素釋放、File型態要關閉檔案控制碼、MutexGuard需要解鎖等等。
+
+那如果是自己定義的型態呢？
+
+```{Rust}
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn print(p: Point) {
+    rprintln!("({}, {})", p.x, p.y);
+}
+
+let p = Point {x: 1, y: 2};
+print(p);//
+rprintln!("({}, {})", p.x, p.y);
+
+```
+
+✖ error[E0382]: borrow of moved value: `p`
+  --> src/lib.rs:16:28
+   |
+14 | let p = Point {x: 1, y: 2};
+   |     - move occurs because `p` has type `Point`, which does not implement the `Copy` trait
+15 | print(p);
+   |       - value moved here
+16 | rprintln!("({}, {})", p.x, p.y);
+   |                            ^^^ value borrowed here after move
+   |
+   
+
+這裡的抱錯告訴你，在print(p)後，p的所有權被移動，所以你不能再使用p。所以在預設情況下，自定義的型態都是非Copy型態。
+
+但明明point型態裡放的都是整數，沒有必要動來動去！因此，你可以加入#[derive(Copy, Clone)]來讓point型態成為Copy型態。
+
+不過注意，如果你的型態裡有非Copy型態的成員，那麽你可不能用#[derive(Copy, Clone)]，而是要自己實作Copy與Clone trait。
+
+## Rc與Arc：共享所有權
+
+所有權帶來安全，但設計程式免不了遇到需要保留值到最後，卻找不到適合的單一所有權人，又或著需要在多個執行緒間共享值。這時你可以使用Rc與Arc，他們是**參考計數指標**，可以讓值有多個所有權人。
+
+
+Rc與Arc的差別在於Arc可以在不同的執行緒間共享，Rc則是以高速在單執行緒間更改參數量，除此之外，兩者是等效，因此我們以Rc示範。
+
+
+Rc就是重現python的參考數管理生命週期的方式
+
+```{extendr}
+use std::rc::Rc;
+
+let s = Rc::new("shirataki".to_string());
+let s2 = s.clone();
+let s3 = s.clone();
+```
+
+Rc<T>是一個指向heap裡的指標，並且附帶一個參考數量。當你呼叫clone時，並非移動或複製，而是另外一個指向同個heap的指標，並且增加參考數。
+
+Rc的值並不可變，於此來確立執行緒安全的保障。所以，「任何值不可以是既共享又可變」。
+
+參考管理記憶體最大的問題是：當兩個參考計數的值互指，導致計數永遠不會歸零，卡在記憶體不被釋出。這種情況通常出現在舊值可變的情況，因為這樣才會出現此種循環，剛好Rust的機制讓這種情況很難發生。
+
+## 總結
+
+在此章節中，我們先學會了Rust的所有權概念，並且比較了不同語言的運作方式。接著，了解移動、複製與共享3種讓所有權更彈性。下一章節我們將討論最後一招：借用值的參考。
+
