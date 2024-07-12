@@ -1,7 +1,7 @@
 --- 
 title: "Rust之書"
 author: "董宸賓"
-date: "2024-07-10"
+date: "2024-07-12"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]

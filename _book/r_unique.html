@@ -4,16 +4,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Chapter 6 R_unique | Rust之書</title>
+<title>Chapter 8 R_unique | Rust之書</title>
 <meta name="author" content="董宸賓">
-<meta name="description" content="6.1 part1 輸出檔 2.輸入檔或Stdout 3.是否顯示字數">
+<meta name="description" content="8.1 part1 輸出檔 2.輸入檔或Stdout 3.是否顯示字數">
 <meta name="generator" content="bookdown 0.36.2 with bs4_book()">
-<meta property="og:title" content="Chapter 6 R_unique | Rust之書">
+<meta property="og:title" content="Chapter 8 R_unique | Rust之書">
 <meta property="og:type" content="book">
-<meta property="og:description" content="6.1 part1 輸出檔 2.輸入檔或Stdout 3.是否顯示字數">
+<meta property="og:description" content="8.1 part1 輸出檔 2.輸入檔或Stdout 3.是否顯示字數">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Chapter 6 R_unique | Rust之書">
-<meta name="twitter:description" content="6.1 part1 輸出檔 2.輸入檔或Stdout 3.是否顯示字數">
+<meta name="twitter:title" content="Chapter 8 R_unique | Rust之書">
+<meta name="twitter:description" content="8.1 part1 輸出檔 2.輸入檔或Stdout 3.是否顯示字數">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -49,7 +49,9 @@
 <li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
 <li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
 <li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
-<li><a class="active" href="r_unique.html"><span class="header-section-number">6</span> R_unique</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="active" href="r_unique.html"><span class="header-section-number">8</span> R_unique</a></li>
 </ul>
 
         <div class="book-extra">
@@ -57,13 +59,13 @@
         </div>
       </nav>
 </div>
-  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="r_unique" class="section level1" number="6">
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="r_unique" class="section level1" number="8">
 <h1>
-<span class="header-section-number">6</span> R_unique<a class="anchor" aria-label="anchor" href="#r_unique"><i class="fas fa-link"></i></a>
+<span class="header-section-number">8</span> R_unique<a class="anchor" aria-label="anchor" href="#r_unique"><i class="fas fa-link"></i></a>
 </h1>
-<div id="part1" class="section level2" number="6.1">
+<div id="part1" class="section level2" number="8.1">
 <h2>
-<span class="header-section-number">6.1</span> part1<a class="anchor" aria-label="anchor" href="#part1"><i class="fas fa-link"></i></a>
+<span class="header-section-number">8.1</span> part1<a class="anchor" aria-label="anchor" href="#part1"><i class="fas fa-link"></i></a>
 </h2>
 <ol style="list-style-type: decimal">
 <li>輸出檔</li>
@@ -74,13 +76,13 @@
 </div>
 </div>
   <div class="chapter-nav">
-<div class="prev"><a href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></div>
+<div class="prev"><a href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></div>
 <div class="empty"></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
       <ul class="nav navbar-nav">
-<li><a class="nav-link" href="#r_unique"><span class="header-section-number">6</span> R_unique</a></li>
-<li><a class="nav-link" href="#part1"><span class="header-section-number">6.1</span> part1</a></li>
+<li><a class="nav-link" href="#r_unique"><span class="header-section-number">8</span> R_unique</a></li>
+<li><a class="nav-link" href="#part1"><span class="header-section-number">8.1</span> part1</a></li>
 </ul>
 
       <div class="book-extra">
@@ -98,7 +100,7 @@
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-07-10.</p>
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-07-12.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

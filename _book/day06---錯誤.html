@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 7 Day06 - 錯誤 | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="Rust在錯誤處理的方式也很特別，因為錯誤處理本身不難，但有幾個新概念要注意 Rust裡的錯誤分為panic與Result，一種是出於程式本身，不該發生的錯誤。另一個是本章的重點，處理無法控制問題的Result。 (在這裡向各位致歉，錯誤處理本身很難用簡單的例子描述)  7.1 Panic...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 7 Day06 - 錯誤 | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="Rust在錯誤處理的方式也很特別，因為錯誤處理本身不難，但有幾個新概念要注意 Rust裡的錯誤分為panic與Result，一種是出於程式本身，不該發生的錯誤。另一個是本章的重點，處理無法控制問題的Result。 (在這裡向各位致歉，錯誤處理本身很難用簡單的例子描述)  7.1 Panic...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 7 Day06 - 錯誤 | Rust之書">
+<meta name="twitter:description" content="Rust在錯誤處理的方式也很特別，因為錯誤處理本身不難，但有幾個新概念要注意 Rust裡的錯誤分為panic與Result，一種是出於程式本身，不該發生的錯誤。另一個是本章的重點，處理無法控制問題的Result。 (在這裡向各位致歉，錯誤處理本身很難用簡單的例子描述)  7.1 Panic...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="active" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">8</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="day06---錯誤" class="section level1" number="7">
+<h1>
+<span class="header-section-number">7</span> Day06 - 錯誤<a class="anchor" aria-label="anchor" href="#day06---%E9%8C%AF%E8%AA%A4"><i class="fas fa-link"></i></a>
+</h1>
+<p>Rust在錯誤處理的方式也很特別，因為錯誤處理本身不難，但有幾個新概念要注意</p>
+<p>Rust裡的錯誤分為panic與Result，一種是出於程式本身，不該發生的錯誤。另一個是本章的重點，處理無法控制問題的Result。</p>
+<p>(在這裡向各位致歉，錯誤處理本身很難用簡單的例子描述)</p>
+<div id="panic" class="section level2" number="7.1">
+<h2>
+<span class="header-section-number">7.1</span> Panic<a class="anchor" aria-label="anchor" href="#panic"><i class="fas fa-link"></i></a>
+</h2>
+<p>第一個要介紹的是Panic，由各種bug引起，最好的方法就是不要panic。但不可能不遇到錯誤，你也不必擔心，因為Rust的panic是安全的。</p>
+<p>下面以兩種panic會出現的狀況做介紹：<strong>回溯</strong>與<strong>中止</strong>。</p>
+<div id="回溯unwinding" class="section level3" number="7.1.1">
+<h3>
+<span class="header-section-number">7.1.1</span> 回溯(unwinding)<a class="anchor" aria-label="anchor" href="#%E5%9B%9E%E6%BA%AFunwinding"><i class="fas fa-link"></i></a>
+</h3>
+<p>假設我們要設計一個程式，讓海盜分贓寶物。其中，船長先拿到所有的一半，剩下的由船員均分(小數部分給鸚鵡)</p>
+<pre class="extendr"><code>fn share(total:u64, crew_size:u64) -&gt; u64 {
+  let half = total/2;
+  half/crew_size
+}
+rprintln!("The share for each crew member is {}", share(100,3));
+</code></pre>
+<p>基本上這麼簡單的程式很難錯誤，但當船員因為船難都死光，只剩船長歸來，Rust會告訴你：</p>
+<pre><code>thread '&lt;unnamed&gt;' panicked at src/lib.rs:7:3:
+attempt to divide by zero</code></pre>
+<p>當這個panic發生時，會發生以下的事情：</p>
+<ol style="list-style-type: decimal">
+<li><p>如果你依照建議回溯對疊，程式會將所有的區域變數、參數全部卸除：任何的Vec與String都會被釋放，打開的File會被關閉等等</p></li>
+<li><p>當清理完當前的函式呼叫，會前往上一層函式呼叫，沿著堆疊向上清除。</p></li>
+<li><p>最後會退出整個執行緒，如果panic的是整個執行緒，那麽整個程式就會終止。</p></li>
+</ol>
+<p>panic不是崩潰，而是一種安全機制，它的目的是在不安全發生前，將危險的堆疊回溯，但不影響其他程式執行。換句話說，除了主執行緒以外，其他執行緒的panic是各自發生，不互相影響。</p>
+</div>
+<div id="中止" class="section level3" number="7.1.2">
+<h3>
+<span class="header-section-number">7.1.2</span> 中止<a class="anchor" aria-label="anchor" href="#%E4%B8%AD%E6%AD%A2"><i class="fas fa-link"></i></a>
+</h3>
+<p>堆疊回溯是panic預設的行為，但有兩種情況不會嘗試回溯堆疊：</p>
+<ol style="list-style-type: decimal">
+<li><p>當Rust還在嘗試處理第一個panic，第二個panic由.drop()方法觸發，Rust會停止回溯，直接中止程式。</p></li>
+<li><p>如果你主動用<code>-C panic=abort</code>參數編譯程式，Rust會直接中止程式，好處是可以減少編譯後的程序大小。</p></li>
+</ol>
+</div>
+</div>
+<div id="result" class="section level2" number="7.2">
+<h2>
+<span class="header-section-number">7.2</span> Result<a class="anchor" aria-label="anchor" href="#result"><i class="fas fa-link"></i></a>
+</h2>
+<p>Rust沒有例外(exception)，可能失敗函式要使用這種回傳型態：</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb118-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb118-1" tabindex="-1"></a><span class="kw">fn</span> get_weather(location<span class="op">:</span>Lating) <span class="op">-&gt;</span> <span class="dt">Result</span><span class="op">&lt;</span>WeatherReport<span class="op">,</span> <span class="pp">io::</span><span class="bu">Error</span><span class="op">&gt;</span></span></code></pre></div>
+<p>Result型態代表你準備好迎接失敗，當我們呼叫<code>get_weather()</code>函式時，成功的結果是<code>Ok(WeatherReport)</code>，失敗的結果是<code>Err(io::Error)</code>。</p>
+</div>
+<div id="捕捉錯誤" class="section level2" number="7.3">
+<h2>
+<span class="header-section-number">7.3</span> 捕捉錯誤<a class="anchor" aria-label="anchor" href="#%E6%8D%95%E6%8D%89%E9%8C%AF%E8%AA%A4"><i class="fas fa-link"></i></a>
+</h2>
+<p>最直接的方法就是直接使用match:</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb119-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-1" tabindex="-1"></a><span class="cf">match</span> get_weather(location) <span class="op">{</span></span>
+<span id="cb119-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-2" tabindex="-1"></a>  <span class="cn">Ok</span>(report) <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb119-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-3" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"The weather is {}"</span><span class="op">,</span> report)<span class="op">;</span></span>
+<span id="cb119-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-4" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="cb119-5"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-5" tabindex="-1"></a>  <span class="cn">Err</span>(e) <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb119-6"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-6" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"Error: {}"</span><span class="op">,</span> e)<span class="op">;</span></span>
+<span id="cb119-7"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-7" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb119-8"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb119-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>每次都要用match似乎有些繁複，所以Result&lt;T, E&gt;提供各種方法，這些方法都是用match實作：</p>
+<ul>
+<li><p><code>result.is_ok()</code>, <code>result.is_err()</code>：<br>
+回傳一個bool來表示result是成功的結果還是錯誤的</p></li>
+<li><p><code>result.ok()</code>：<br>
+以Option<t>回傳成功值，<code>Some(T)</code>或回傳<code>None</code>捨棄錯誤值</t></p></li>
+<li><p><code>result.err()</code>：<br>
+以Option<e>回傳錯誤值</e></p></li>
+<li><p><code>result.unwrap_or(fallback)</code>：<br>
+回傳成公值，否則回傳fallback，捨棄錯物值。最優秀的部分是，它可以在成功時直接拿到回傳值，而不是Option<t>。</t></p></li>
+<li><p><code>result.unwrap_or_else(fallback_fn)</code>：<br>
+與上面的例子相同，但它適合在計算fallback值很昂貴時，因為fallback_fn只有在錯誤時會計算。</p></li>
+<li><p><code>result.unwrap()</code>：<br>
+直接回傳成功值，如果是錯誤，直接panic。</p></li>
+<li><p><code>result.expect(msg)</code>：<br>
+與unwrap()相同，但可以自訂panic的訊息。</p></li>
+</ul>
+<p>最後兩個是針對參考的方法，兩者都十分常用，因為除了<code>.is_ok()</code>與<code>.is_err()</code>，其他方法都會消耗Result&lt;T, E&gt;，所以你必須用參考來處理。</p>
+<ul>
+<li><p><code>result.as_ref()</code>：<br>
+將Result&lt;T, E&gt;轉換成Result&lt;&amp;T, &amp;E&gt;</p></li>
+<li><p><code>result.as_mut()</code>：<br>
+將Result&lt;T, E&gt;轉換成Result&lt;&amp;mut T, &amp;mut E&gt;</p></li>
+</ul>
+<div id="打印錯誤" class="section level3" number="7.3.1">
+<h3>
+<span class="header-section-number">7.3.1</span> 打印錯誤<a class="anchor" aria-label="anchor" href="#%E6%89%93%E5%8D%B0%E9%8C%AF%E8%AA%A4"><i class="fas fa-link"></i></a>
+</h3>
+<p>println!：</p>
+<p>所有的錯誤型態都可以用printn!這個宏來打印。如果你用<code><a href="https://rdrr.io/r/base/Paren.html">{}</a></code>，會打印出較短的錯誤訊息。而如果你用<code>{:?}</code>，會包括額外的技術錯誤訊息。</p>
+<p>err.to_string()：</p>
+<p>即以String形式回傳錯誤訊息</p>
+</div>
+<div id="傳播錯誤" class="section level3" number="7.3.2">
+<h3>
+<span class="header-section-number">7.3.2</span> 傳播錯誤<a class="anchor" aria-label="anchor" href="#%E5%82%B3%E6%92%AD%E9%8C%AF%E8%AA%A4"><i class="fas fa-link"></i></a>
+</h3>
+<p><code>?</code>：</p>
+<p>你可以在產生Result的任何運算式後面加上<code>?</code>，而結果取決於成功或失敗</p>
+<p>成功：會打開result並取得裡面的成功值</p>
+<p>錯誤：會立刻從原函式return，沿著呼叫鏈往上回傳。?只能用於回傳Result的函式，如果你的函式回傳的是Option，你可以用<code>ok_or</code>或<code>ok_or_else</code>來轉換。</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb120-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-1" tabindex="-1"></a><span class="kw">fn</span> get_weather(location<span class="op">:</span>Lating) <span class="op">-&gt;</span> <span class="dt">Result</span><span class="op">&lt;</span>WeatherReport<span class="op">,</span> <span class="pp">io::</span><span class="bu">Error</span><span class="op">&gt;</span></span>
+<span id="cb120-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-2" tabindex="-1"></a></span>
+<span id="cb120-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-3" tabindex="-1"></a><span class="co">//用?來處理，成功可以直接拿到WeatherReport</span></span>
+<span id="cb120-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-4" tabindex="-1"></a><span class="kw">let</span> weather <span class="op">=</span> get_weather(location)<span class="op">?;</span></span>
+<span id="cb120-5"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-5" tabindex="-1"></a></span>
+<span id="cb120-6"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-6" tabindex="-1"></a><span class="co">// 相等的match</span></span>
+<span id="cb120-7"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-7" tabindex="-1"></a><span class="cf">match</span> weather <span class="op">=</span> get_weather(location) <span class="op">{</span></span>
+<span id="cb120-8"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-8" tabindex="-1"></a>  <span class="cn">Ok</span>(report) <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb120-9"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-9" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"The weather is {}"</span><span class="op">,</span> report)<span class="op">;</span></span>
+<span id="cb120-10"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-10" tabindex="-1"></a>  <span class="op">},</span></span>
+<span id="cb120-11"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-11" tabindex="-1"></a>  <span class="cn">Err</span>(e) <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb120-12"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-12" tabindex="-1"></a>    <span class="cf">return</span> <span class="cn">Err</span>(e)<span class="op">;</span></span>
+<span id="cb120-13"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-13" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb120-14"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb120-14" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre class="extendr"><code>use std::fs;
+use std::io;
+use std::path::Path;
+
+fn move_all(src: &amp;Path, dst: &amp;Path) -&gt; io::Result&lt;()&gt; {
+  rprintln!("Moving all files from {:?} to {:?}", src, dst);
+  for entry_result in src.read_dir()? {  // 打開目錄可能發生錯誤
+    let entry = entry_result?;  // 讀取檔案可能發生錯誤
+    let dst_file = dst.join(entry.file_name());
+    fs::rename(entry.path(), dst_file)?; // 移動檔案可能發生錯誤
+  }
+  Ok(())
+}</code></pre>
+</div>
+</div>
+<div id="在main中處理錯誤" class="section level2" number="7.4">
+<h2>
+<span class="header-section-number">7.4</span> 在main中處理錯誤<a class="anchor" aria-label="anchor" href="#%E5%9C%A8main%E4%B8%AD%E8%99%95%E7%90%86%E9%8C%AF%E8%AA%A4"><i class="fas fa-link"></i></a>
+</h2>
+<p><code>?</code>用來處理錯誤大多數情況被視為一個絕佳的方法，但在main函式中，因為回傳值不是Result，你不能用<code>?</code></p>
+<p>最簡單的方式是用expect，若回傳錯誤訊息，程式會直接panic，這在小型的程式中非常常見。</p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb122-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb122-1" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb122-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb122-2" tabindex="-1"></a>  caculate()<span class="op">.</span>expect(<span class="st">"calculation failed"</span>)<span class="op">;</span></span>
+<span id="cb122-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb122-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>但expect所印出的訊息通常不夠詳細，這時候你可以修改main讓他回傳Result，這樣你就可以用<code>?</code>來處理錯誤。</p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb123-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb123-1" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">-&gt;</span> <span class="dt">Result</span><span class="op">&lt;</span>()<span class="op">,</span> <span class="pp">io::</span><span class="bu">Error</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb123-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb123-2" tabindex="-1"></a>  caculate()<span class="op">?;</span></span>
+<span id="cb123-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb123-3" tabindex="-1"></a>  <span class="cn">Ok</span>(())</span>
+<span id="cb123-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb123-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="自訂錯誤型態" class="section level2" number="7.5">
+<h2>
+<span class="header-section-number">7.5</span> 自訂錯誤型態<a class="anchor" aria-label="anchor" href="#%E8%87%AA%E8%A8%82%E9%8C%AF%E8%AA%A4%E5%9E%8B%E6%85%8B"><i class="fas fa-link"></i></a>
+</h2>
+<p>來假設你要寫一個新的Json解析器，而且要用自己的錯誤型態：</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb124-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb124-1" tabindex="-1"></a># [derive(<span class="bu">Debug</span><span class="op">,</span> <span class="bu">Clone</span>)]</span>
+<span id="cb124-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb124-2" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> JsonError <span class="op">{</span></span>
+<span id="cb124-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb124-3" tabindex="-1"></a>  <span class="kw">pub</span> message<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb124-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb124-4" tabindex="-1"></a>  <span class="kw">pub</span> line<span class="op">:</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb124-5"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb124-5" tabindex="-1"></a>  <span class="kw">pub</span> column<span class="op">:</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb124-6"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb124-6" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>這個struct叫json::error::JsonError，它有三個欄位：message、line、column。當你想發出這個錯誤型態：</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb125-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb125-1" tabindex="-1"></a><span class="cf">return</span> <span class="cn">Err</span>(JsonError <span class="op">{</span></span>
+<span id="cb125-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb125-2" tabindex="-1"></a>  message<span class="op">:</span> <span class="st">"Expected a colon"</span><span class="op">.</span>to_string()<span class="op">,</span></span>
+<span id="cb125-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb125-3" tabindex="-1"></a>  line<span class="op">:</span> current_line<span class="op">,</span></span>
+<span id="cb125-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb125-4" tabindex="-1"></a>  column<span class="op">:</span> current_column<span class="op">,</span></span>
+<span id="cb125-5"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb125-5" tabindex="-1"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+<p>但如果你想要讓他更標準，你還要：</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb126-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::</span>fmt<span class="op">;</span></span>
+<span id="cb126-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-2" tabindex="-1"></a></span>
+<span id="cb126-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-3" tabindex="-1"></a><span class="kw">impl</span> <span class="pp">fmt::</span><span class="bu">Display</span> <span class="cf">for</span> JsonError <span class="op">{</span></span>
+<span id="cb126-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-4" tabindex="-1"></a>  <span class="kw">fn</span> fmt(<span class="op">&amp;</span><span class="kw">self</span><span class="op">,</span> f<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="pp">fmt::</span>Formatter) <span class="op">-&gt;</span> <span class="pp">fmt::</span><span class="dt">Result</span> <span class="op">{</span></span>
+<span id="cb126-5"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-5" tabindex="-1"></a>    <span class="pp">write!</span>(f<span class="op">,</span> <span class="st">"{} ({}:{})"</span><span class="op">,</span> <span class="kw">self</span><span class="op">.</span>message<span class="op">,</span> <span class="kw">self</span><span class="op">.</span>line<span class="op">,</span> <span class="kw">self</span><span class="op">.</span>column)</span>
+<span id="cb126-6"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-6" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb126-7"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb126-8"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-8" tabindex="-1"></a></span>
+<span id="cb126-9"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb126-9" tabindex="-1"></a><span class="kw">impl</span> <span class="pp">std::error::</span><span class="bu">Error</span> <span class="cf">for</span> JsonError <span class="op">{}</span></span></code></pre></div>
+<p>但這樣做真的太過繁瑣，你應該化繁為簡，crate就是為這種時刻而存在的。常用的有很多，例如<code>thiserror</code>、<code>snafu</code>、<code>anyhow</code>等等。</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb127-1"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">thiserror::</span><span class="bu">Error</span><span class="op">;</span></span>
+<span id="cb127-2"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-2" tabindex="-1"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Error</span><span class="op">,</span> <span class="bu">Debug</span><span class="at">)]</span></span>
+<span id="cb127-3"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-3" tabindex="-1"></a><span class="at">#[</span>error<span class="at">(</span><span class="st">"{message} ({line}:{column})"</span><span class="at">)]</span></span>
+<span id="cb127-4"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-4" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> JsonError <span class="op">{</span></span>
+<span id="cb127-5"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-5" tabindex="-1"></a>  <span class="kw">pub</span> message<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb127-6"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-6" tabindex="-1"></a>  <span class="kw">pub</span> line<span class="op">:</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb127-7"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-7" tabindex="-1"></a>  <span class="kw">pub</span> column<span class="op">:</span> <span class="dt">usize</span><span class="op">,</span></span>
+<span id="cb127-8"><a href="day06---%E9%8C%AF%E8%AA%A4.html#cb127-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="為何使用result" class="section level2" number="7.6">
+<h2>
+<span class="header-section-number">7.6</span> 為何使用Result<a class="anchor" aria-label="anchor" href="#%E7%82%BA%E4%BD%95%E4%BD%BF%E7%94%A8result"><i class="fas fa-link"></i></a>
+</h2>
+<p>讀完整章之後，你大概有足夠的知識來了解為什麼Rust選擇用Result而不是例外：</p>
+<ul>
+<li><p>Rust嚴格要求你在可能出錯的地方做出某種選擇，讓你不會疏漏某塊重要的東西</p></li>
+<li><p>最常見的<code>?</code>，也就是傳播錯誤，在Rust裡是一見好事，因為你可以一目瞭然掌握錯誤發生的地方</p></li>
+<li><p>Result本身是一種資料型態，你可以在集合中儲存結果，例如你要載入上萬比資料，並且預期有少部分會失敗，用Result向量就可以很好的處理</p></li>
+</ul>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></div>
+<div class="next"><a href="r_unique.html"><span class="header-section-number">8</span> R_unique</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#day06---%E9%8C%AF%E8%AA%A4"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li>
+<a class="nav-link" href="#panic"><span class="header-section-number">7.1</span> Panic</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E5%9B%9E%E6%BA%AFunwinding"><span class="header-section-number">7.1.1</span> 回溯(unwinding)</a></li>
+<li><a class="nav-link" href="#%E4%B8%AD%E6%AD%A2"><span class="header-section-number">7.1.2</span> 中止</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#result"><span class="header-section-number">7.2</span> Result</a></li>
+<li>
+<a class="nav-link" href="#%E6%8D%95%E6%8D%89%E9%8C%AF%E8%AA%A4"><span class="header-section-number">7.3</span> 捕捉錯誤</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E9%8C%AF%E8%AA%A4"><span class="header-section-number">7.3.1</span> 打印錯誤</a></li>
+<li><a class="nav-link" href="#%E5%82%B3%E6%92%AD%E9%8C%AF%E8%AA%A4"><span class="header-section-number">7.3.2</span> 傳播錯誤</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#%E5%9C%A8main%E4%B8%AD%E8%99%95%E7%90%86%E9%8C%AF%E8%AA%A4"><span class="header-section-number">7.4</span> 在main中處理錯誤</a></li>
+<li><a class="nav-link" href="#%E8%87%AA%E8%A8%82%E9%8C%AF%E8%AA%A4%E5%9E%8B%E6%85%8B"><span class="header-section-number">7.5</span> 自訂錯誤型態</a></li>
+<li><a class="nav-link" href="#%E7%82%BA%E4%BD%95%E4%BD%BF%E7%94%A8result"><span class="header-section-number">7.6</span> 為何使用Result</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/06-Day06.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/06-Day06.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-07-12.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

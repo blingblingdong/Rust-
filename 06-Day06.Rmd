@@ -1,0 +1,251 @@
+# Day06 - 錯誤
+
+Rust在錯誤處理的方式也很特別，因為錯誤處理本身不難，但有幾個新概念要注意
+
+Rust裡的錯誤分為panic與Result，一種是出於程式本身，不該發生的錯誤。另一個是本章的重點，處理無法控制問題的Result。
+
+(在這裡向各位致歉，錯誤處理本身很難用簡單的例子描述)
+
+## Panic
+
+第一個要介紹的是Panic，由各種bug引起，最好的方法就是不要panic。但不可能不遇到錯誤，你也不必擔心，因為Rust的panic是安全的。
+
+下面以兩種panic會出現的狀況做介紹：**回溯**與**中止**。
+
+### 回溯(unwinding)
+
+假設我們要設計一個程式，讓海盜分贓寶物。其中，船長先拿到所有的一半，剩下的由船員均分(小數部分給鸚鵡)
+
+```{extendr}
+fn share(total:u64, crew_size:u64) -> u64 {
+  let half = total/2;
+  half/crew_size
+}
+rprintln!("The share for each crew member is {}", share(100,3));
+
+```
+
+
+基本上這麼簡單的程式很難錯誤，但當船員因為船難都死光，只剩船長歸來，Rust會告訴你：
+
+```
+thread '<unnamed>' panicked at src/lib.rs:7:3:
+attempt to divide by zero
+```
+
+當這個panic發生時，會發生以下的事情：
+
+1. 如果你依照建議回溯對疊，程式會將所有的區域變數、參數全部卸除：任何的Vec與String都會被釋放，打開的File會被關閉等等
+
+2. 當清理完當前的函式呼叫，會前往上一層函式呼叫，沿著堆疊向上清除。
+
+3. 最後會退出整個執行緒，如果panic的是整個執行緒，那麽整個程式就會終止。
+
+
+panic不是崩潰，而是一種安全機制，它的目的是在不安全發生前，將危險的堆疊回溯，但不影響其他程式執行。換句話說，除了主執行緒以外，其他執行緒的panic是各自發生，不互相影響。
+
+### 中止
+
+堆疊回溯是panic預設的行為，但有兩種情況不會嘗試回溯堆疊：
+
+1. 當Rust還在嘗試處理第一個panic，第二個panic由.drop()方法觸發，Rust會停止回溯，直接中止程式。
+
+2. 如果你主動用`-C panic=abort`參數編譯程式，Rust會直接中止程式，好處是可以減少編譯後的程序大小。
+
+## Result
+
+Rust沒有例外(exception)，可能失敗函式要使用這種回傳型態：
+
+```{Rust}
+fn get_weather(location:Lating) -> Result<WeatherReport, io::Error>
+```
+
+Result型態代表你準備好迎接失敗，當我們呼叫`get_weather()`函式時，成功的結果是`Ok(WeatherReport)`，失敗的結果是`Err(io::Error)`。
+
+## 捕捉錯誤
+
+最直接的方法就是直接使用match:
+
+
+```{Rust}
+match get_weather(location) {
+  Ok(report) => {
+    println!("The weather is {}", report);
+  },
+  Err(e) => {
+    println!("Error: {}", e);
+  }
+}
+```
+
+每次都要用match似乎有些繁複，所以Result<T, E>提供各種方法，這些方法都是用match實作：
+
+- `result.is_ok()`, `result.is_err()`：<br>
+回傳一個bool來表示result是成功的結果還是錯誤的
+
+- `result.ok()`：<br>
+以Option<T>回傳成功值，`Some(T)`或回傳`None`捨棄錯誤值
+
+- `result.err()`：<br>
+以Option<E>回傳錯誤值
+
+- `result.unwrap_or(fallback)`：<br>
+回傳成公值，否則回傳fallback，捨棄錯物值。最優秀的部分是，它可以在成功時直接拿到回傳值，而不是Option<T>。
+
+- `result.unwrap_or_else(fallback_fn)`：<br>
+與上面的例子相同，但它適合在計算fallback值很昂貴時，因為fallback_fn只有在錯誤時會計算。
+
+- `result.unwrap()`：<br>
+直接回傳成功值，如果是錯誤，直接panic。
+
+- `result.expect(msg)`：<br>
+與unwrap()相同，但可以自訂panic的訊息。
+
+最後兩個是針對參考的方法，兩者都十分常用，因為除了`.is_ok()`與`.is_err()`，其他方法都會消耗Result<T, E>，所以你必須用參考來處理。
+
+- `result.as_ref()`：<br>
+將Result<T, E>轉換成Result<&T, &E>
+
+- `result.as_mut()`：<br>
+將Result<T, E>轉換成Result<&mut T, &mut E>
+
+### 打印錯誤
+
+println!：
+
+所有的錯誤型態都可以用printn!這個宏來打印。如果你用`{}`，會打印出較短的錯誤訊息。而如果你用`{:?}`，會包括額外的技術錯誤訊息。
+
+err.to_string()：
+
+即以String形式回傳錯誤訊息
+
+### 傳播錯誤
+
+`?`：
+
+你可以在產生Result的任何運算式後面加上`?`，而結果取決於成功或失敗
+
+成功：會打開result並取得裡面的成功值
+
+錯誤：會立刻從原函式return，沿著呼叫鏈往上回傳。?只能用於回傳Result的函式，如果你的函式回傳的是Option，你可以用`ok_or`或`ok_or_else`來轉換。
+
+```{Rust}
+fn get_weather(location:Lating) -> Result<WeatherReport, io::Error>
+
+//用?來處理，成功可以直接拿到WeatherReport
+let weather = get_weather(location)?;
+
+// 相等的match
+match weather = get_weather(location) {
+  Ok(report) => {
+    println!("The weather is {}", report);
+  },
+  Err(e) => {
+    return Err(e);
+  }
+}
+```
+
+```{extendr}
+use std::fs;
+use std::io;
+use std::path::Path;
+
+fn move_all(src: &Path, dst: &Path) -> io::Result<()> {
+  rprintln!("Moving all files from {:?} to {:?}", src, dst);
+  for entry_result in src.read_dir()? {  // 打開目錄可能發生錯誤
+    let entry = entry_result?;  // 讀取檔案可能發生錯誤
+    let dst_file = dst.join(entry.file_name());
+    fs::rename(entry.path(), dst_file)?; // 移動檔案可能發生錯誤
+  }
+  Ok(())
+}
+```
+
+## 在main中處理錯誤
+
+`?`用來處理錯誤大多數情況被視為一個絕佳的方法，但在main函式中，因為回傳值不是Result，你不能用`?`
+
+最簡單的方式是用expect，若回傳錯誤訊息，程式會直接panic，這在小型的程式中非常常見。
+
+```{Rust}
+fn main() {
+  caculate().expect("calculation failed");
+}
+```
+
+但expect所印出的訊息通常不夠詳細，這時候你可以修改main讓他回傳Result，這樣你就可以用`?`來處理錯誤。
+
+```{Rust}
+fn main() -> Result<(), io::Error> {
+  caculate()?;
+  Ok(())
+}
+```
+
+## 自訂錯誤型態
+
+來假設你要寫一個新的Json解析器，而且要用自己的錯誤型態：
+
+```{Rust}
+# [derive(Debug, Clone)]
+pub struct JsonError {
+  pub message: String,
+  pub line: usize,
+  pub column: usize,
+}
+```
+
+這個struct叫json::error::JsonError，它有三個欄位：message、line、column。當你想發出這個錯誤型態：
+
+```{Rust}
+return Err(JsonError {
+  message: "Expected a colon".to_string(),
+  line: current_line,
+  column: current_column,
+});
+```
+
+但如果你想要讓他更標準，你還要：
+
+```{Rust}
+use std::fmt;
+
+impl fmt::Display for JsonError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{} ({}:{})", self.message, self.line, self.column)
+  }
+}
+
+impl std::error::Error for JsonError {}
+```
+
+但這樣做真的太過繁瑣，你應該化繁為簡，crate就是為這種時刻而存在的。常用的有很多，例如`thiserror`、`snafu`、`anyhow`等等。
+
+```{Rust}
+use thiserror::Error;
+#[derive(Error, Debug)]
+#[error("{message} ({line}:{column})")]
+pub struct JsonError {
+  pub message: String,
+  pub line: usize,
+  pub column: usize,
+}
+```
+
+## 為何使用Result
+
+
+讀完整章之後，你大概有足夠的知識來了解為什麼Rust選擇用Result而不是例外：
+
+- Rust嚴格要求你在可能出錯的地方做出某種選擇，讓你不會疏漏某塊重要的東西
+
+- 最常見的`?`，也就是傳播錯誤，在Rust裡是一見好事，因為你可以一目瞭然掌握錯誤發生的地方
+
+- Result本身是一種資料型態，你可以在集合中儲存結果，例如你要載入上萬比資料，並且預期有少部分會失敗，用Result向量就可以很好的處理
+
+
+
+
+
+
