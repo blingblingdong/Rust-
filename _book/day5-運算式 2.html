@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 6 Day5-運算式 | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="Rust是運算式語言，幾乎所有工作都是由運算式完成。  6.0.1 區塊與分號 區塊{}是最簡單的運算式，會產生一個值，如下例中，大區塊的結果是author.name()或ip.to_string()，None的區塊產生的值是沒有分號的ip.to_string()。 let display_name = match post.author() {   Some(author) =&gt;...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 6 Day5-運算式 | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="Rust是運算式語言，幾乎所有工作都是由運算式完成。  6.0.1 區塊與分號 區塊{}是最簡單的運算式，會產生一個值，如下例中，大區塊的結果是author.name()或ip.to_string()，None的區塊產生的值是沒有分號的ip.to_string()。 let display_name = match post.author() {   Some(author) =&gt;...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 6 Day5-運算式 | Rust之書">
+<meta name="twitter:description" content="Rust是運算式語言，幾乎所有工作都是由運算式完成。  6.0.1 區塊與分號 區塊{}是最簡單的運算式，會產生一個值，如下例中，大區塊的結果是author.name()或ip.to_string()，None的區塊產生的值是沒有分號的ip.to_string()。 let display_name = match post.author() {   Some(author) =&gt;...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="active" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">8</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="day5-運算式" class="section level1" number="6">
+<h1>
+<span class="header-section-number">6</span> Day5-運算式<a class="anchor" aria-label="anchor" href="#day5-%E9%81%8B%E7%AE%97%E5%BC%8F"><i class="fas fa-link"></i></a>
+</h1>
+<p>Rust是運算式語言，幾乎所有工作都是由運算式完成。</p>
+<div id="區塊與分號" class="section level3" number="6.0.1">
+<h3>
+<span class="header-section-number">6.0.1</span> 區塊與分號<a class="anchor" aria-label="anchor" href="#%E5%8D%80%E5%A1%8A%E8%88%87%E5%88%86%E8%99%9F"><i class="fas fa-link"></i></a>
+</h3>
+<p>區塊<code><a href="https://rdrr.io/r/base/Paren.html">{}</a></code>是最簡單的運算式，會產生一個值，如下例中，大區塊的結果是<code>author.name()</code>或<code>ip.to_string()</code>，None的區塊產生的值是沒有分號的<code>ip.to_string()</code>。</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb98-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-1" tabindex="-1"></a><span class="kw">let</span> display_name <span class="op">=</span> <span class="cf">match</span> post<span class="op">.</span>author() <span class="op">{</span></span>
+<span id="cb98-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-2" tabindex="-1"></a>    <span class="cn">Some</span>(author) <span class="op">=&gt;</span> author<span class="op">.</span>name()<span class="op">,</span></span>
+<span id="cb98-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-3" tabindex="-1"></a>    <span class="cn">None</span> <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb98-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-4" tabindex="-1"></a>      <span class="kw">let</span> network_info <span class="op">=</span> post<span class="op">.</span>get_network_metadata()<span class="op">?;</span></span>
+<span id="cb98-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-5" tabindex="-1"></a>      <span class="kw">let</span> ip <span class="op">=</span> network_info<span class="op">.</span>ip()<span class="op">;</span></span>
+<span id="cb98-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-6" tabindex="-1"></a>      ip<span class="op">.</span>to_string()</span>
+<span id="cb98-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-7" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb98-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb98-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Rust的每一個分號都是有意義的，如在區塊中，通常以()作為回傳的值，但若出現沒有分號的運算式，就會回傳該運算式的值，請再看下面的例子：</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb99-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-1" tabindex="-1"></a><span class="kw">let</span> message<span class="op">{</span></span>
+<span id="cb99-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-2" tabindex="-1"></a>  <span class="co">// let宣告式必須有分號</span></span>
+<span id="cb99-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-3" tabindex="-1"></a>  <span class="kw">let</span> controler <span class="op">=</span> puffball<span class="op">.</span>open()<span class="op">;</span></span>
+<span id="cb99-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-4" tabindex="-1"></a>  </span>
+<span id="cb99-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-5" tabindex="-1"></a>  <span class="co">// 運算式加上分號，，是呼叫方法，並卸除回傳值</span></span>
+<span id="cb99-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-6" tabindex="-1"></a>  controler<span class="op">.</span>run()<span class="op">;</span></span>
+<span id="cb99-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-7" tabindex="-1"></a>  </span>
+<span id="cb99-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-8" tabindex="-1"></a>  <span class="co">// 運算式沒有分號，是呼叫方法，並回傳值</span></span>
+<span id="cb99-9"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-9" tabindex="-1"></a>  <span class="co">// 此例中即回傳給message</span></span>
+<span id="cb99-10"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-10" tabindex="-1"></a>  controler<span class="op">.</span>message()</span>
+<span id="cb99-11"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb99-11" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="宣告式" class="section level2" number="6.1">
+<h2>
+<span class="header-section-number">6.1</span> 宣告式<a class="anchor" aria-label="anchor" href="#%E5%AE%A3%E5%91%8A%E5%BC%8F"><i class="fas fa-link"></i></a>
+</h2>
+<p>宣告式最常見的是let，用來宣告區域變數。你可以在宣告同時初始化，也可以選擇不這麼做：</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb100-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-1" tabindex="-1"></a><span class="kw">let</span> Alex <span class="op">=</span> <span class="st">"Alex"</span><span class="op">;</span></span>
+<span id="cb100-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-2" tabindex="-1"></a><span class="kw">let</span> age<span class="op">;</span></span>
+<span id="cb100-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-3" tabindex="-1"></a></span>
+<span id="cb100-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-4" tabindex="-1"></a><span class="cf">if</span> user<span class="op">.</span>is_adult() <span class="op">{</span></span>
+<span id="cb100-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-5" tabindex="-1"></a>  age <span class="op">=</span> <span class="dv">18</span><span class="op">;</span></span>
+<span id="cb100-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-6" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb100-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-7" tabindex="-1"></a>  age <span class="op">=</span> <span class="dv">12</span><span class="op">;</span></span>
+<span id="cb100-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb100-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>在宣告後初始化是很常見的手段，還有有些時候會重複宣告：</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb101-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-1" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> file<span class="op">.</span>lines() <span class="op">{</span></span>
+<span id="cb101-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-2" tabindex="-1"></a>  <span class="kw">let</span> line <span class="op">=</span> line<span class="op">?;</span></span>
+<span id="cb101-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb101-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-4" tabindex="-1"></a></span>
+<span id="cb101-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-5" tabindex="-1"></a><span class="co">// 同等的形式是：</span></span>
+<span id="cb101-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-6" tabindex="-1"></a><span class="cf">for</span> line_result <span class="kw">in</span> file<span class="op">.</span>lines() <span class="op">{</span></span>
+<span id="cb101-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-7" tabindex="-1"></a>  <span class="kw">let</span> line <span class="op">=</span> line_result<span class="op">?;</span></span>
+<span id="cb101-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb101-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>我們稱這種形式為「shadowing」，第一個line的型態與第二個不同。但有時會造成ㄧ些混淆，所以也可以用另外一個變數取代，如範例中的line_result。</p>
+<p>第二種是<strong>項目宣告式(item declaration)</strong>，項目指可以在全域中出現，例如fn、struct或use。</p>
+<p>以fn為例，任何區塊都可以容忍fn：</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb102-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::</span>io<span class="op">;</span></span>
+<span id="cb102-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-2" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::cmp::</span>Ordering<span class="op">;</span></span>
+<span id="cb102-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-3" tabindex="-1"></a></span>
+<span id="cb102-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-4" tabindex="-1"></a><span class="kw">fn</span> show_files() <span class="op">-&gt;</span> <span class="pp">io::</span><span class="dt">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb102-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-5" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> v <span class="op">=</span> <span class="pp">vec!</span>[]<span class="op">;</span></span>
+<span id="cb102-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-6" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb102-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-7" tabindex="-1"></a>  </span>
+<span id="cb102-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-8" tabindex="-1"></a>  <span class="kw">fn</span> cmp_by_timestamp_then_name(a<span class="op">:</span> <span class="op">&amp;</span>File<span class="op">,</span> b<span class="op">:</span> <span class="op">&amp;</span>File) <span class="op">-&gt;</span> Ordering <span class="op">{</span></span>
+<span id="cb102-9"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-9" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb102-10"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-10" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb102-11"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-11" tabindex="-1"></a>  </span>
+<span id="cb102-12"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-12" tabindex="-1"></a>  v<span class="op">.</span>sort_by(cmp_by_timestamp_then_name)<span class="op">;</span></span>
+<span id="cb102-13"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-13" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb102-14"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-14" tabindex="-1"></a>  </span>
+<span id="cb102-15"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb102-15" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="if與match" class="section level2" number="6.2">
+<h2>
+<span class="header-section-number">6.2</span> if與match<a class="anchor" aria-label="anchor" href="#if%E8%88%87match"><i class="fas fa-link"></i></a>
+</h2>
+<p>if的形式應該非常熟悉，只要記得你不用幫條件式加上括號</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb103-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-1" tabindex="-1"></a><span class="cf">if</span> condition1 <span class="op">{</span></span>
+<span id="cb103-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-2" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb103-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-3" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> condition2 <span class="op">{</span></span>
+<span id="cb103-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-4" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb103-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-5" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb103-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-6" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb103-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb103-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>match與swtch非常相似，以下這個範例是4個分支，最後一個_是萬用分支，類似default，要記得它永遠放在最後。</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb104-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-1" tabindex="-1"></a><span class="cf">match</span> guess<span class="op">.</span>cmp(<span class="op">&amp;</span>secret_number)<span class="op">{</span></span>
+<span id="cb104-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-2" tabindex="-1"></a>    Ordering<span class="op">:</span>Less <span class="op">=&gt;</span> <span class="pp">rprintln!</span>(<span class="st">"太小了！"</span>)<span class="op">,</span></span>
+<span id="cb104-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-3" tabindex="-1"></a>    Ordering<span class="op">:</span>Greater <span class="op">=&gt;</span> <span class="pp">rprintln!</span>(<span class="st">"太大了！"</span>)<span class="op">,</span></span>
+<span id="cb104-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-4" tabindex="-1"></a>    Ordering<span class="op">:</span>Equal <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb104-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-5" tabindex="-1"></a>        <span class="pp">rprintln!</span>(<span class="st">"猜對了！"</span>)<span class="op">;</span></span>
+<span id="cb104-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-6" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb104-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-7" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb104-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-8" tabindex="-1"></a>    _ <span class="op">=&gt;</span> <span class="pp">rprintln!</span>(<span class="st">"錯誤！"</span>)<span class="op">,</span></span>
+<span id="cb104-9"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb104-9" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>match的限制是，你的選項必須涵蓋所有可能的值，否則會發生錯誤：</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb105-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-1" tabindex="-1"></a><span class="kw">let</span> score <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb105-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-2" tabindex="-1"></a></span>
+<span id="cb105-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-3" tabindex="-1"></a><span class="cf">match</span> score <span class="op">{</span></span>
+<span id="cb105-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-4" tabindex="-1"></a>  <span class="dv">1</span> <span class="op">=&gt;</span> <span class="pp">println!</span>(<span class="st">"糟糕！"</span>)<span class="op">,</span></span>
+<span id="cb105-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-5" tabindex="-1"></a>  <span class="dv">2</span> <span class="op">=&gt;</span> <span class="pp">println!</span>(<span class="st">"還好！"</span>)<span class="op">,</span></span>
+<span id="cb105-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-6" tabindex="-1"></a>  <span class="dv">3</span> <span class="op">=&gt;</span> <span class="pp">println!</span>(<span class="st">"不錯！"</span>)<span class="op">,</span></span>
+<span id="cb105-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb105-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<pre><code>✖ error[E0004]: non-exhaustive patterns: `i32::MIN..=0_i32` and `4_i32..=i32::MAX` not covered
+ --&gt; src/lib.rs:7:7
+  |
+7 | match score {
+  |       ^^^^^ patterns `i32::MIN..=0_i32` and `4_i32..=i32::MAX` not covered
+  |
+  = note: the matched value is of type `i32`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern, a match arm with multiple or-patterns as shown, or multiple match arms</code></pre>
+<p>另外一個規則是，若有回傳值，則每個分支欲回傳的值必須為<strong>相同型態</strong>，不管是if或match都是如此。</p>
+</div>
+<div id="迴圈" class="section level2" number="6.3">
+<h2>
+<span class="header-section-number">6.3</span> 迴圈<a class="anchor" aria-label="anchor" href="#%E8%BF%B4%E5%9C%88"><i class="fas fa-link"></i></a>
+</h2>
+<p>Rust的迴圈是運算式，但while與loop的回傳值是()，沒有什麼用。而loop可以在有指定情況下，產生回傳值</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb107-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-1" tabindex="-1"></a><span class="cf">while</span> condition <span class="op">{</span></span>
+<span id="cb107-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-2" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb107-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb107-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-4" tabindex="-1"></a></span>
+<span id="cb107-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-5" tabindex="-1"></a><span class="cf">loop</span> <span class="op">{</span></span>
+<span id="cb107-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-6" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb107-7"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb107-8"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-8" tabindex="-1"></a></span>
+<span id="cb107-9"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-9" tabindex="-1"></a><span class="cf">for</span> pattern <span class="kw">in</span> iterable <span class="op">{</span></span>
+<span id="cb107-10"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-10" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb107-11"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb107-11" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>for 迴圈我相信大家也都很熟了，有幾個小細節可以提醒你：</p>
+<pre class="extendr"><code>for i in 0..5 {
+  rprintln!("{}", i);
+}</code></pre>
+<p><code>..</code>是產生一個範圍，依種簡單的struct，如上例是<code>{start: 0, end: 5}</code>，</p>
+<div id="迴圈的流程控制" class="section level3" number="6.3.1">
+<h3>
+<span class="header-section-number">6.3.1</span> 迴圈的流程控制<a class="anchor" aria-label="anchor" href="#%E8%BF%B4%E5%9C%88%E7%9A%84%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6"><i class="fas fa-link"></i></a>
+</h3>
+<p><code><a href="https://rdrr.io/r/base/Control.html">break</a></code>只用在圍封迴圈中，不會用在<code>match</code>中，與其他程式稍有不同，它可以讓你跳出回圈，並且指定一個運算式給他，而這個運算式的值就是回傳值。</p>
+<pre class="extendr"><code>let x = [1, 2, 3, 4, 5];
+let mut a:usize = 0;
+
+loop {
+  if a == 5 {
+    break rprint!("x被耗用了\n");
+  }else{
+    a = x[a];
+    rprint!("{}\n", a);
+  }
+}</code></pre>
+<p><code>continue</code>則是會跳過這次迭代，繼續下一次迭代。</p>
+<pre class="extendr"><code>for number in 1..=10 {
+  if number % 2 == 0 {
+    continue;
+  }
+  rprintln!("{}", number);
+}</code></pre>
+<p>你可以標記一個外部迴圈，讓break或continue可以直接穿越到標記的迴圈，標記的方法是在標記名稱前加上<code>'</code>，如<code>'h</code>、<code>'search</code>等。</p>
+<pre class="extendr"><code>let x = [1, 2, 3, 4, 5];
+
+let a = 'h : loop {
+  for i in 0..5 {
+    if x[i] == 3 {
+      break 'h i;
+    }else{
+      rprint!("{}\n", x[i]);
+    }
+  }
+};
+</code></pre>
+</div>
+<div id="函式呼叫與方法呼叫" class="section level3" number="6.3.2">
+<h3>
+<span class="header-section-number">6.3.2</span> 函式呼叫與方法呼叫<a class="anchor" aria-label="anchor" href="#%E5%87%BD%E5%BC%8F%E5%91%BC%E5%8F%AB%E8%88%87%E6%96%B9%E6%B3%95%E5%91%BC%E5%8F%AB"><i class="fas fa-link"></i></a>
+</h3>
+<p>在Rust裡，總共有3種呼叫形式，函式呼叫、方法呼叫、型態關聯函式呼叫。</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb112-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb112-1" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> gcd(<span class="dv">1302</span><span class="op">,</span> <span class="dv">462</span>)<span class="op">;</span> <span class="co">//函式呼叫</span></span>
+<span id="cb112-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb112-2" tabindex="-1"></a></span>
+<span id="cb112-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb112-3" tabindex="-1"></a><span class="kw">let</span> room <span class="op">=</span> player<span class="op">.</span>location()<span class="op">.</span>ip()<span class="op">;</span> <span class="co">//方法呼叫</span></span>
+<span id="cb112-4"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb112-4" tabindex="-1"></a><span class="co">// 方法呼叫可以串連</span></span>
+<span id="cb112-5"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb112-5" tabindex="-1"></a></span>
+<span id="cb112-6"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb112-6" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> numbers <span class="op">=</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">;</span> <span class="co">//型態關聯函式呼叫</span></span></code></pre></div>
+<p>有一件奇怪的事情，那就是Rust在呼叫時，<code>Vec&lt;T&gt;</code>是無效的，你應該用::Vec<t>，或是尤機器判斷回傳型態。</t></p>
+<div class="sourceCode" id="cb113"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb113-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb113-1" tabindex="-1"></a><span class="cf">return</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">&gt;</span><span class="pp">::</span>with_capacity(<span class="dv">10</span>)<span class="op">;</span><span class="co">// 錯誤</span></span>
+<span id="cb113-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb113-2" tabindex="-1"></a><span class="cf">return</span> <span class="dt">Vec</span><span class="pp">::</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">&gt;</span><span class="pp">::</span>with_capacity(<span class="dv">10</span>)<span class="op">;</span><span class="co">// 正確</span></span>
+<span id="cb113-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb113-3" tabindex="-1"></a><span class="cf">return</span> <span class="dt">Vec</span><span class="pp">::</span>with_capacity(<span class="dv">10</span>)<span class="op">;</span><span class="co">// 正確</span></span></code></pre></div>
+</div>
+</div>
+<div id="欄位與元素" class="section level2" number="6.4">
+<h2>
+<span class="header-section-number">6.4</span> 欄位與元素<a class="anchor" aria-label="anchor" href="#%E6%AC%84%E4%BD%8D%E8%88%87%E5%85%83%E7%B4%A0"><i class="fas fa-link"></i></a>
+</h2>
+<p><code>.</code>可以取出struct與tuple的元素，前者是以名字，後者是以數字</p>
+<p><code>[]</code>可以操作陣列、向量、字串，取出元素。</p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb114-1"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb114-1" tabindex="-1"></a>game<span class="op">.</span>player <span class="co">// struct</span></span>
+<span id="cb114-2"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb114-2" tabindex="-1"></a>coords<span class="op">.</span><span class="dv">0</span> <span class="co">// tuple</span></span>
+<span id="cb114-3"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html#cb114-3" tabindex="-1"></a>pices[<span class="dv">0</span>] <span class="co">// array</span></span></code></pre></div>
+<p>用..可以幫助你省略運算元，而<code>..=</code>則是包含運算元。</p>
+<pre class="extendr"><code>let x = [1, 2, 3, 4, 5];
+
+// {start:a-1, end:b+1}從a到b
+let s1 = &amp;x[1..=2];
+rprintln!("{:?}",s1);
+
+// {end:b+1}但包含b
+let s2 = &amp;x[..=2];
+rprintln!("{:?}",s2);
+
+// 全部
+let s3 = &amp;x[..];
+rprintln!("{:?}",s3);
+
+// {start:a}從a的後一個到最後
+let s4 = &amp;x[1..];
+rprintln!("{:?}",s4);
+ 
+// {start:a, end:b}從a的後一個到b的前一個
+let s5 = &amp;x[1..4];
+rprintln!("s5 = {:?}",s5);
+
+// {end:b}表示到b的前一個
+let s6 = &amp;x[..4];
+rprintln!("s6 = {:?}",s6);
+</code></pre>
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></div>
+<div class="next"><a href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li>
+<a class="nav-link" href="#day5-%E9%81%8B%E7%AE%97%E5%BC%8F"><span class="header-section-number">6</span> Day5-運算式</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#%E5%8D%80%E5%A1%8A%E8%88%87%E5%88%86%E8%99%9F"><span class="header-section-number">6.0.1</span> 區塊與分號</a></li></ul>
+</li>
+<li><a class="nav-link" href="#%E5%AE%A3%E5%91%8A%E5%BC%8F"><span class="header-section-number">6.1</span> 宣告式</a></li>
+<li><a class="nav-link" href="#if%E8%88%87match"><span class="header-section-number">6.2</span> if與match</a></li>
+<li>
+<a class="nav-link" href="#%E8%BF%B4%E5%9C%88"><span class="header-section-number">6.3</span> 迴圈</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E8%BF%B4%E5%9C%88%E7%9A%84%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6"><span class="header-section-number">6.3.1</span> 迴圈的流程控制</a></li>
+<li><a class="nav-link" href="#%E5%87%BD%E5%BC%8F%E5%91%BC%E5%8F%AB%E8%88%87%E6%96%B9%E6%B3%95%E5%91%BC%E5%8F%AB"><span class="header-section-number">6.3.2</span> 函式呼叫與方法呼叫</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#%E6%AC%84%E4%BD%8D%E8%88%87%E5%85%83%E7%B4%A0"><span class="header-section-number">6.4</span> 欄位與元素</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/05-Day5.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/05-Day5.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-07-12.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

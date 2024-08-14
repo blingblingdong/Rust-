@@ -1,0 +1,9 @@
+/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/actix/target/debug/deps/liballoc_stdlib-896f28dee5a2c6b3.rmeta: /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs
+
+/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/actix/target/debug/deps/liballoc_stdlib-896f28dee5a2c6b3.rlib: /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs
+
+/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/actix/target/debug/deps/alloc_stdlib-896f28dee5a2c6b3.d: /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs
+
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs:
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs:
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs:

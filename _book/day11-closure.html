@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 12 Day11-closure | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="排序整數向量十分容易： integers.sort(); 但並非所有需要排序的資料都是向量，例如結構，你就無法使用sort方法，你可能需要指定方法 // 依人口數遞減排列 struct City {  name: String,  population: i64,  country: String,  ... } fn city_population_descending(cities:...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 12 Day11-closure | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="排序整數向量十分容易： integers.sort(); 但並非所有需要排序的資料都是向量，例如結構，你就無法使用sort方法，你可能需要指定方法 // 依人口數遞減排列 struct City {  name: String,  population: i64,  country: String,  ... } fn city_population_descending(cities:...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 12 Day11-closure | Rust之書">
+<meta name="twitter:description" content="排序整數向量十分容易： integers.sort(); 但並非所有需要排序的資料都是向量，例如結構，你就無法使用sort方法，你可能需要指定方法 // 依人口數遞減排列 struct City {  name: String,  population: i64,  country: String,  ... } fn city_population_descending(cities:...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="day07---crate%E8%88%87%E6%A8%A1%E7%B5%84.html"><span class="header-section-number">8</span> Day07 - crate與模組</a></li>
+<li><a class="" href="day08---%E7%B5%90%E6%A7%8B.html"><span class="header-section-number">9</span> Day08 - 結構</a></li>
+<li><a class="" href="day09---enum%E8%88%87%E6%A8%A1%E5%BC%8F.html"><span class="header-section-number">10</span> Day09 - enum與模式</a></li>
+<li><a class="" href="day10-tarit%E8%88%87%E6%B3%9B%E5%9E%8B.html"><span class="header-section-number">11</span> Day10-tarit與泛型</a></li>
+<li><a class="active" href="day11-closure.html"><span class="header-section-number">12</span> Day11-closure</a></li>
+<li><a class="" href="day12-iterator.html"><span class="header-section-number">13</span> Day12-Iterator</a></li>
+<li><a class="" href="day13-%E9%9B%86%E5%90%88.html"><span class="header-section-number">14</span> Day13-集合</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">15</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="day11-closure" class="section level1" number="12">
+<h1>
+<span class="header-section-number">12</span> Day11-closure<a class="anchor" aria-label="anchor" href="#day11-closure"><i class="fas fa-link"></i></a>
+</h1>
+<p>排序整數向量十分容易：</p>
+<div class="sourceCode" id="cb220"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">integers.sort</span><span class="op">(</span><span class="op">)</span>;</span></code></pre></div>
+<p>但並非所有需要排序的資料都是向量，例如結構，你就無法使用sort方法，你可能需要指定方法</p>
+<div class="sourceCode" id="cb221"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb221-1"><a href="day11-closure.html#cb221-1" tabindex="-1"></a><span class="co">// 依人口數遞減排列</span></span>
+<span id="cb221-2"><a href="day11-closure.html#cb221-2" tabindex="-1"></a><span class="kw">struct</span> City <span class="op">{</span></span>
+<span id="cb221-3"><a href="day11-closure.html#cb221-3" tabindex="-1"></a>  name<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb221-4"><a href="day11-closure.html#cb221-4" tabindex="-1"></a>  population<span class="op">:</span> <span class="dt">i64</span><span class="op">,</span></span>
+<span id="cb221-5"><a href="day11-closure.html#cb221-5" tabindex="-1"></a>  country<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb221-6"><a href="day11-closure.html#cb221-6" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb221-7"><a href="day11-closure.html#cb221-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb221-8"><a href="day11-closure.html#cb221-8" tabindex="-1"></a></span>
+<span id="cb221-9"><a href="day11-closure.html#cb221-9" tabindex="-1"></a><span class="kw">fn</span> city_population_descending(cities<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;</span>) <span class="op">{</span></span>
+<span id="cb221-10"><a href="day11-closure.html#cb221-10" tabindex="-1"></a>  cities<span class="op">.</span>sort_by_key(city_population_descending)<span class="op">;</span></span>
+<span id="cb221-11"><a href="day11-closure.html#cb221-11" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb221-12"><a href="day11-closure.html#cb221-12" tabindex="-1"></a></span>
+<span id="cb221-13"><a href="day11-closure.html#cb221-13" tabindex="-1"></a><span class="kw">fn</span> sort_cities(cities<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;</span>) <span class="op">{</span></span>
+<span id="cb221-14"><a href="day11-closure.html#cb221-14" tabindex="-1"></a>  cites<span class="op">.</span>sort_by_key(city_population_descending)<span class="op">;</span></span>
+<span id="cb221-15"><a href="day11-closure.html#cb221-15" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>sort_by_key</code>會把參數<code>cites</code>丟給函式，在收集函式吐出來的資料做排序，這個key指的是sort接受key函式。</p>
+<p>因此你可以用更簡潔的方式處裡，<strong>匿名函式closure</strong></p>
+<div class="sourceCode" id="cb222"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb222-1"><a href="day11-closure.html#cb222-1" tabindex="-1"></a><span class="kw">fn</span> sort_cities(cities<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;</span>)<span class="op">{</span></span>
+<span id="cb222-2"><a href="day11-closure.html#cb222-2" tabindex="-1"></a>  cites<span class="op">.</span>sort_by_key(<span class="op">|</span>citiy<span class="op">|</span> <span class="op">-</span>city<span class="op">.</span>population)</span>
+<span id="cb222-3"><a href="day11-closure.html#cb222-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>closure的引數是city，回傳-city.population，系統會根據使用的方法來推斷引數的型態以及回傳型態</p>
+<div id="抓變數" class="section level2" number="12.1">
+<h2>
+<span class="header-section-number">12.1</span> 抓變數<a class="anchor" aria-label="anchor" href="#%E6%8A%93%E8%AE%8A%E6%95%B8"><i class="fas fa-link"></i></a>
+</h2>
+<p>closure可以使用包著它的函式的參數，例如下例，這個closure的使用stat，可以視為「捕捉capture到stat，但基於對生命週期的掌控，沒有垃圾回收的Rust使用closure抓變數使有限制的。</p>
+<div class="sourceCode" id="cb223"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb223-1"><a href="day11-closure.html#cb223-1" tabindex="-1"></a><span class="kw">fn</span> sort_cities(cities<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;,</span> stat<span class="op">:</span> Statistic)<span class="op">{</span></span>
+<span id="cb223-2"><a href="day11-closure.html#cb223-2" tabindex="-1"></a>  cites<span class="op">.</span>sort_by_key(<span class="op">|</span>citiy<span class="op">|</span> <span class="op">-</span>city<span class="op">.</span>get_statistic(stat))<span class="op">;</span></span>
+<span id="cb223-3"><a href="day11-closure.html#cb223-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div id="借用的closure" class="section level3" number="12.1.1">
+<h3>
+<span class="header-section-number">12.1.1</span> 借用的closure<a class="anchor" aria-label="anchor" href="#%E5%80%9F%E7%94%A8%E7%9A%84closure"><i class="fas fa-link"></i></a>
+</h3>
+<p>回顧上例，一般的closure使用參數時，會自動借用參考，並且這個行為符合過去所說的生命規則，closure使用stat參考，不能超過stat的生命週期。而此例closure在排序後消滅，沒有問題。</p>
+<p>這樣的做法既確保安全性，並且比垃圾回收的速度快，等等會詳細說明。</p>
+</div>
+<div id="盜用的closure" class="section level3" number="12.1.2">
+<h3>
+<span class="header-section-number">12.1.2</span> 盜用的closure<a class="anchor" aria-label="anchor" href="#%E7%9B%9C%E7%94%A8%E7%9A%84closure"><i class="fas fa-link"></i></a>
+</h3>
+<div class="sourceCode" id="cb224"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb224-1"><a href="day11-closure.html#cb224-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::</span>thread<span class="op">;</span></span>
+<span id="cb224-2"><a href="day11-closure.html#cb224-2" tabindex="-1"></a></span>
+<span id="cb224-3"><a href="day11-closure.html#cb224-3" tabindex="-1"></a><span class="kw">fn</span> start_sorting_thread(<span class="kw">mut</span> cities<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;,</span> stat<span class="op">:</span> Statistic) </span>
+<span id="cb224-4"><a href="day11-closure.html#cb224-4" tabindex="-1"></a><span class="op">-&gt;</span> <span class="pp">thread::</span>JoinHandle<span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;&gt;</span></span>
+<span id="cb224-5"><a href="day11-closure.html#cb224-5" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb224-6"><a href="day11-closure.html#cb224-6" tabindex="-1"></a>    <span class="kw">let</span> key_fn <span class="op">=</span> <span class="op">|</span>city <span class="op">&amp;</span>City<span class="op">|</span> <span class="op">-&gt;</span> <span class="dt">i64</span> <span class="op">{</span> <span class="op">-</span>city<span class="op">.</span>get_statistic(stat)<span class="op">};</span></span>
+<span id="cb224-7"><a href="day11-closure.html#cb224-7" tabindex="-1"></a>    </span>
+<span id="cb224-8"><a href="day11-closure.html#cb224-8" tabindex="-1"></a>    <span class="pp">thread::</span>spawn(<span class="op">||</span> <span class="op">{</span></span>
+<span id="cb224-9"><a href="day11-closure.html#cb224-9" tabindex="-1"></a>      cities<span class="op">.</span>sort_by_key(key_fn)<span class="op">;</span></span>
+<span id="cb224-10"><a href="day11-closure.html#cb224-10" tabindex="-1"></a>      cities</span>
+<span id="cb224-11"><a href="day11-closure.html#cb224-11" tabindex="-1"></a>    <span class="op">}</span>)</span>
+<span id="cb224-12"><a href="day11-closure.html#cb224-12" tabindex="-1"></a>    </span>
+<span id="cb224-13"><a href="day11-closure.html#cb224-13" tabindex="-1"></a>    </span>
+<span id="cb224-14"><a href="day11-closure.html#cb224-14" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>thread::swpan會開啟新的執行緒，完全獨立於主要的執行緒，它接受一個closure。</p>
+<p>因此在這段程式中，有一些新的生命週期問題</p>
+<p>closure_fn會借用stat的參考，但新執行緒有自己的生命週期，即使仍在同一個函式中，無法確認stat的生命週期有超過。換句話說，當stat的參考被放入key_fn，再放入行執行緒中，無法判斷新執行緒與<code>start_sorting_thread</code>的執行(此函式執行結束stat會被耗用)哪個先結束。</p>
+<p>同樣的，我們也無法確認cities有被安全的共享，因此，我們應該是要將兩者<strong>盜用steal</strong>，而不是借用參考：</p>
+<div class="sourceCode" id="cb225"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb225-1"><a href="day11-closure.html#cb225-1" tabindex="-1"></a><span class="kw">fn</span> start_sorting_thread(<span class="kw">mut</span> cities<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;,</span> stat<span class="op">:</span> Statistic) </span>
+<span id="cb225-2"><a href="day11-closure.html#cb225-2" tabindex="-1"></a><span class="op">-&gt;</span> <span class="pp">thread::</span>JoinHandle<span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span>City<span class="op">&gt;&gt;</span></span>
+<span id="cb225-3"><a href="day11-closure.html#cb225-3" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb225-4"><a href="day11-closure.html#cb225-4" tabindex="-1"></a>    <span class="kw">let</span> key_fn <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span>city <span class="op">&amp;</span>City<span class="op">|</span> <span class="op">-&gt;</span> <span class="dt">i64</span> <span class="op">{</span> <span class="op">-</span>city<span class="op">.</span>get_statistic(stat)<span class="op">};</span></span>
+<span id="cb225-5"><a href="day11-closure.html#cb225-5" tabindex="-1"></a>    </span>
+<span id="cb225-6"><a href="day11-closure.html#cb225-6" tabindex="-1"></a>    <span class="pp">thread::</span>spawn(<span class="kw">move</span> <span class="op">||</span> <span class="op">{</span></span>
+<span id="cb225-7"><a href="day11-closure.html#cb225-7" tabindex="-1"></a>      cities<span class="op">.</span>sort_by_key(key_fn)<span class="op">;</span></span>
+<span id="cb225-8"><a href="day11-closure.html#cb225-8" tabindex="-1"></a>      cities</span>
+<span id="cb225-9"><a href="day11-closure.html#cb225-9" tabindex="-1"></a>    <span class="op">}</span>)</span>
+<span id="cb225-10"><a href="day11-closure.html#cb225-10" tabindex="-1"></a>    </span>
+<span id="cb225-11"><a href="day11-closure.html#cb225-11" tabindex="-1"></a>    </span>
+<span id="cb225-12"><a href="day11-closure.html#cb225-12" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>我們要告訴Rust我們要移入stat與cities，只要在前面加上<code>move</code>關鍵字。</p>
+<p>第一個key_fn我們要取得stat的所有權，第二個thread::spwan我們要key_fn與cities的所有權。</p>
+</div>
+</div>
+<div id="closure性能" class="section level2" number="12.2">
+<h2>
+<span class="header-section-number">12.2</span> closure性能<a class="anchor" aria-label="anchor" href="#closure%E6%80%A7%E8%83%BD"><i class="fas fa-link"></i></a>
+</h2>
+<p>Rust的closure最大優點就是一個字：快</p>
+<p>多數程式語言會將closure放置在heap中，並且以函式般動態指派與垃圾回收處理，進而導致佔用cpu的時間在建立、呼叫與收集。</p>
+<p>而Rust，第一不需要垃圾回收，第二它不會被配置在heap中，除非你將他們放在Box、Vec或其他容器中。第三因為每個closure都”有特定的型態，因此可以藉由內連技術(讓closure直接插入調用點而不是動態呼叫)，讓你在緊密的回圈中也可以使用closure。</p>
+<div class="inline-figure"><img src="www/closure1.png"></div>
+<p>(a)案例中，我們用closure找出既有taco又有tornado的程式，在記憶體內，就像一個小型結構，有它使用的變數參考</p>
+<p>注意，裡面沒有指向它的程式碼的指標，而是以型態來判斷呼叫的程式</p>
+<p>(b)同上例，只是以move來容納值，而不是參考。</p>
+<p>(c)不使用任何周遭環境變數，closure不佔用任何記憶體</p>
+<p>closure除了使用的參考或值之外，不會佔用記憶體，且加上內連的技術，連這張圖的簡的結構也可以優化。</p>
+</div>
+<div id="closure安全性" class="section level2" number="12.3">
+<h2>
+<span class="header-section-number">12.3</span> Closure安全性<a class="anchor" aria-label="anchor" href="#closure%E5%AE%89%E5%85%A8%E6%80%A7"><i class="fas fa-link"></i></a>
+</h2>
+<p>雖然預設的情況是借用參考，但有些狀況下，closure會根據你所使用的方式決定是否移動該值，也就是即使不使用move，仍有可能封包行為必須獲取參數的所有權</p>
+<p>回歸到本質，會有獲取參考、所有權與可變參考，以trait的角度看：</p>
+<div class="sourceCode" id="cb226"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb226-1"><a href="day11-closure.html#cb226-1" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">Fn</span>() <span class="op">-&gt;</span> R <span class="op">{</span></span>
+<span id="cb226-2"><a href="day11-closure.html#cb226-2" tabindex="-1"></a>  <span class="kw">fn</span> call(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> R<span class="op">;</span></span>
+<span id="cb226-3"><a href="day11-closure.html#cb226-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb226-4"><a href="day11-closure.html#cb226-4" tabindex="-1"></a></span>
+<span id="cb226-5"><a href="day11-closure.html#cb226-5" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">FnMut</span>() <span class="op">-&gt;</span> R <span class="op">{</span></span>
+<span id="cb226-6"><a href="day11-closure.html#cb226-6" tabindex="-1"></a>  <span class="kw">fn</span> call_mut(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span>) <span class="op">-&gt;</span> R<span class="op">;</span></span>
+<span id="cb226-7"><a href="day11-closure.html#cb226-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb226-8"><a href="day11-closure.html#cb226-8" tabindex="-1"></a></span>
+<span id="cb226-9"><a href="day11-closure.html#cb226-9" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">FnOnce</span> <span class="op">-&gt;</span> R <span class="op">{</span></span>
+<span id="cb226-10"><a href="day11-closure.html#cb226-10" tabindex="-1"></a>  <span class="kw">fn</span> call_once(<span class="kw">self</span>) <span class="op">-&gt;</span> R<span class="op">;</span></span>
+<span id="cb226-11"><a href="day11-closure.html#cb226-11" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div id="fnonce" class="section level3" number="12.3.1">
+<h3>
+<span class="header-section-number">12.3.1</span> FnOnce<a class="anchor" aria-label="anchor" href="#fnonce"><i class="fas fa-link"></i></a>
+</h3>
+<p>FnOnce的概念是，因為耗用所有權，所以他們不能使用第二次</p>
+<div class="sourceCode" id="cb227"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb227-1"><a href="day11-closure.html#cb227-1" tabindex="-1"></a><span class="kw">let</span> dict <span class="op">=</span> produce_glossary()<span class="op">;</span></span>
+<span id="cb227-2"><a href="day11-closure.html#cb227-2" tabindex="-1"></a><span class="kw">let</span> debug_dump_dict <span class="op">=</span> <span class="op">||</span> <span class="op">{</span></span>
+<span id="cb227-3"><a href="day11-closure.html#cb227-3" tabindex="-1"></a>  <span class="cf">for</span> (key<span class="op">,</span> value) <span class="kw">in</span> dict <span class="op">{</span></span>
+<span id="cb227-4"><a href="day11-closure.html#cb227-4" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"{:?} - {:?}, key , value"</span>)<span class="op">;</span></span>
+<span id="cb227-5"><a href="day11-closure.html#cb227-5" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb227-6"><a href="day11-closure.html#cb227-6" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb227-7"><a href="day11-closure.html#cb227-7" tabindex="-1"></a></span>
+<span id="cb227-8"><a href="day11-closure.html#cb227-8" tabindex="-1"></a>debug_dump_dict()</span>
+<span id="cb227-9"><a href="day11-closure.html#cb227-9" tabindex="-1"></a>debug_dump_dict() <span class="co">//dict會被耗用</span></span></code></pre></div>
+<ol style="list-style-type: decimal">
+<li><p>dict 的所有權：當你在閉包中使用 dict 時，閉包試圖將 dict 的所有權轉移到閉包內部。這是因為你在閉包內部的 for 迴圈嘗試使用 dict，這種情況下 Rust 必須捕獲 dict 的所有權，因為它需要在閉包的執行過程中擁有 dict。</p></li>
+<li><p>無法重複使用：由於閉包捕獲了 dict 的所有權，dict 在第一次執行閉包時會被移動，這導致 dict 在閉包第一次調用後就不再有效。因此，你不能再次調用閉包，因為 dict 已經被移動了。</p></li>
+</ol>
+<p>要修正這樣的bug，就是使<code>debug_dump_dict()</code>變成Fn()，捕獲參考</p>
+<div class="sourceCode" id="cb228"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb228-1"><a href="day11-closure.html#cb228-1" tabindex="-1"></a><span class="kw">let</span> dict <span class="op">=</span> produce_glossary()<span class="op">;</span></span>
+<span id="cb228-2"><a href="day11-closure.html#cb228-2" tabindex="-1"></a><span class="kw">let</span> debug_dump_dict <span class="op">=</span> <span class="op">||</span> <span class="op">{</span></span>
+<span id="cb228-3"><a href="day11-closure.html#cb228-3" tabindex="-1"></a>    <span class="cf">for</span> (key<span class="op">,</span> value) <span class="kw">in</span> <span class="op">&amp;</span>dict <span class="op">{</span>  <span class="co">// 捕獲 dict 的不可變引用</span></span>
+<span id="cb228-4"><a href="day11-closure.html#cb228-4" tabindex="-1"></a>        <span class="pp">println!</span>(<span class="st">"{:?} - {:?}"</span><span class="op">,</span> key<span class="op">,</span> value)<span class="op">;</span></span>
+<span id="cb228-5"><a href="day11-closure.html#cb228-5" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb228-6"><a href="day11-closure.html#cb228-6" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+</div>
+<div id="fnmut" class="section level3" number="12.3.2">
+<h3>
+<span class="header-section-number">12.3.2</span> FnMut<a class="anchor" aria-label="anchor" href="#fnmut"><i class="fas fa-link"></i></a>
+</h3>
+<p>共用包含mut資料的非mut closure是不安全的，因為讓多個執行緒同時呼叫時會有資料爭用的問題，尤其是同時對同一筆資料讀取和寫入時。</p>
+<p>因此，Rust的第三種closure是FnMut，又稱寫入closure，需要以mut的方式操作值(如寫入、修改)都會自動被判定為<code>FnMut</code></p>
+<div class="sourceCode" id="cb229"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb229-1"><a href="day11-closure.html#cb229-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb229-2"><a href="day11-closure.html#cb229-2" tabindex="-1"></a><span class="kw">let</span> incr <span class="op">=</span> <span class="op">||</span> <span class="op">{</span></span>
+<span id="cb229-3"><a href="day11-closure.html#cb229-3" tabindex="-1"></a>  i <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb229-4"><a href="day11-closure.html#cb229-4" tabindex="-1"></a>  <span class="pp">println!</span>(<span class="st">"Ding i is now"</span><span class="op">,</span> i)<span class="op">;</span></span>
+<span id="cb229-5"><a href="day11-closure.html#cb229-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>如果是有參數的閉包，你必須手動在前面加上<code>mut</code>：</p>
+<div class="sourceCode" id="cb230"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb230-1"><a href="day11-closure.html#cb230-1" tabindex="-1"></a><span class="kw">let</span> i_plus_x <span class="op">=</span> <span class="op">|</span>x<span class="op">|</span> <span class="op">{</span> i <span class="op">+=</span> x<span class="op">;};</span><span class="co">// 錯誤</span></span>
+<span id="cb230-2"><a href="day11-closure.html#cb230-2" tabindex="-1"></a></span>
+<span id="cb230-3"><a href="day11-closure.html#cb230-3" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> i_plus_x <span class="op">=</span> <span class="op">|</span>x<span class="op">|</span> <span class="op">{</span> i <span class="op">+=</span> x<span class="op">;};</span> <span class="co">//正確</span></span>
+<span id="cb230-4"><a href="day11-closure.html#cb230-4" tabindex="-1"></a></span>
+<span id="cb230-5"><a href="day11-closure.html#cb230-5" tabindex="-1"></a>i_plus_x(<span class="dv">0</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="關係" class="section level3" number="12.3.3">
+<h3>
+<span class="header-section-number">12.3.3</span> 關係<a class="anchor" aria-label="anchor" href="#%E9%97%9C%E4%BF%82"><i class="fas fa-link"></i></a>
+</h3>
+<p>如果我們想將寫一個函式來重覆使用兩次closure：</p>
+<div class="sourceCode" id="cb231"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb231-1"><a href="day11-closure.html#cb231-1" tabindex="-1"></a><span class="kw">fn</span> call_twice<span class="op">&lt;</span>F<span class="op">&gt;</span>(closure<span class="op">:</span> F) <span class="kw">where</span> F<span class="op">:</span> <span class="bu">Fn</span>() <span class="op">{</span></span>
+<span id="cb231-2"><a href="day11-closure.html#cb231-2" tabindex="-1"></a>  closure()<span class="op">;</span></span>
+<span id="cb231-3"><a href="day11-closure.html#cb231-3" tabindex="-1"></a>  closure()<span class="op">;</span></span>
+<span id="cb231-4"><a href="day11-closure.html#cb231-4" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>它絕對不能放入FnOnce，因為FnOnce必定會卸除原本參數的值，那如果是放入FnMut呢？</p>
+<div class="sourceCode" id="cb232"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb232-1"><a href="day11-closure.html#cb232-1" tabindex="-1"></a></span>
+<span id="cb232-2"><a href="day11-closure.html#cb232-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb232-3"><a href="day11-closure.html#cb232-3" tabindex="-1"></a></span>
+<span id="cb232-4"><a href="day11-closure.html#cb232-4" tabindex="-1"></a><span class="kw">let</span> i_plus_one <span class="op">=</span> <span class="op">||</span> <span class="op">{</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">;};</span></span>
+<span id="cb232-5"><a href="day11-closure.html#cb232-5" tabindex="-1"></a></span>
+<span id="cb232-6"><a href="day11-closure.html#cb232-6" tabindex="-1"></a>call_twice(i_plus_one)<span class="op">;</span><span class="co">// 錯誤！</span></span></code></pre></div>
+<p>重新檢視一下call_twice，它的參數是<code>where F: Fn()</code>，我們所提供的事FnMut，因此有告訴call_twice我們要給的是<code>FnMut</code>!</p>
+<div class="sourceCode" id="cb233"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb233-1"><a href="day11-closure.html#cb233-1" tabindex="-1"></a><span class="kw">fn</span> call_twice<span class="op">&lt;</span>F<span class="op">&gt;</span>(<span class="kw">mut</span> closure<span class="op">:</span> F) <span class="kw">where</span> F<span class="op">:</span> <span class="bu">FnMut</span>() <span class="op">{</span></span>
+<span id="cb233-2"><a href="day11-closure.html#cb233-2" tabindex="-1"></a>  closure()<span class="op">;</span></span>
+<span id="cb233-3"><a href="day11-closure.html#cb233-3" tabindex="-1"></a>  closure()<span class="op">;</span></span>
+<span id="cb233-4"><a href="day11-closure.html#cb233-4" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb233-5"><a href="day11-closure.html#cb233-5" tabindex="-1"></a></span>
+<span id="cb233-6"><a href="day11-closure.html#cb233-6" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb233-7"><a href="day11-closure.html#cb233-7" tabindex="-1"></a></span>
+<span id="cb233-8"><a href="day11-closure.html#cb233-8" tabindex="-1"></a><span class="kw">let</span> i_plus_one <span class="op">=</span> <span class="op">||</span> <span class="op">{</span> i <span class="op">+=</span> <span class="dv">1</span><span class="op">;};</span></span>
+<span id="cb233-9"><a href="day11-closure.html#cb233-9" tabindex="-1"></a></span>
+<span id="cb233-10"><a href="day11-closure.html#cb233-10" tabindex="-1"></a>call_twice(i_plus_one)<span class="op">;</span></span>
+<span id="cb233-11"><a href="day11-closure.html#cb233-11" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"i = {}"</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb233-12"><a href="day11-closure.html#cb233-12" tabindex="-1"></a>#<span class="op">&gt;</span> i <span class="op">=</span> <span class="dv">1</span></span></code></pre></div>
+<p>總結來說，closure類型分三種，並且三個是由於對閉包值處理性質不同，而有嚴格成度不一的結構：</p>
+<div class="inline-figure"><img src="www/closure2.png" width="100%" style="display: block; margin: auto;"></div>
+</div>
+<div id="closure的copy與clone" class="section level3" number="12.3.4">
+<h3>
+<span class="header-section-number">12.3.4</span> closure的Copy與Clone<a class="anchor" aria-label="anchor" href="#closure%E7%9A%84copy%E8%88%87clone"><i class="fas fa-link"></i></a>
+</h3>
+<p>Rust將closure視為一種結構，裡面有它捕捉的值(對move)或值的參考(非move)。</p>
+<p>因此，它遵從一般結構的概念，以它內部行為來決定型態是Copy或Clone。不改變變數，僅保存共想參考的，因為共享參考既是Copy也是Clone，那個CLosure也是如此。</p>
+<div class="sourceCode" id="cb234"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb234-1"><a href="day11-closure.html#cb234-1" tabindex="-1"></a></span>
+<span id="cb234-2"><a href="day11-closure.html#cb234-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> y <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb234-3"><a href="day11-closure.html#cb234-3" tabindex="-1"></a><span class="kw">let</span> add_y <span class="op">=</span> <span class="op">|</span>x<span class="op">|</span>y<span class="op">+</span>x<span class="op">;</span> <span class="co">//僅借用y的參考與x的Copy</span></span>
+<span id="cb234-4"><a href="day11-closure.html#cb234-4" tabindex="-1"></a><span class="kw">let</span> copy_of_add_y <span class="op">=</span> add_y<span class="op">;</span> <span class="co">// 因此add_y也是Copy</span></span>
+<span id="cb234-5"><a href="day11-closure.html#cb234-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span>add_y(copy_of_add_y(<span class="dv">22</span>)))<span class="op">;</span> <span class="co">// add_y不會被耗用</span></span>
+<span id="cb234-6"><a href="day11-closure.html#cb234-6" tabindex="-1"></a></span>
+<span id="cb234-7"><a href="day11-closure.html#cb234-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">42</span></span>
+<span id="cb234-8"><a href="day11-closure.html#cb234-8" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>相反，可變參考既不是Copy，也不是Clone，使用它的closure也不是。</p>
+<div class="sourceCode" id="cb235"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb235-1"><a href="day11-closure.html#cb235-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb235-2"><a href="day11-closure.html#cb235-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> i_add_x <span class="op">=</span> <span class="op">|</span>x<span class="op">|</span> i <span class="op">+=</span>x<span class="op">;</span> <span class="co">//要改變i的值，因此是FnMut</span></span>
+<span id="cb235-3"><a href="day11-closure.html#cb235-3" tabindex="-1"></a><span class="kw">let</span> copy_of_i_add_x <span class="op">=</span> i_add_x<span class="op">;</span> <span class="co">// i_add_x會移入，進而變成未宣告</span></span>
+<span id="cb235-4"><a href="day11-closure.html#cb235-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span>i_add_x(copy_of_i_add_x(<span class="dv">1</span>)))<span class="op">;</span> <span class="co">// 錯誤，i_add_x被移動</span></span></code></pre></div>
+<p>對於move closure，決定於move的值是哪種：</p>
+<div class="sourceCode" id="cb236"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb236-1"><a href="day11-closure.html#cb236-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> greeting <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"Hello, "</span>)<span class="op">;</span></span>
+<span id="cb236-2"><a href="day11-closure.html#cb236-2" tabindex="-1"></a><span class="kw">let</span> greet <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span>name<span class="op">|</span> <span class="op">{</span></span>
+<span id="cb236-3"><a href="day11-closure.html#cb236-3" tabindex="-1"></a>  greeting<span class="op">.</span>push_str(name)<span class="op">;</span></span>
+<span id="cb236-4"><a href="day11-closure.html#cb236-4" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> greeting)<span class="op">;</span></span>
+<span id="cb236-5"><a href="day11-closure.html#cb236-5" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb236-6"><a href="day11-closure.html#cb236-6" tabindex="-1"></a></span>
+<span id="cb236-7"><a href="day11-closure.html#cb236-7" tabindex="-1"></a>greet<span class="op">.</span>clone()(<span class="st">"Alan"</span>)<span class="op">;</span></span>
+<span id="cb236-8"><a href="day11-closure.html#cb236-8" tabindex="-1"></a>greet<span class="op">.</span>clone()(<span class="st">"Blan"</span>)<span class="op">;</span></span>
+<span id="cb236-9"><a href="day11-closure.html#cb236-9" tabindex="-1"></a>#<span class="op">&gt;</span> Hello<span class="op">,</span> Alan</span>
+<span id="cb236-10"><a href="day11-closure.html#cb236-10" tabindex="-1"></a>#<span class="op">&gt;</span> Hello<span class="op">,</span> Blan</span></code></pre></div>
+<p><code>clone()(...)</code>看起來是很奇怪的語法，它其實只是代表我們複製closure，然後呼叫clone。在greet這個closure中，它內部有greeting的所有權。</p>
+<p>當你複製他們時，裡面的greeting也會被複製1份，因此每個函式的greeting都是自己擁有的。</p>
+</div>
+</div>
+<div id="回呼" class="section level2" number="12.4">
+<h2>
+<span class="header-section-number">12.4</span> 回呼<a class="anchor" aria-label="anchor" href="#%E5%9B%9E%E5%91%BC"><i class="fas fa-link"></i></a>
+</h2>
+<p>許多程式庫的API都使用回呼，呼回是由用戶提供函式，讓程式褲呼叫。</p>
+<div class="sourceCode" id="cb237"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb237-1"><a href="day11-closure.html#cb237-1" tabindex="-1"></a><span class="kw">async</span> <span class="kw">fn</span> get_index() <span class="op">-&gt;</span> HttpResponse <span class="op">{</span></span>
+<span id="cb237-2"><a href="day11-closure.html#cb237-2" tabindex="-1"></a>    <span class="pp">HttpResponse::</span><span class="cn">Ok</span>()</span>
+<span id="cb237-3"><a href="day11-closure.html#cb237-3" tabindex="-1"></a>        <span class="op">.</span>content_type(<span class="st">"text/html"</span>)</span>
+<span id="cb237-4"><a href="day11-closure.html#cb237-4" tabindex="-1"></a>        <span class="op">.</span>body(</span>
+<span id="cb237-5"><a href="day11-closure.html#cb237-5" tabindex="-1"></a>            <span class="st">"&lt;meta charset="</span>UTF<span class="op">-</span><span class="dv">8</span><span class="st">"&gt;</span></span>
+<span id="cb237-6"><a href="day11-closure.html#cb237-6" tabindex="-1"></a><span class="st">             &lt;title&gt;猜猜數字&lt;/title&gt;..."</span><span class="op">,</span>)</span>
+<span id="cb237-7"><a href="day11-closure.html#cb237-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb237-8"><a href="day11-closure.html#cb237-8" tabindex="-1"></a></span>
+<span id="cb237-9"><a href="day11-closure.html#cb237-9" tabindex="-1"></a></span>
+<span id="cb237-10"><a href="day11-closure.html#cb237-10" tabindex="-1"></a><span class="pp">App::</span>new()</span>
+<span id="cb237-11"><a href="day11-closure.html#cb237-11" tabindex="-1"></a>    <span class="op">.</span>route(<span class="st">"/"</span><span class="op">,</span> <span class="pp">web::</span>get()<span class="op">.</span>to(get_index))</span>
+<span id="cb237-12"><a href="day11-closure.html#cb237-12" tabindex="-1"></a>    <span class="op">.</span>route(<span class="st">"/gcd"</span><span class="op">,</span> <span class="pp">web::</span>post()<span class="op">.</span>to(post_gcd))</span>
+<span id="cb237-13"><a href="day11-closure.html#cb237-13" tabindex="-1"></a>    </span></code></pre></div>
+<p>路由器的概念是將網際網路傳來的請求傳給處理請求的Rust程式碼，在這個例子中，網際網路傳來<code>/get</code>請求時，傳遞給post_gcd處理，因此可以換成交由一個closur處理。</p>
+<div class="sourceCode" id="cb238"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb238-1"><a href="day11-closure.html#cb238-1" tabindex="-1"></a><span class="pp">App::</span>new()</span>
+<span id="cb238-2"><a href="day11-closure.html#cb238-2" tabindex="-1"></a>    <span class="op">.</span>route(<span class="st">"/"</span><span class="op">,</span> <span class="pp">web::</span>get()<span class="op">.</span>to(<span class="op">||{</span></span>
+<span id="cb238-3"><a href="day11-closure.html#cb238-3" tabindex="-1"></a>      <span class="pp">HttpResponse::</span><span class="cn">Ok</span>()</span>
+<span id="cb238-4"><a href="day11-closure.html#cb238-4" tabindex="-1"></a>          <span class="op">.</span>content_type(<span class="st">"text/html"</span>)</span>
+<span id="cb238-5"><a href="day11-closure.html#cb238-5" tabindex="-1"></a>          <span class="op">.</span>body(<span class="st">"&lt;title&gt;GCD Caculator&lt;/title&gt;..."</span>)</span>
+<span id="cb238-6"><a href="day11-closure.html#cb238-6" tabindex="-1"></a>    <span class="op">}</span>))</span>
+<span id="cb238-7"><a href="day11-closure.html#cb238-7" tabindex="-1"></a>    <span class="op">.</span>route(<span class="st">"/gcd"</span><span class="op">,</span> <span class="pp">web::</span>post()<span class="op">.</span>to(<span class="op">|</span>form<span class="op">:</span> <span class="pp">web::</span>Form<span class="op">&lt;</span>GcdParameters<span class="op">&gt;|{</span></span>
+<span id="cb238-8"><a href="day11-closure.html#cb238-8" tabindex="-1"></a>      <span class="pp">HttpResponse::</span><span class="cn">Ok</span>()</span>
+<span id="cb238-9"><a href="day11-closure.html#cb238-9" tabindex="-1"></a>        <span class="op">.</span>content_type(<span class="st">"text/html"</span>)</span>
+<span id="cb238-10"><a href="day11-closure.html#cb238-10" tabindex="-1"></a>        <span class="op">.</span>body(<span class="pp">format!</span>(<span class="st">"The Gcd of {} and {} is {}."</span><span class="op">,</span></span>
+<span id="cb238-11"><a href="day11-closure.html#cb238-11" tabindex="-1"></a>                      form<span class="op">.</span>n<span class="op">,</span> form<span class="op">.</span>m<span class="op">,</span> gcd(form<span class="op">.</span>n<span class="op">,</span> form<span class="op">.</span>m)))</span>
+<span id="cb238-12"><a href="day11-closure.html#cb238-12" tabindex="-1"></a>    <span class="op">}</span>))</span></code></pre></div>
+<p>這是因為actix-web接受任何執行緒安全的Fn引數。</p>
+<p>要如何在自己的程式這樣做？我們試著從零開始寫一個簡單的路由器，我們先宣告一些代表HTTP請求與回應的型態：</p>
+<div class="sourceCode" id="cb239"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb239-1"><a href="day11-closure.html#cb239-1" tabindex="-1"></a><span class="kw">struct</span> Request <span class="op">{</span></span>
+<span id="cb239-2"><a href="day11-closure.html#cb239-2" tabindex="-1"></a>  method<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb239-3"><a href="day11-closure.html#cb239-3" tabindex="-1"></a>  url<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb239-4"><a href="day11-closure.html#cb239-4" tabindex="-1"></a>  headers<span class="op">:</span> HashMap<span class="op">&lt;</span><span class="dt">String</span><span class="op">,</span> <span class="dt">String</span><span class="op">&gt;,</span></span>
+<span id="cb239-5"><a href="day11-closure.html#cb239-5" tabindex="-1"></a>  body<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;</span></span>
+<span id="cb239-6"><a href="day11-closure.html#cb239-6" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb239-7"><a href="day11-closure.html#cb239-7" tabindex="-1"></a></span>
+<span id="cb239-8"><a href="day11-closure.html#cb239-8" tabindex="-1"></a><span class="kw">struct</span> Response <span class="op">{</span></span>
+<span id="cb239-9"><a href="day11-closure.html#cb239-9" tabindex="-1"></a>  code<span class="op">:</span> <span class="dt">u32</span><span class="op">,</span></span>
+<span id="cb239-10"><a href="day11-closure.html#cb239-10" tabindex="-1"></a>  headers<span class="op">:</span> HashMap<span class="op">&lt;</span><span class="dt">String</span><span class="op">,</span> <span class="dt">String</span><span class="op">&gt;,</span></span>
+<span id="cb239-11"><a href="day11-closure.html#cb239-11" tabindex="-1"></a>  body<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;</span></span>
+<span id="cb239-12"><a href="day11-closure.html#cb239-12" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>目前，路由器的工作只是儲存一個將URL對映到回呼的表，按需求回應到正確的回呼</p>
+<div class="sourceCode" id="cb240"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb240-1"><a href="day11-closure.html#cb240-1" tabindex="-1"></a><span class="kw">struct</span> BasicRouter<span class="op">&lt;</span>C<span class="op">&gt;</span> <span class="kw">where</span> C<span class="op">:</span> <span class="bu">Fn</span>(<span class="op">&amp;</span>Request) <span class="op">-&gt;</span> Response <span class="op">{</span></span>
+<span id="cb240-2"><a href="day11-closure.html#cb240-2" tabindex="-1"></a>  routes<span class="op">:</span> HashMap<span class="op">&lt;</span><span class="dt">String</span><span class="op">,</span> C<span class="op">&gt;</span></span>
+<span id="cb240-3"><a href="day11-closure.html#cb240-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb240-4"><a href="day11-closure.html#cb240-4" tabindex="-1"></a></span>
+<span id="cb240-5"><a href="day11-closure.html#cb240-5" tabindex="-1"></a><span class="kw">impl</span><span class="op">&lt;</span>C<span class="op">&gt;</span> BasicRouter<span class="op">&lt;</span>C<span class="op">&gt;</span> Where C<span class="op">:</span> <span class="bu">Fn</span>(<span class="op">&amp;</span>Request) <span class="op">-&gt;</span> Response <span class="op">{</span></span>
+<span id="cb240-6"><a href="day11-closure.html#cb240-6" tabindex="-1"></a>  <span class="co">/// 建立空白路由器</span></span>
+<span id="cb240-7"><a href="day11-closure.html#cb240-7" tabindex="-1"></a>  <span class="kw">fn</span> new() <span class="op">-&gt;</span> BasicRouter<span class="op">&lt;</span>C<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb240-8"><a href="day11-closure.html#cb240-8" tabindex="-1"></a>    BasicRouter <span class="op">{</span> routes<span class="op">:</span> <span class="pp">Hashmap::</span>new() <span class="op">}</span></span>
+<span id="cb240-9"><a href="day11-closure.html#cb240-9" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb240-10"><a href="day11-closure.html#cb240-10" tabindex="-1"></a>  </span>
+<span id="cb240-11"><a href="day11-closure.html#cb240-11" tabindex="-1"></a>  <span class="kw">fn</span> add_route(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">,</span> url<span class="op">:</span> <span class="op">&amp;</span><span class="dt">str</span><span class="op">,</span> callback<span class="op">:</span> C) <span class="op">{</span></span>
+<span id="cb240-12"><a href="day11-closure.html#cb240-12" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>routes()<span class="op">.</span>insert(url<span class="op">.</span>to_string()<span class="op">,</span> callback)<span class="op">;</span></span>
+<span id="cb240-13"><a href="day11-closure.html#cb240-13" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb240-14"><a href="day11-closure.html#cb240-14" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>但這樣做犯了致命的錯誤，我們宣告每一個BasicRouter都有一個回呼形態C，而所有HshMap都要是相同型態的回呼，這導致當你處理第二條路徑時，編譯器告訴你傳入的closure與預期的不同型態。</p>
+<div class="sourceCode" id="cb241"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb241-1"><a href="day11-closure.html#cb241-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> router <span class="op">=</span> <span class="pp">BasicRouter::</span>new()<span class="op">;</span></span>
+<span id="cb241-2"><a href="day11-closure.html#cb241-2" tabindex="-1"></a>router<span class="op">.</span>add_route(<span class="st">"/"</span><span class="op">,</span> <span class="op">|</span>_<span class="op">|</span> get_form_response())<span class="op">;</span> <span class="co">//編譯正確</span></span>
+<span id="cb241-3"><a href="day11-closure.html#cb241-3" tabindex="-1"></a>router<span class="op">.</span>add_route(<span class="st">"/gcd"</span><span class="op">,</span> <span class="op">|</span>req<span class="op">|</span> get_gcd_response(req))<span class="op">;</span> <span class="co">//錯誤</span></span></code></pre></div>
+<p>我們想要支援各種型態，替代的方案是使用box與trait物件</p>
+<div class="sourceCode" id="cb242"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb242-1"><a href="day11-closure.html#cb242-1" tabindex="-1"></a><span class="kw">type</span> BoxedCallback <span class="op">=</span> <span class="dt">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="bu">Fn</span>(<span class="op">&amp;</span>Request) <span class="op">-&gt;</span> Response<span class="op">&gt;;</span></span>
+<span id="cb242-2"><a href="day11-closure.html#cb242-2" tabindex="-1"></a></span>
+<span id="cb242-3"><a href="day11-closure.html#cb242-3" tabindex="-1"></a><span class="kw">struct</span> BasicRouter <span class="op">{</span></span>
+<span id="cb242-4"><a href="day11-closure.html#cb242-4" tabindex="-1"></a>  routes<span class="op">:</span> HashMap<span class="op">&lt;</span><span class="dt">String</span><span class="op">,</span> BoxedCallback<span class="op">&gt;</span></span>
+<span id="cb242-5"><a href="day11-closure.html#cb242-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>每一個box都可以容納不同型態的closure，所以一個HashMap可以容納各種回呼</p>
+<pre class="rsut"><code>impl BasicRouter {
+  fn new() -&gt; BasicRouter {
+      BasicRouter { routes: HashMap::new() }
+  }
+  
+  fn add_route&lt;C&gt;(&amp;mut self, url: &amp;str, callback: C)
+    where C: Fn(&amp;Request) -&gt; Response + 'static
+    {
+      self.routes.insert(url.to_string(), Box::new(callback));
+    }
+}</code></pre>
+<p>在add_route的簽章中，C有兩個bound：有一個Fn trait，以及一個’static生命期。如果沒有static生命期，呼叫Box:new(callbak)會是一個錯誤，因為當closure所借用的變數參考離開作用域，那麼整個closue將不再安全。</p>
+<p>接下來這個路由器就可以處理傳來的請求：</p>
+<div class="sourceCode" id="cb244"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb244-1"><a href="day11-closure.html#cb244-1" tabindex="-1"></a><span class="kw">impl</span> BasicRouter <span class="op">{</span></span>
+<span id="cb244-2"><a href="day11-closure.html#cb244-2" tabindex="-1"></a>  <span class="kw">fn</span> handle_request(<span class="op">&amp;</span><span class="kw">self</span><span class="op">,</span> request<span class="op">:</span> <span class="op">&amp;</span>Request) <span class="op">-&gt;</span> Response <span class="op">{</span></span>
+<span id="cb244-3"><a href="day11-closure.html#cb244-3" tabindex="-1"></a>    <span class="cf">match</span> <span class="kw">self</span><span class="op">.</span>routes<span class="op">.</span>get(<span class="op">&amp;</span>request<span class="op">,</span>url) <span class="op">{</span></span>
+<span id="cb244-4"><a href="day11-closure.html#cb244-4" tabindex="-1"></a>      <span class="cn">None</span> <span class="op">=&gt;</span> not_found_response()<span class="op">,</span></span>
+<span id="cb244-5"><a href="day11-closure.html#cb244-5" tabindex="-1"></a>      <span class="cn">Some</span>(callback) <span class="op">=&gt;</span> callback(request)</span>
+<span id="cb244-6"><a href="day11-closure.html#cb244-6" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb244-7"><a href="day11-closure.html#cb244-7" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb244-8"><a href="day11-closure.html#cb244-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>如果要寫一個更節省空間但彈性較小的程式，試著用<strong>指標函式</strong>取代儲存trait物件，這些型態與closure的作用很像。</p>
+<div class="sourceCode" id="cb245"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb245-1"><a href="day11-closure.html#cb245-1" tabindex="-1"></a><span class="kw">fn</span> add_ten(x<span class="op">:</span> <span class="dt">u32</span>) <span class="op">-&gt;</span> <span class="dt">u32</span> <span class="op">{</span></span>
+<span id="cb245-2"><a href="day11-closure.html#cb245-2" tabindex="-1"></a>  x <span class="op">+</span> <span class="dv">10</span></span>
+<span id="cb245-3"><a href="day11-closure.html#cb245-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb245-4"><a href="day11-closure.html#cb245-4" tabindex="-1"></a></span>
+<span id="cb245-5"><a href="day11-closure.html#cb245-5" tabindex="-1"></a><span class="kw">let</span> fn_ptr<span class="op">:</span> <span class="kw">fn</span>(<span class="dt">u32</span>) <span class="op">-&gt;</span> <span class="dt">u32</span> <span class="op">=</span> add_ten<span class="op">;</span></span>
+<span id="cb245-6"><a href="day11-closure.html#cb245-6" tabindex="-1"></a><span class="kw">let</span> eleven <span class="op">=</span> fn_ptr(<span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb245-7"><a href="day11-closure.html#cb245-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> eleven)<span class="op">;</span></span>
+<span id="cb245-8"><a href="day11-closure.html#cb245-8" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">11</span></span></code></pre></div>
+<p>函式指標的適用與不捕捉任何東西的closure完全相同，都不需要保存被捕捉變數的任何資訊。如果你適當使用，無論在binding或是函式簽章中，都可以讓程式簡潔。</p>
+<p>以下是以函式指標的路由表：</p>
+<div class="sourceCode" id="cb246"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb246-1"><a href="day11-closure.html#cb246-1" tabindex="-1"></a>strut FnPoniterRouter <span class="op">{</span></span>
+<span id="cb246-2"><a href="day11-closure.html#cb246-2" tabindex="-1"></a>  routes<span class="op">:</span> HashMap<span class="op">&lt;</span><span class="dt">String</span><span class="op">,</span> <span class="kw">fn</span>(<span class="op">&amp;</span>Request) <span class="op">-&gt;</span> Response<span class="op">&gt;</span></span>
+<span id="cb246-3"><a href="day11-closure.html#cb246-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb246-4"><a href="day11-closure.html#cb246-4" tabindex="-1"></a></span>
+<span id="cb246-5"><a href="day11-closure.html#cb246-5" tabindex="-1"></a><span class="kw">impl</span> FnPoniterRouter <span class="op">{</span></span>
+<span id="cb246-6"><a href="day11-closure.html#cb246-6" tabindex="-1"></a>  <span class="kw">fn</span> new() <span class="op">-&gt;</span> FnPoniterRouter <span class="op">{</span></span>
+<span id="cb246-7"><a href="day11-closure.html#cb246-7" tabindex="-1"></a>    FnPointerRouter <span class="op">{</span> routes<span class="op">:</span> <span class="pp">HashMap::</span>new() <span class="op">}</span></span>
+<span id="cb246-8"><a href="day11-closure.html#cb246-8" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb246-9"><a href="day11-closure.html#cb246-9" tabindex="-1"></a>  </span>
+<span id="cb246-10"><a href="day11-closure.html#cb246-10" tabindex="-1"></a>  <span class="kw">fn</span> add_route(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">,</span> url<span class="op">:</span> <span class="op">&amp;</span><span class="dt">str</span><span class="op">,</span> callback<span class="op">:</span><span class="kw">fn</span>(<span class="op">&amp;</span>Request) <span class="op">-&gt;</span> Response)</span>
+<span id="cb246-11"><a href="day11-closure.html#cb246-11" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb246-12"><a href="day11-closure.html#cb246-12" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>routes<span class="op">.</span>insert(url<span class="op">.</span>to_string<span class="op">,</span> callback)<span class="op">;</span></span>
+<span id="cb246-13"><a href="day11-closure.html#cb246-13" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb246-14"><a href="day11-closure.html#cb246-14" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>看起來簡潔多了，沒有Box，也沒有動態配置，只有HashMap本身。</p>
+<p>這側面展示的訊息是，Closure本身就是一個獨特的型態，基於它所捕捉的變數不同，因此也需要較複雜的更動。或是在情況許可下，犧牲彈性，寫出如上面例子般，接收函式指標與不抓東西的closure。</p>
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="day10-tarit%E8%88%87%E6%B3%9B%E5%9E%8B.html"><span class="header-section-number">11</span> Day10-tarit與泛型</a></div>
+<div class="next"><a href="day12-iterator.html"><span class="header-section-number">13</span> Day12-Iterator</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#day11-closure"><span class="header-section-number">12</span> Day11-closure</a></li>
+<li>
+<a class="nav-link" href="#%E6%8A%93%E8%AE%8A%E6%95%B8"><span class="header-section-number">12.1</span> 抓變數</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E5%80%9F%E7%94%A8%E7%9A%84closure"><span class="header-section-number">12.1.1</span> 借用的closure</a></li>
+<li><a class="nav-link" href="#%E7%9B%9C%E7%94%A8%E7%9A%84closure"><span class="header-section-number">12.1.2</span> 盜用的closure</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#closure%E6%80%A7%E8%83%BD"><span class="header-section-number">12.2</span> closure性能</a></li>
+<li>
+<a class="nav-link" href="#closure%E5%AE%89%E5%85%A8%E6%80%A7"><span class="header-section-number">12.3</span> Closure安全性</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#fnonce"><span class="header-section-number">12.3.1</span> FnOnce</a></li>
+<li><a class="nav-link" href="#fnmut"><span class="header-section-number">12.3.2</span> FnMut</a></li>
+<li><a class="nav-link" href="#%E9%97%9C%E4%BF%82"><span class="header-section-number">12.3.3</span> 關係</a></li>
+<li><a class="nav-link" href="#closure%E7%9A%84copy%E8%88%87clone"><span class="header-section-number">12.3.4</span> closure的Copy與Clone</a></li>
+</ul>
+</li>
+<li><a class="nav-link" href="#%E5%9B%9E%E5%91%BC"><span class="header-section-number">12.4</span> 回呼</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/11-closure.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/11-closure.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-08-14.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

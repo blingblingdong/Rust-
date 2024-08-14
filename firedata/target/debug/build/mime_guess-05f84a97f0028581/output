@@ -1,0 +1,1 @@
+cargo:rustc-env=MIME_TYPES_GENERATED_PATH=/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/firedata/target/debug/build/mime_guess-05f84a97f0028581/out/mime_types_generated.rs

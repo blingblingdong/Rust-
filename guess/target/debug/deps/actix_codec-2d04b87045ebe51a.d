@@ -1,0 +1,10 @@
+/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/guess/target/debug/deps/libactix_codec-2d04b87045ebe51a.rmeta: /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lib.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/bcodec.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/framed.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lines.rs
+
+/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/guess/target/debug/deps/libactix_codec-2d04b87045ebe51a.rlib: /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lib.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/bcodec.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/framed.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lines.rs
+
+/Users/dongchenbin/Desktop/桌面 - cc.MacBook Pro/Rust/Rust書/guess/target/debug/deps/actix_codec-2d04b87045ebe51a.d: /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lib.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/bcodec.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/framed.rs /Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lines.rs
+
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lib.rs:
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/bcodec.rs:
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/framed.rs:
+/Users/dongchenbin/.cargo/registry/src/index.crates.io-6f17d22bba15001f/actix-codec-0.5.2/src/lines.rs:

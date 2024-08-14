@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 16 Iterator | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="iterator 就是實作了std::iter::Iterator trait的任何值 trait Iterator {  type Item;  fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt;;  ...// 許多其他方法 } Item...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 16 Iterator | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="iterator 就是實作了std::iter::Iterator trait的任何值 trait Iterator {  type Item;  fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt;;  ...// 許多其他方法 } Item...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 16 Iterator | Rust之書">
+<meta name="twitter:description" content="iterator 就是實作了std::iter::Iterator trait的任何值 trait Iterator {  type Item;  fn next(&amp;mut self) -&gt; Option&lt;Self::Item&gt;;  ...// 許多其他方法 } Item...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="day07---crate%E8%88%87%E6%A8%A1%E7%B5%84.html"><span class="header-section-number">8</span> Day07 - crate與模組</a></li>
+<li><a class="" href="day07---crate%E8%88%87%E6%A8%A1%E7%B5%84-1.html"><span class="header-section-number">9</span> Day07 - crate與模組</a></li>
+<li><a class="" href="day08---%E7%B5%90%E6%A7%8B.html"><span class="header-section-number">10</span> Day08 - 結構</a></li>
+<li><a class="" href="section.html"><span class="header-section-number">11</span> 09</a></li>
+<li><a class="" href="day10-tarit%E8%88%87%E6%B3%9B%E5%9E%8B.html"><span class="header-section-number">12</span> Day10-tarit與泛型</a></li>
+<li><a class="" href="closure.html"><span class="header-section-number">13</span> 100-closure</a></li>
+<li><a class="" href="iterator.html"><span class="header-section-number">14</span> Iterator</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">15</span> R_unique</a></li>
+<li><a class="active" href="iterator-1.html"><span class="header-section-number">16</span> Iterator</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="iterator-1" class="section level1" number="16">
+<h1>
+<span class="header-section-number">16</span> Iterator<a class="anchor" aria-label="anchor" href="#iterator-1"><i class="fas fa-link"></i></a>
+</h1>
+<p>iterator 就是實作了std::iter::Iterator trait的任何值</p>
+<div class="sourceCode" id="cb268"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb268-1"><a href="iterator-1.html#cb268-1" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">Iterator</span> <span class="op">{</span></span>
+<span id="cb268-2"><a href="iterator-1.html#cb268-2" tabindex="-1"></a>  <span class="kw">type</span> Item<span class="op">;</span></span>
+<span id="cb268-3"><a href="iterator-1.html#cb268-3" tabindex="-1"></a>  <span class="kw">fn</span> next(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;;</span></span>
+<span id="cb268-4"><a href="iterator-1.html#cb268-4" tabindex="-1"></a>  <span class="op">...</span><span class="co">// 許多其他方法</span></span>
+<span id="cb268-5"><a href="iterator-1.html#cb268-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Item 是iterator產生的值的型態。next方法會回傳Some(v)，v是iterator的下一個值，當序列結束，會回傳None。</p>
+<p>如果某個型態可以用自然的方式迭代，你可以為那個型態實作<code>std::iter::IntoIterator</code>，他的into_iter方法會接受一個值，並回傳它的<code>iterator</code>：</p>
+<div class="sourceCode" id="cb269"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb269-1"><a href="iterator-1.html#cb269-1" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">IntoIterator</span> <span class="kw">where</span> <span class="dt">Self</span><span class="pp">::</span>IntoIter<span class="op">:</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb269-2"><a href="iterator-1.html#cb269-2" tabindex="-1"></a>  typ Item<span class="op">;</span></span>
+<span id="cb269-3"><a href="iterator-1.html#cb269-3" tabindex="-1"></a>  <span class="kw">type</span> IntoIter: Iterator<span class="op">;</span></span>
+<span id="cb269-4"><a href="iterator-1.html#cb269-4" tabindex="-1"></a>  <span class="kw">fn</span> into_iter(<span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">Self</span><span class="pp">::</span>IntoIter<span class="op">;</span></span>
+<span id="cb269-5"><a href="iterator-1.html#cb269-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Rust的for迴圈就是如此整合上面的元素，假設你要迭代一個向量印出他們：</p>
+<pre class="extnedr"><code>println!("There's:");
+let v = vec!["a", "b", "c"];
+
+for element in &amp;v {
+  println!("{}", element);
+}</code></pre>
+<p>在底層，for迴圈其實就是呼叫IntoIterator與Iterator方法的簡寫而已</p>
+<div class="sourceCode" id="cb271"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb271-1"><a href="iterator-1.html#cb271-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iterator <span class="op">=</span> (<span class="op">&amp;</span>v)<span class="op">.</span>into_iter()<span class="op">;</span></span>
+<span id="cb271-2"><a href="iterator-1.html#cb271-2" tabindex="-1"></a><span class="cf">while</span> <span class="kw">let</span> <span class="cn">Some</span>(element) <span class="op">=</span> iterator<span class="op">.</span>next <span class="op">{</span></span>
+<span id="cb271-3"><a href="iterator-1.html#cb271-3" tabindex="-1"></a>  <span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> element)<span class="op">;</span></span>
+<span id="cb271-4"><a href="iterator-1.html#cb271-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>我們來了解一下iterator的術語：</p>
+<ul>
+<li><p>之前說過，iterator是實作了Iterator的任何型態</p></li>
+<li><p>iterable是可以實作Interator的任何型態。</p></li>
+<li><p>iterator會產生值</p></li>
+<li><p>iterator產生的值稱為項目(item)。在此，項目是”a”、“b”、“c”</p></li>
+<li><p>接受iterator產生的值的項目是consumer，在上面例子，for迴圈是consumer</p></li>
+</ul>
+<div id="建立iterator-1" class="section level2" number="16.1">
+<h2>
+<span class="header-section-number">16.1</span> 建立Iterator<a class="anchor" aria-label="anchor" href="#%E5%BB%BA%E7%AB%8Biterator-1"><i class="fas fa-link"></i></a>
+</h2>
+<div id="iter與iter_mut方法-1" class="section level3" number="16.1.1">
+<h3>
+<span class="header-section-number">16.1.1</span> iter與iter_mut方法<a class="anchor" aria-label="anchor" href="#iter%E8%88%87iter_mut%E6%96%B9%E6%B3%95-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>大多數的集合型態都提供iter與iter_mut方法，這些方法會回傳迭代該型態的iterator，可產生每一個項目的共享或可變參考。&amp;[T]與&amp;mut [T]這種陣列slice也有iter與iter_mut方法，如果不用for迴圈，以下是最常用來取得iterator方法：</p>
+<div class="sourceCode" id="cb272"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb272-1"><a href="iterator-1.html#cb272-1" tabindex="-1"></a><span class="kw">let</span> v <span class="op">=</span> <span class="pp">vec!</span>[<span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span><span class="op">,</span><span class="dv">4</span><span class="op">,</span><span class="dv">5</span>]<span class="op">;</span></span>
+<span id="cb272-2"><a href="iterator-1.html#cb272-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iterator <span class="op">=</span> v<span class="op">.</span>iter()<span class="op">;</span></span>
+<span id="cb272-3"><a href="iterator-1.html#cb272-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb272-4"><a href="iterator-1.html#cb272-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb272-5"><a href="iterator-1.html#cb272-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb272-6"><a href="iterator-1.html#cb272-6" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb272-7"><a href="iterator-1.html#cb272-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb272-8"><a href="iterator-1.html#cb272-8" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb272-9"><a href="iterator-1.html#cb272-9" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">1</span>)</span>
+<span id="cb272-10"><a href="iterator-1.html#cb272-10" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">2</span>)</span>
+<span id="cb272-11"><a href="iterator-1.html#cb272-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">3</span>)</span>
+<span id="cb272-12"><a href="iterator-1.html#cb272-12" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">4</span>)</span>
+<span id="cb272-13"><a href="iterator-1.html#cb272-13" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">5</span>)</span>
+<span id="cb272-14"><a href="iterator-1.html#cb272-14" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">None</span></span></code></pre></div>
+<p>每個型態實作的iter與iter_mut後的iterator可能有些不同，例如std::path::Path的iter方法回傳一個iterator，它每次會回傳一個路徑組件，這些項目型態是&amp;std::ffi::OsStor。</p>
+<div class="sourceCode" id="cb273"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb273-1"><a href="iterator-1.html#cb273-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::ffi::</span>OsStr<span class="op">;</span></span>
+<span id="cb273-2"><a href="iterator-1.html#cb273-2" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::path::</span><span class="dt">Path</span><span class="op">;</span></span>
+<span id="cb273-3"><a href="iterator-1.html#cb273-3" tabindex="-1"></a></span>
+<span id="cb273-4"><a href="iterator-1.html#cb273-4" tabindex="-1"></a><span class="kw">let</span> path <span class="op">=</span> <span class="dt">Path</span><span class="pp">::</span>new(<span class="st">"C:/User/JimB/Dowloads/Fedora.iso"</span>)<span class="op">;</span></span>
+<span id="cb273-5"><a href="iterator-1.html#cb273-5" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iterator <span class="op">=</span> path<span class="op">.</span>iter()<span class="op">;</span></span>
+<span id="cb273-6"><a href="iterator-1.html#cb273-6" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb273-7"><a href="iterator-1.html#cb273-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb273-8"><a href="iterator-1.html#cb273-8" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iterator<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb273-9"><a href="iterator-1.html#cb273-9" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"C:"</span>)</span>
+<span id="cb273-10"><a href="iterator-1.html#cb273-10" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"User"</span>)</span>
+<span id="cb273-11"><a href="iterator-1.html#cb273-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"JimB"</span>)</span></code></pre></div>
+<p>如果某種型態迭代不只一種，那種型態通常為各種遍歷方式提供轉數的方法，例如&amp;str字串就沒有iter方法，而是有<code>s.bytes()</code>與<code>s.chars()</code>來取代。</p>
+</div>
+<div id="intoiterator-1" class="section level3" number="16.1.2">
+<h3>
+<span class="header-section-number">16.1.2</span> IntoIterator<a class="anchor" aria-label="anchor" href="#intoiterator-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>如果型態實作了IntoIterator，你可以自己呼叫它的into_iter方法，就像for迴圈的做法</p>
+<div class="sourceCode" id="cb274"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb274-1"><a href="iterator-1.html#cb274-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::collections::</span>BTreeSet<span class="op">;</span></span>
+<span id="cb274-2"><a href="iterator-1.html#cb274-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> favorites <span class="op">=</span> <span class="pp">BTreeSet::</span>new()<span class="op">;</span></span>
+<span id="cb274-3"><a href="iterator-1.html#cb274-3" tabindex="-1"></a>favorites<span class="op">.</span>insert(<span class="st">"Lucky in the Sky With Diamonds"</span><span class="op">.</span>to_string())<span class="op">;</span></span>
+<span id="cb274-4"><a href="iterator-1.html#cb274-4" tabindex="-1"></a>favorites<span class="op">.</span>insert(<span class="st">"Liebestraume No. 3"</span><span class="op">.</span>to_string())<span class="op">;</span></span>
+<span id="cb274-5"><a href="iterator-1.html#cb274-5" tabindex="-1"></a></span>
+<span id="cb274-6"><a href="iterator-1.html#cb274-6" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> it <span class="op">=</span> favorites<span class="op">.</span>into_iter()<span class="op">;</span></span>
+<span id="cb274-7"><a href="iterator-1.html#cb274-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> it<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb274-8"><a href="iterator-1.html#cb274-8" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> it<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb274-9"><a href="iterator-1.html#cb274-9" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> it<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb274-10"><a href="iterator-1.html#cb274-10" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"Liebestraume No. 3"</span>)</span>
+<span id="cb274-11"><a href="iterator-1.html#cb274-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"Lucky in the Sky With Diamonds"</span>)</span>
+<span id="cb274-12"><a href="iterator-1.html#cb274-12" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">None</span></span></code></pre></div>
+<p>不同狀況的iterator會產生不同的item，來處理共享參考(&amp;T)、可變參考(&amp;mut T)與移動(T)：</p>
+<ul>
+<li><p>當into_iter接收集合的共享參考後，它會回傳一個iterator，這個iterator會產生項目的共享參考。例如，上面的程式中，(&amp;favorite).into_iter()會回傳一個iterator，它的Item型態是&amp;String</p></li>
+<li><p>當into_iter收到集合的可變參考後，它會回傳一個iterator，這個iterator會產生項目的可變參考。例如，如果vector是Vec<string>，那麽呼叫(&amp;mut vector).into_iter()會回傳一個iterator，它的Item型態是&amp;mut String</string></p></li>
+<li><p>當into_iter以值收到集合後，into_iter會回傳一個iterator，該iterator擁有集合的所有權，並以值回傳項目；項目的所有權會從集合移交給耗用者，原始的集合在過程中會被耗用。例如上述的程式中呼叫favorites.into_iter()會回傳一個iterator，它會以值產生每個字串，耗用者將每一個字串的所有權。當iterator被卸除時，在BTreeSet裡面剩餘的任何元素也會被卸除，然後集合的空殼也會被丟棄。</p></li>
+</ul>
+<p>也並非每一個型態都會實作三種情況，例如HashSet、BTreeSet與BinaryHeap未實作處理可變參考的Iterator，因為修改本身會違反型態的不可變性：如修改過後產生不同的雜湊值，或與臨值的排列不同。</p>
+<p>而有些僅部分可變，如HashMap產生的項目值的可變參考，但只有索引鍵是共享參考。</p>
+<p>slice本身不擁有它的元素，所以不能以<strong>值</strong>參考，只實作共享參考與可變參考</p>
+<p>另外，<code>favorites.iter()</code>與<code>(&amp;favorites).into_iter()</code>都是以共享參考作為迭代，但前者更加簡潔與易懂</p>
+<p>IntoIterator在泛型程式也很有用，使用<code>T: IntoIterator</code>來將型態變數T限制為可以迭代的型態。進一步可以用<code>T: IntoIterator&lt;Item=U&gt;</code> 來要求迭代特並型態U。</p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb275-1"><a href="iterator-1.html#cb275-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::fmt::</span><span class="bu">Debug</span><span class="op">;</span></span>
+<span id="cb275-2"><a href="iterator-1.html#cb275-2" tabindex="-1"></a></span>
+<span id="cb275-3"><a href="iterator-1.html#cb275-3" tabindex="-1"></a><span class="kw">fn</span> dump<span class="op">&lt;</span>T<span class="op">,</span> U<span class="op">&gt;</span>(t<span class="op">:</span> T)</span>
+<span id="cb275-4"><a href="iterator-1.html#cb275-4" tabindex="-1"></a>    <span class="kw">where</span> T<span class="op">:</span> <span class="bu">IntoIterator</span><span class="op">&lt;</span>Item<span class="op">=</span>U<span class="op">&gt;,</span></span>
+<span id="cb275-5"><a href="iterator-1.html#cb275-5" tabindex="-1"></a>    U<span class="op">:</span> debug</span>
+<span id="cb275-6"><a href="iterator-1.html#cb275-6" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb275-7"><a href="iterator-1.html#cb275-7" tabindex="-1"></a>  <span class="cf">for</span> u <span class="kw">in</span> t <span class="op">{</span></span>
+<span id="cb275-8"><a href="iterator-1.html#cb275-8" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"{:?}"</span><span class="op">,</span> u)<span class="op">;</span></span>
+<span id="cb275-9"><a href="iterator-1.html#cb275-9" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb275-10"><a href="iterator-1.html#cb275-10" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+</div>
+<div id="form_fn-與-successors-1" class="section level2" number="16.2">
+<h2>
+<span class="header-section-number">16.2</span> form_fn 與 successors<a class="anchor" aria-label="anchor" href="#form_fn-%E8%88%87-successors-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>若要產生一系列的值，一種簡單的方式是提供一個回傳他們的closure。</p>
+<p>當<code>std::iter::form_fn</code>接受一個回傳<code>Option&lt;T&gt;</code>的closure，並回傳iterator不停呼叫這個函式來產生值，搭配<code>take()</code>函式可以限制產生的數字。</p>
+<div class="sourceCode" id="cb276"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb276-1"><a href="iterator-1.html#cb276-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">rand::</span>random<span class="op">;</span></span>
+<span id="cb276-2"><a href="iterator-1.html#cb276-2" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::iter::</span>form_fn<span class="op">;</span></span>
+<span id="cb276-3"><a href="iterator-1.html#cb276-3" tabindex="-1"></a></span>
+<span id="cb276-4"><a href="iterator-1.html#cb276-4" tabindex="-1"></a><span class="co">// 產生1000個隨機線段的長度</span></span>
+<span id="cb276-5"><a href="iterator-1.html#cb276-5" tabindex="-1"></a><span class="co">// 會在[0,1]區間內產生值</span></span>
+<span id="cb276-6"><a href="iterator-1.html#cb276-6" tabindex="-1"></a><span class="kw">let</span> lengths<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">f64</span><span class="op">&gt;</span> <span class="op">=</span></span>
+<span id="cb276-7"><a href="iterator-1.html#cb276-7" tabindex="-1"></a>    form_fn(<span class="op">||</span> <span class="cn">Some</span>((<span class="pp">random::</span><span class="op">&lt;</span><span class="dt">f64</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="pp">random::</span><span class="op">&lt;</span><span class="dt">f64</span><span class="op">&gt;</span>())<span class="op">.</span>abs()))</span>
+<span id="cb276-8"><a href="iterator-1.html#cb276-8" tabindex="-1"></a>    <span class="op">.</span>take(<span class="dv">1000</span>)</span>
+<span id="cb276-9"><a href="iterator-1.html#cb276-9" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span></code></pre></div>
+<p>如果每個項目依賴前一個項目，<code>std::iter::successors</code>函式可以很好的運作</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb277-1"><a href="iterator-1.html#cb277-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::iter::</span>successors<span class="op">;</span></span>
+<span id="cb277-2"><a href="iterator-1.html#cb277-2" tabindex="-1"></a></span>
+<span id="cb277-3"><a href="iterator-1.html#cb277-3" tabindex="-1"></a><span class="kw">let</span> start <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb277-4"><a href="iterator-1.html#cb277-4" tabindex="-1"></a></span>
+<span id="cb277-5"><a href="iterator-1.html#cb277-5" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iter <span class="op">=</span> successors(<span class="cn">Some</span>(start)<span class="op">,</span> <span class="op">|&amp;</span>x<span class="op">|</span> <span class="cn">Some</span>(x<span class="op">+</span><span class="dv">2</span>) )<span class="op">;</span></span>
+<span id="cb277-6"><a href="iterator-1.html#cb277-6" tabindex="-1"></a></span>
+<span id="cb277-7"><a href="iterator-1.html#cb277-7" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="dv">0</span><span class="op">..</span><span class="dv">5</span> <span class="op">{</span></span>
+<span id="cb277-8"><a href="iterator-1.html#cb277-8" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">let</span> <span class="cn">Some</span>(val) <span class="op">=</span> iter<span class="op">.</span>next() <span class="op">{</span></span>
+<span id="cb277-9"><a href="iterator-1.html#cb277-9" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> val)<span class="op">;</span></span>
+<span id="cb277-10"><a href="iterator-1.html#cb277-10" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb277-11"><a href="iterator-1.html#cb277-11" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb277-12"><a href="iterator-1.html#cb277-12" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span></span>
+<span id="cb277-13"><a href="iterator-1.html#cb277-13" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">3</span></span>
+<span id="cb277-14"><a href="iterator-1.html#cb277-14" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">5</span></span>
+<span id="cb277-15"><a href="iterator-1.html#cb277-15" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">7</span></span>
+<span id="cb277-16"><a href="iterator-1.html#cb277-16" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">9</span></span>
+<span id="cb277-17"><a href="iterator-1.html#cb277-17" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>successors接受兩個參數，1是初始值，2是一個回傳值的closure。第一次迭代中，closure的參數是初始值(上例中的<code>start</code>)，隨後回傳值(回傳<code>Some(start+2)</code>)。第二次迭代，closure的參數是上一次迭代的值(上例中的<code>start+2</code>)…</p>
+<p>form_fn與successor兩者都可以接受<code>FnMut closure</code>，用來捕捉作用域的變數並修改它。例如，這個<code>fibonacci</code>函式使用一個<code>move closure</code>來捕捉變數，並將它當成它的運作狀態來使用</p>
+<div class="sourceCode" id="cb278"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb278-1"><a href="iterator-1.html#cb278-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::iter::</span>from_fn<span class="op">;</span></span>
+<span id="cb278-2"><a href="iterator-1.html#cb278-2" tabindex="-1"></a></span>
+<span id="cb278-3"><a href="iterator-1.html#cb278-3" tabindex="-1"></a><span class="kw">fn</span> fibonacci() <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">usize</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb278-4"><a href="iterator-1.html#cb278-4" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> state <span class="op">=</span> (<span class="dv">0</span><span class="op">,</span><span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb278-5"><a href="iterator-1.html#cb278-5" tabindex="-1"></a>  <span class="pp">std::iter::</span>from_fn(<span class="kw">move</span> <span class="op">||</span> <span class="op">{</span></span>
+<span id="cb278-6"><a href="iterator-1.html#cb278-6" tabindex="-1"></a>    state <span class="op">=</span> (state<span class="op">.</span><span class="dv">1</span><span class="op">,</span> state<span class="op">.</span><span class="dv">0</span> <span class="op">+</span> state<span class="op">.</span><span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb278-7"><a href="iterator-1.html#cb278-7" tabindex="-1"></a>    <span class="cn">Some</span>(state<span class="op">.</span><span class="dv">0</span>)</span>
+<span id="cb278-8"><a href="iterator-1.html#cb278-8" tabindex="-1"></a>  <span class="op">}</span>)</span>
+<span id="cb278-9"><a href="iterator-1.html#cb278-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb278-10"><a href="iterator-1.html#cb278-10" tabindex="-1"></a></span>
+<span id="cb278-11"><a href="iterator-1.html#cb278-11" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> x <span class="op">=</span> fibonacci()<span class="op">.</span>take(<span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb278-12"><a href="iterator-1.html#cb278-12" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="dv">0</span><span class="op">..</span><span class="dv">8</span> <span class="op">{</span></span>
+<span id="cb278-13"><a href="iterator-1.html#cb278-13" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">let</span> <span class="cn">Some</span>(val) <span class="op">=</span> x<span class="op">.</span>next() <span class="op">{</span></span>
+<span id="cb278-14"><a href="iterator-1.html#cb278-14" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> val)<span class="op">;</span></span>
+<span id="cb278-15"><a href="iterator-1.html#cb278-15" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb278-16"><a href="iterator-1.html#cb278-16" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb278-17"><a href="iterator-1.html#cb278-17" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>from_fn與successor方法很靈活，幾乎可以用在所有iterator的地方，來讓你的程式更簡潔與，但它們相較於常用模式，較難說明資料如何在計算過程中移動。</p>
+<div id="darin方法-1" class="section level3" number="16.2.1">
+<h3>
+<span class="header-section-number">16.2.1</span> darin方法<a class="anchor" aria-label="anchor" href="#darin%E6%96%B9%E6%B3%95-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>如果型態可以用範圍檢索，例如String、向量與VecDeque，drain方法可以擷取範圍內的item。</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb279-1"><a href="iterator-1.html#cb279-1" tabindex="-1"></a></span>
+<span id="cb279-2"><a href="iterator-1.html#cb279-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> outer <span class="op">=</span> <span class="st">"Rust"</span><span class="op">.</span>to_string()<span class="op">;</span></span>
+<span id="cb279-3"><a href="iterator-1.html#cb279-3" tabindex="-1"></a><span class="kw">let</span> inner <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from_iter(outer<span class="op">.</span>drain(<span class="dv">1</span><span class="op">..</span><span class="dv">3</span>))<span class="op">;</span></span>
+<span id="cb279-4"><a href="iterator-1.html#cb279-4" tabindex="-1"></a></span>
+<span id="cb279-5"><a href="iterator-1.html#cb279-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"outer：{}"</span><span class="op">,</span> outer)<span class="op">;</span></span>
+<span id="cb279-6"><a href="iterator-1.html#cb279-6" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"inner：{}"</span><span class="op">,</span> inner)<span class="op">;</span></span>
+<span id="cb279-7"><a href="iterator-1.html#cb279-7" tabindex="-1"></a>#<span class="op">&gt;</span> outer：Rt</span>
+<span id="cb279-8"><a href="iterator-1.html#cb279-8" tabindex="-1"></a>#<span class="op">&gt;</span> inner：us</span></code></pre></div>
+</div>
+</div>
+<div id="iterator改造方法-1" class="section level2" number="16.3">
+<h2>
+<span class="header-section-number">16.3</span> Iterator改造方法<a class="anchor" aria-label="anchor" href="#iterator%E6%94%B9%E9%80%A0%E6%96%B9%E6%B3%95-1"><i class="fas fa-link"></i></a>
+</h2>
+<p>關於Iterator有兩個重點：</p>
+<p>1.對著iterator呼叫adapter不會耗用任何值，而是<strong>回傳一個新iterator</strong></p>
+<p>以下這段程式不會印出任何值：</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb280-1"><a href="iterator-1.html#cb280-1" tabindex="-1"></a>[<span class="st">"Java"</span><span class="op">,</span> <span class="st">"Rust"</span><span class="op">,</span> <span class="st">"css"</span><span class="op">,</span> <span class="st">"R"</span>]</span>
+<span id="cb280-2"><a href="iterator-1.html#cb280-2" tabindex="-1"></a>  <span class="op">.</span>iter()<span class="op">.</span>map(<span class="op">|</span>elt<span class="op">|</span> <span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> elt))<span class="op">;</span></span></code></pre></div>
+<p>程式會警告你：<code>note: iterators are lazy and do nothing unless consumed</code>。</p>
+<p><code>iter()</code>方法會回傳ㄧ個迭代陣列元素吧iterator，接著map會回傳第二個iterator，但沒人呼叫鍵索取值，也就是完全沒有人呼叫<code>next()</code>來讓這個iterator工作。</p>
+<p>2.iterator是抽象零成本的。如map、filter都是泛型，所以執行它們時，當對著iterator執行它們時，Rust會根據參與其中的iterator類型量身打造程式碼，因此它有足夠的資訊將各個iterator的next方法內連至它的耗用者裡面，然後將整個安排視為一個單位，翻譯成機器碼，讓它與你親自撰寫函式來過濾執行ㄧ樣高效。</p>
+<div id="map與filter-1" class="section level3" number="16.3.1">
+<h3>
+<span class="header-section-number">16.3.1</span> map與filter<a class="anchor" aria-label="anchor" href="#map%E8%88%87filter-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>map adapter可對iterator的項目執行一個closure，filter adpater則可從iterator篩選項目，用closure來決定保留項目。</p>
+<p>假設你要迭代多行文字，並省略每一行的空格與結尾，使用map來呼叫trim方法就非常適合</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb281-1"><a href="iterator-1.html#cb281-1" tabindex="-1"></a><span class="kw">let</span> text <span class="op">=</span> <span class="st">"hello, RUST!</span><span class="sc">\n</span><span class="st"> 妳好，羅斯特</span><span class="sc">\n</span><span class="st"> Java is better</span><span class="sc">\n</span><span class="st"> QQ"</span><span class="op">.</span>to_string()<span class="op">;</span></span>
+<span id="cb281-2"><a href="iterator-1.html#cb281-2" tabindex="-1"></a></span>
+<span id="cb281-3"><a href="iterator-1.html#cb281-3" tabindex="-1"></a><span class="kw">let</span> v<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">=</span> text<span class="op">.</span>lines()</span>
+<span id="cb281-4"><a href="iterator-1.html#cb281-4" tabindex="-1"></a>    <span class="op">.</span>map(<span class="dt">str</span><span class="pp">::</span>trim)</span>
+<span id="cb281-5"><a href="iterator-1.html#cb281-5" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb281-6"><a href="iterator-1.html#cb281-6" tabindex="-1"></a>    </span>
+<span id="cb281-7"><a href="iterator-1.html#cb281-7" tabindex="-1"></a><span class="cf">for</span> word <span class="kw">in</span> v <span class="op">{</span></span>
+<span id="cb281-8"><a href="iterator-1.html#cb281-8" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> word)<span class="op">;</span></span>
+<span id="cb281-9"><a href="iterator-1.html#cb281-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb281-10"><a href="iterator-1.html#cb281-10" tabindex="-1"></a>#<span class="op">&gt;</span> hello<span class="op">,</span> <span class="pp">RUST!</span></span>
+<span id="cb281-11"><a href="iterator-1.html#cb281-11" tabindex="-1"></a>#<span class="op">&gt;</span> 妳好，羅斯特</span>
+<span id="cb281-12"><a href="iterator-1.html#cb281-12" tabindex="-1"></a>#<span class="op">&gt;</span> Java is better</span>
+<span id="cb281-13"><a href="iterator-1.html#cb281-13" tabindex="-1"></a>#<span class="op">&gt;</span> QQ</span>
+<span id="cb281-14"><a href="iterator-1.html#cb281-14" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>map完的iterator還可以繼續改造，假如你想過濾有Java的字串，你可以使用filter：</p>
+<div class="sourceCode" id="cb282"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb282-1"><a href="iterator-1.html#cb282-1" tabindex="-1"></a><span class="kw">let</span> text <span class="op">=</span> <span class="st">"hello, RUST!</span><span class="sc">\n</span><span class="st"> 妳好，羅斯特</span><span class="sc">\n</span><span class="st"> Java is better</span><span class="sc">\n</span><span class="st"> QQ"</span><span class="op">.</span>to_string()<span class="op">;</span></span>
+<span id="cb282-2"><a href="iterator-1.html#cb282-2" tabindex="-1"></a></span>
+<span id="cb282-3"><a href="iterator-1.html#cb282-3" tabindex="-1"></a><span class="kw">let</span> v<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;&amp;</span><span class="dt">str</span><span class="op">&gt;</span> <span class="op">=</span> text<span class="op">.</span>lines()</span>
+<span id="cb282-4"><a href="iterator-1.html#cb282-4" tabindex="-1"></a>    <span class="op">.</span>map(<span class="dt">str</span><span class="pp">::</span>trim)</span>
+<span id="cb282-5"><a href="iterator-1.html#cb282-5" tabindex="-1"></a>    <span class="op">.</span>filter(<span class="op">|</span>s<span class="op">|</span> <span class="op">!</span>s<span class="op">.</span>contains(<span class="st">"Java"</span>))</span>
+<span id="cb282-6"><a href="iterator-1.html#cb282-6" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb282-7"><a href="iterator-1.html#cb282-7" tabindex="-1"></a>    </span>
+<span id="cb282-8"><a href="iterator-1.html#cb282-8" tabindex="-1"></a><span class="cf">for</span> word <span class="kw">in</span> v <span class="op">{</span></span>
+<span id="cb282-9"><a href="iterator-1.html#cb282-9" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> word)<span class="op">;</span></span>
+<span id="cb282-10"><a href="iterator-1.html#cb282-10" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb282-11"><a href="iterator-1.html#cb282-11" tabindex="-1"></a>#<span class="op">&gt;</span> hello<span class="op">,</span> <span class="pp">RUST!</span></span>
+<span id="cb282-12"><a href="iterator-1.html#cb282-12" tabindex="-1"></a>#<span class="op">&gt;</span> 妳好，羅斯特</span>
+<span id="cb282-13"><a href="iterator-1.html#cb282-13" tabindex="-1"></a>#<span class="op">&gt;</span> QQ</span>
+<span id="cb282-14"><a href="iterator-1.html#cb282-14" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>iterator的adapter的寫法很容易閱讀，每一個adapter都有一個目的，並且有續的把改造結果往下傳</p>
+<p>這些adpater的簽章：</p>
+<div class="sourceCode" id="cb283"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb283-1"><a href="iterator-1.html#cb283-1" tabindex="-1"></a><span class="kw">fn</span> map<span class="op">&lt;</span>B<span class="op">,</span> F<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> f<span class="op">:</span>F) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span>B<span class="op">&gt;</span></span>
+<span id="cb283-2"><a href="iterator-1.html#cb283-2" tabindex="-1"></a>  <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> F<span class="op">:</span> <span class="bu">FnMut</span>(<span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> B<span class="op">;</span></span>
+<span id="cb283-3"><a href="iterator-1.html#cb283-3" tabindex="-1"></a></span>
+<span id="cb283-4"><a href="iterator-1.html#cb283-4" tabindex="-1"></a><span class="kw">fn</span> filter<span class="op">&lt;</span>P<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> predicate<span class="op">:</span> P) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span></span>
+<span id="cb283-5"><a href="iterator-1.html#cb283-5" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> P<span class="op">:</span> <span class="bu">FnMut</span>(<span class="op">&amp;</span><span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> <span class="dt">bool</span><span class="op">;</span></span></code></pre></div>
+<p>map iterator將每個項目以值傳給他的closure，並依序將closure產生的結果的所有權交給它的耗用者。filter iterator以共享參考傳給它的closure，因此有時在使用filter要注意解參考，如：<code>filter(|s| *s != QQ);</code>參數型是<code>&amp;&amp;str</code>，要解參考後才能直接比較。</p>
+</div>
+<div id="filter_map與fat_map-1" class="section level3" number="16.3.2">
+<h3>
+<span class="header-section-number">16.3.2</span> filter_map與fat_map<a class="anchor" aria-label="anchor" href="#filter_map%E8%88%87fat_map-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>map adapter最適合處理每一個項目都要產生下一個項目，而filter adapter適合回傳零或ㄧ個目，但如果以想將項目一次轉換成一個或多個項目呢？或是想刪除某個項目而不處理呢？</p>
+<p>filter_map就如語意上的使用方式，就是map+filter，它可以讓vlosure轉換成新項目或選擇卸除，以下是它的簽章：</p>
+<div class="sourceCode" id="cb284"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb284-1"><a href="iterator-1.html#cb284-1" tabindex="-1"></a><span class="kw">fn</span> filter_map<span class="op">&lt;</span>B<span class="op">,</span> F<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> f<span class="op">:</span> F) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span>B<span class="op">&gt;</span></span>
+<span id="cb284-2"><a href="iterator-1.html#cb284-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> F<span class="op">:</span> <span class="bu">FnMut</span>(<span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span>B<span class="op">&gt;;</span></span></code></pre></div>
+<p>這個簽章與mapㄧ樣，但它回傳的是Option<b>，而不是B。當closure回傳<code>None</code>時，項目會卸除值，當它回傳<code>Some(b)</code>時，b是filter_map iterator產生的下一個項目。</b></p>
+<p>例如，我們要從字串提取數字，必須先以空格分開後，找出單詞後卸除無法解析的詞：</p>
+<div class="sourceCode" id="cb285"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb285-1"><a href="iterator-1.html#cb285-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::</span><span class="dt">str</span><span class="pp">::</span><span class="bu">FromStr</span><span class="op">;</span></span>
+<span id="cb285-2"><a href="iterator-1.html#cb285-2" tabindex="-1"></a></span>
+<span id="cb285-3"><a href="iterator-1.html#cb285-3" tabindex="-1"></a><span class="kw">let</span> text <span class="op">=</span> <span class="st">"11</span><span class="sc">\n</span><span class="st"> found .25 289 </span><span class="sc">\n</span><span class="st"> 3.1415 kkday</span><span class="sc">\n</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb285-4"><a href="iterator-1.html#cb285-4" tabindex="-1"></a></span>
+<span id="cb285-5"><a href="iterator-1.html#cb285-5" tabindex="-1"></a><span class="kw">let</span> numbers<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">f64</span><span class="op">&gt;</span> <span class="op">=</span> text<span class="op">.</span>split_whitespace()</span>
+<span id="cb285-6"><a href="iterator-1.html#cb285-6" tabindex="-1"></a>    <span class="op">.</span>filter_map(<span class="op">|</span>t<span class="op">|</span> <span class="dt">f64</span><span class="pp">::</span>from_str(t)<span class="op">.</span>ok())</span>
+<span id="cb285-7"><a href="iterator-1.html#cb285-7" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb285-8"><a href="iterator-1.html#cb285-8" tabindex="-1"></a>    </span>
+<span id="cb285-9"><a href="iterator-1.html#cb285-9" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers)<span class="op">;</span></span>
+<span id="cb285-10"><a href="iterator-1.html#cb285-10" tabindex="-1"></a>    </span>
+<span id="cb285-11"><a href="iterator-1.html#cb285-11" tabindex="-1"></a>#<span class="op">&gt;</span> [<span class="dv">11.0</span><span class="op">,</span> <span class="dv">0.25</span><span class="op">,</span> <span class="dv">289.0</span><span class="op">,</span> <span class="dv">3.1415</span>]</span></code></pre></div>
+<p>當filter_map的closure試著使用<code>f64::from_str</code>來解析各個以空白分開的slice，並回傳Result&lt;f64, ParseFloatError&gt;，它的.ok()會轉換成Option<f64>：解析錯誤會變成None，而成功的解析則是Some(v)</f64></p>
+<p>而flat_map則是可以回傳不只一個項目或零個，而是任意數量的項目，它的簽章如此：</p>
+<div class="sourceCode" id="cb286"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb286-1"><a href="iterator-1.html#cb286-1" tabindex="-1"></a><span class="kw">fn</span> flat_map<span class="op">&lt;</span>U<span class="op">,</span> F<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> f<span class="op">:</span>F) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="pp">U::</span>Item<span class="op">&gt;</span></span>
+<span id="cb286-2"><a href="iterator-1.html#cb286-2" tabindex="-1"></a>   <span class="kw">where</span> F<span class="op">:</span> <span class="bu">FnMut</span>(<span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> U<span class="op">,</span> U<span class="op">:</span> <span class="bu">IntoIterator</span><span class="op">;</span></span></code></pre></div>
+<p>傳給flat_map的closure必須回傳一個<strong>iterable</strong>，但任何形式的iterable都可以。</p>
+<div class="sourceCode" id="cb287"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb287-1"><a href="iterator-1.html#cb287-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::collections::</span>HashMap<span class="op">;</span></span>
+<span id="cb287-2"><a href="iterator-1.html#cb287-2" tabindex="-1"></a></span>
+<span id="cb287-3"><a href="iterator-1.html#cb287-3" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> major_cities <span class="op">=</span> <span class="pp">HashMap::</span>new()<span class="op">;</span></span>
+<span id="cb287-4"><a href="iterator-1.html#cb287-4" tabindex="-1"></a>major_cities<span class="op">.</span>insert (<span class="st">"Japan"</span><span class="op">,</span> <span class="pp">vec!</span> [<span class="st">"Tokyo"</span><span class="op">,</span> <span class="st">"Kyoto"</span>])<span class="op">;</span></span>
+<span id="cb287-5"><a href="iterator-1.html#cb287-5" tabindex="-1"></a>major_cities<span class="op">.</span>insert(<span class="st">"TheUnitedStates"</span><span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"Portland"</span><span class="op">,</span><span class="st">"Nashville"</span>])<span class="op">;</span></span>
+<span id="cb287-6"><a href="iterator-1.html#cb287-6" tabindex="-1"></a>major_cities<span class="op">.</span>insert(<span class="st">"Brazil"</span><span class="op">,</span> <span class="pp">vec!</span> [<span class="st">"São Paulo"</span><span class="op">,</span><span class="st">"Brasilia"</span>])<span class="op">;</span></span>
+<span id="cb287-7"><a href="iterator-1.html#cb287-7" tabindex="-1"></a>major_cities<span class="op">.</span>insert(<span class="st">"Kenya"</span><span class="op">,</span> <span class="pp">vec!</span> [<span class="st">"Nairobi"</span><span class="op">,</span><span class="st">"Mombasa"</span> ])<span class="op">;</span></span>
+<span id="cb287-8"><a href="iterator-1.html#cb287-8" tabindex="-1"></a></span>
+<span id="cb287-9"><a href="iterator-1.html#cb287-9" tabindex="-1"></a><span class="kw">let</span> countries <span class="op">=</span> [<span class="st">"Japan"</span><span class="op">,</span> <span class="st">"Brazil"</span><span class="op">,</span> <span class="st">"Kenya"</span>]<span class="op">;</span></span>
+<span id="cb287-10"><a href="iterator-1.html#cb287-10" tabindex="-1"></a></span>
+<span id="cb287-11"><a href="iterator-1.html#cb287-11" tabindex="-1"></a><span class="cf">for</span> <span class="op">&amp;</span>city <span class="kw">in</span> countries<span class="op">.</span>iter()<span class="op">.</span>flat_map(<span class="op">|</span>country<span class="op">|</span> <span class="op">&amp;</span>major_cities[country]) <span class="op">{</span></span>
+<span id="cb287-12"><a href="iterator-1.html#cb287-12" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> city)<span class="op">;</span></span>
+<span id="cb287-13"><a href="iterator-1.html#cb287-13" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb287-14"><a href="iterator-1.html#cb287-14" tabindex="-1"></a>#<span class="op">&gt;</span> Tokyo</span>
+<span id="cb287-15"><a href="iterator-1.html#cb287-15" tabindex="-1"></a>#<span class="op">&gt;</span> Kyoto</span>
+<span id="cb287-16"><a href="iterator-1.html#cb287-16" tabindex="-1"></a>#<span class="op">&gt;</span> São Paulo</span>
+<span id="cb287-17"><a href="iterator-1.html#cb287-17" tabindex="-1"></a>#<span class="op">&gt;</span> Brasilia</span>
+<span id="cb287-18"><a href="iterator-1.html#cb287-18" tabindex="-1"></a>#<span class="op">&gt;</span> Nairobi</span>
+<span id="cb287-19"><a href="iterator-1.html#cb287-19" tabindex="-1"></a>#<span class="op">&gt;</span> Mombasa</span>
+<span id="cb287-20"><a href="iterator-1.html#cb287-20" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<div id="flatten-1" class="section level3" number="16.3.3">
+<h3>
+<span class="header-section-number">16.3.3</span> flatten<a class="anchor" aria-label="anchor" href="#flatten-1"><i class="fas fa-link"></i></a>
+</h3>
+<p>flatten adapter會串接iterator的項目，將數個項目輾平成單層，回傳一個傳遞所有元素的iterator</p>
+<div class="sourceCode" id="cb288"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb288-1"><a href="iterator-1.html#cb288-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::collections::</span>HashMap<span class="op">;</span></span>
+<span id="cb288-2"><a href="iterator-1.html#cb288-2" tabindex="-1"></a></span>
+<span id="cb288-3"><a href="iterator-1.html#cb288-3" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> transportions <span class="op">=</span> <span class="pp">HashMap::</span>new()<span class="op">;</span></span>
+<span id="cb288-4"><a href="iterator-1.html#cb288-4" tabindex="-1"></a>transportions<span class="op">.</span>insert(<span class="st">"陸地"</span><span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"火車"</span><span class="op">,</span><span class="st">"公車"</span>])<span class="op">;</span></span>
+<span id="cb288-5"><a href="iterator-1.html#cb288-5" tabindex="-1"></a>transportions<span class="op">.</span>insert(<span class="st">"海上"</span><span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"渡輪"</span><span class="op">,</span> <span class="st">"獨木舟"</span>])<span class="op">;</span></span>
+<span id="cb288-6"><a href="iterator-1.html#cb288-6" tabindex="-1"></a>transportions<span class="op">.</span>insert(<span class="st">"空中"</span><span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"客機"</span><span class="op">,</span> <span class="st">"直升機"</span>])<span class="op">;</span></span>
+<span id="cb288-7"><a href="iterator-1.html#cb288-7" tabindex="-1"></a></span>
+<span id="cb288-8"><a href="iterator-1.html#cb288-8" tabindex="-1"></a><span class="kw">let</span> all_transportions<span class="op">:</span><span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> transportions<span class="op">.</span>values()<span class="op">.</span>flatten()<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb288-9"><a href="iterator-1.html#cb288-9" tabindex="-1"></a></span>
+<span id="cb288-10"><a href="iterator-1.html#cb288-10" tabindex="-1"></a><span class="cf">for</span> transportion <span class="kw">in</span> <span class="op">&amp;</span>all_transportions <span class="op">{</span></span>
+<span id="cb288-11"><a href="iterator-1.html#cb288-11" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> transportion)<span class="op">;</span></span>
+<span id="cb288-12"><a href="iterator-1.html#cb288-12" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb288-13"><a href="iterator-1.html#cb288-13" tabindex="-1"></a>#<span class="op">&gt;</span> 渡輪</span>
+<span id="cb288-14"><a href="iterator-1.html#cb288-14" tabindex="-1"></a>#<span class="op">&gt;</span> 獨木舟</span>
+<span id="cb288-15"><a href="iterator-1.html#cb288-15" tabindex="-1"></a>#<span class="op">&gt;</span> 火車</span>
+<span id="cb288-16"><a href="iterator-1.html#cb288-16" tabindex="-1"></a>#<span class="op">&gt;</span> 公車</span>
+<span id="cb288-17"><a href="iterator-1.html#cb288-17" tabindex="-1"></a>#<span class="op">&gt;</span> 客機</span>
+<span id="cb288-18"><a href="iterator-1.html#cb288-18" tabindex="-1"></a>#<span class="op">&gt;</span> 直升機</span>
+<span id="cb288-19"><a href="iterator-1.html#cb288-19" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>flatten的簽章是長這樣的：</p>
+<div class="sourceCode" id="cb289"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb289-1"><a href="iterator-1.html#cb289-1" tabindex="-1"></a><span class="kw">fn</span> flatten(<span class="kw">self</span>) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::Item::</span>Item<span class="op">&gt;</span></span>
+<span id="cb289-2"><a href="iterator-1.html#cb289-2" tabindex="-1"></a>   when <span class="dt">Self</span><span class="pp">::</span>Item<span class="op">:</span> <span class="bu">IntoIterator</span><span class="op">;</span></span></code></pre></div>
+<p>換句話說，上一層的iterator必須實作IntoIterator，並且再沒有呼叫next的耗用者出現部會運作。</p>
+<p>flatten除了輾平雙層結構，有幾個神奇的運作方式，例如你有一個Vec&lt;Option&lt;…&gt;&gt;，而你只想迭代Some值，用一個簡單的flatten就可以做到這件事。</p>
+<div class="sourceCode" id="cb290"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb290-1"><a href="iterator-1.html#cb290-1" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="pp">vec!</span>[<span class="cn">None</span><span class="op">,</span> <span class="cn">Some</span>(<span class="st">"a"</span>)<span class="op">,</span> <span class="cn">None</span><span class="op">,</span> <span class="cn">Some</span>(<span class="st">"b"</span>)]</span>
+<span id="cb290-2"><a href="iterator-1.html#cb290-2" tabindex="-1"></a>        <span class="op">.</span>into_iter()</span>
+<span id="cb290-3"><a href="iterator-1.html#cb290-3" tabindex="-1"></a>        <span class="op">.</span>flatten()</span>
+<span id="cb290-4"><a href="iterator-1.html#cb290-4" tabindex="-1"></a>        <span class="op">.</span><span class="pp">collect::</span><span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>()<span class="op">;</span></span>
+<span id="cb290-5"><a href="iterator-1.html#cb290-5" tabindex="-1"></a>        </span>
+<span id="cb290-6"><a href="iterator-1.html#cb290-6" tabindex="-1"></a><span class="cf">for</span> item_x <span class="kw">in</span> x <span class="op">{</span></span>
+<span id="cb290-7"><a href="iterator-1.html#cb290-7" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> item_x)<span class="op">;</span></span>
+<span id="cb290-8"><a href="iterator-1.html#cb290-8" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb290-9"><a href="iterator-1.html#cb290-9" tabindex="-1"></a></span>
+<span id="cb290-10"><a href="iterator-1.html#cb290-10" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="st">"a"</span></span>
+<span id="cb290-11"><a href="iterator-1.html#cb290-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="st">"b"</span></span>
+<span id="cb290-12"><a href="iterator-1.html#cb290-12" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>flatten+map的組合很常見，將元素是iterator的集合先以map方法執行某個函式(closure)，之後用flatten來將iterator輾平取出元素，參考下面這段程式：</p>
+<div class="sourceCode" id="cb291"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb291-1"><a href="iterator-1.html#cb291-1" tabindex="-1"></a><span class="kw">fn</span> to_uppercase(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> Sring <span class="op">{</span></span>
+<span id="cb291-2"><a href="iterator-1.html#cb291-2" tabindex="-1"></a>  <span class="kw">self</span><span class="op">.</span>chars()</span>
+<span id="cb291-3"><a href="iterator-1.html#cb291-3" tabindex="-1"></a>      <span class="op">.</span>map(<span class="dt">char</span><span class="pp">::</span>to_uppercase)</span>
+<span id="cb291-4"><a href="iterator-1.html#cb291-4" tabindex="-1"></a>      <span class="op">.</span>flatten()</span>
+<span id="cb291-5"><a href="iterator-1.html#cb291-5" tabindex="-1"></a>      <span class="op">.</span>collect()</span>
+<span id="cb291-6"><a href="iterator-1.html#cb291-6" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>要用這種組合技的原因是<code>to::uppercase()</code>不是回傳一個字元，而是回傳一個iterator，可產生ㄧ個或多個字元，flatten負責接受這些iterator，把他們輾平拼接成一個String。</p>
+<p>但不要忘了我們才剛介紹過的flat_map，事實上，它完全可以更輕鬆快速地做到這件事：</p>
+<div class="sourceCode" id="cb292"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb292-1"><a href="iterator-1.html#cb292-1" tabindex="-1"></a><span class="kw">fn</span> to_uppercase(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> Sring <span class="op">{</span></span>
+<span id="cb292-2"><a href="iterator-1.html#cb292-2" tabindex="-1"></a>  <span class="kw">self</span><span class="op">.</span>chars()</span>
+<span id="cb292-3"><a href="iterator-1.html#cb292-3" tabindex="-1"></a>      <span class="op">.</span>flat_map(<span class="dt">char</span><span class="pp">::</span>to_uppercase)</span>
+<span id="cb292-4"><a href="iterator-1.html#cb292-4" tabindex="-1"></a>      <span class="op">.</span>collect()</span>
+<span id="cb292-5"><a href="iterator-1.html#cb292-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="take與-take_while" class="section level3" number="16.3.4">
+<h3>
+<span class="header-section-number">16.3.4</span> take與 take_while<a class="anchor" aria-label="anchor" href="#take%E8%88%87-take_while"><i class="fas fa-link"></i></a>
+</h3>
+<p>你可以用這兩個方法告訴你的Iterator什麼時候結束迭代，在某個數量或某種情況，它們的簽章是：</p>
+<div class="sourceCode" id="cb293"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb293-1"><a href="iterator-1.html#cb293-1" tabindex="-1"></a><span class="kw">fn</span> take(<span class="kw">self</span><span class="op">,</span> n<span class="op">:</span> <span class="dt">usize</span>) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span></span>
+<span id="cb293-2"><a href="iterator-1.html#cb293-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">;</span></span>
+<span id="cb293-3"><a href="iterator-1.html#cb293-3" tabindex="-1"></a></span>
+<span id="cb293-4"><a href="iterator-1.html#cb293-4" tabindex="-1"></a><span class="kw">fn</span> take_while<span class="op">&lt;</span>P<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> predicate<span class="op">:</span> P) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span></span>
+<span id="cb293-5"><a href="iterator-1.html#cb293-5" tabindex="-1"></a>   <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> P<span class="op">:</span> <span class="bu">FnMut</span>(<span class="op">&amp;</span><span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> <span class="dt">bool</span><span class="op">;</span></span></code></pre></div>
+<p>它們接受一個iterator的所有權，同時回傳一個新的iterator。take iterator會在產生最多n個項目後回傳None。take_while會對每個項目執行predicate，並在回傳第一個讓predicate回傳flase的地方回傳<code>None</code>。</p>
+<p>例如，如果有一封email中間與標題正文之間有空行，使用<code>take_while</code>來迭代標題：</p>
+<div class="sourceCode" id="cb294"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb294-1"><a href="iterator-1.html#cb294-1" tabindex="-1"></a><span class="kw">let</span> message <span class="op">=</span> <span class="st">"To Tom</span><span class="sc">\r\n\</span></span>
+<span id="cb294-2"><a href="iterator-1.html#cb294-2" tabindex="-1"></a><span class="st">              From: Bling&lt;whoareyouman0.4@gmail.com&gt;</span><span class="sc">\r\n\</span></span>
+<span id="cb294-3"><a href="iterator-1.html#cb294-3" tabindex="-1"></a><span class="st">              </span><span class="sc">\r\n\</span></span>
+<span id="cb294-4"><a href="iterator-1.html#cb294-4" tabindex="-1"></a><span class="st">              Did you get any writting done today?</span><span class="sc">\r\n</span></span>
+<span id="cb294-5"><a href="iterator-1.html#cb294-5" tabindex="-1"></a><span class="st">              when will you stop wasting time?</span><span class="sc">\r\n</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb294-6"><a href="iterator-1.html#cb294-6" tabindex="-1"></a></span>
+<span id="cb294-7"><a href="iterator-1.html#cb294-7" tabindex="-1"></a><span class="cf">for</span> headers <span class="kw">in</span> message<span class="op">.</span>lines()<span class="op">.</span>take_while(<span class="op">|</span>l<span class="op">|</span> <span class="op">!</span>l<span class="op">.</span>is_empty()) <span class="op">{</span></span>
+<span id="cb294-8"><a href="iterator-1.html#cb294-8" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> headers)<span class="op">;</span></span>
+<span id="cb294-9"><a href="iterator-1.html#cb294-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb294-10"><a href="iterator-1.html#cb294-10" tabindex="-1"></a>#<span class="op">&gt;</span> To Tom</span>
+<span id="cb294-11"><a href="iterator-1.html#cb294-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="bu">From</span><span class="op">:</span> Bling<span class="op">&lt;</span>whoareyouman0<span class="op">.</span><span class="dv">4</span><span class="op">@</span>gmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb294-12"><a href="iterator-1.html#cb294-12" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>我們在過去說過，字串裡面的一行文字結尾是反斜線時，Rust不會加入下一排的縮排，所以字串的每一行的開頭都沒有空格。這意味訊息第三行是空的，take_while 在看到空行時立即終止迭代，只會印出前兩行</p>
+</div>
+<div id="skip與skip_while" class="section level3" number="16.3.5">
+<h3>
+<span class="header-section-number">16.3.5</span> skip與skip_while<a class="anchor" aria-label="anchor" href="#skip%E8%88%87skip_while"><i class="fas fa-link"></i></a>
+</h3>
+<p>Iterator trait的skip與skip_while方法是take與take_while的相反：它們在迭代開始時卸出某個數量的項目，或是一直卸除項目，直到closure找到可接受時為止，將剩餘項目包在iterator傳出</p>
+<div class="sourceCode" id="cb295"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb295-1"><a href="iterator-1.html#cb295-1" tabindex="-1"></a><span class="kw">fn</span> skip(<span class="kw">self</span><span class="op">,</span> n<span class="op">:</span> <span class="dt">usize</span>) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span></span>
+<span id="cb295-2"><a href="iterator-1.html#cb295-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">;</span></span>
+<span id="cb295-3"><a href="iterator-1.html#cb295-3" tabindex="-1"></a></span>
+<span id="cb295-4"><a href="iterator-1.html#cb295-4" tabindex="-1"></a><span class="kw">fn</span> slkip_while<span class="op">&lt;</span>P<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> predicate<span class="op">:</span> P) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span></span>
+<span id="cb295-5"><a href="iterator-1.html#cb295-5" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> P<span class="op">:</span> <span class="bu">FnMut</span>(<span class="op">&amp;</span><span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> <span class="dt">bool</span></span></code></pre></div>
+<p>如果你知道要從哪裡開始，你可以用<code>skip</code>來指定要跳過的項目數：</p>
+<div class="sourceCode" id="cb296"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb296-1"><a href="iterator-1.html#cb296-1" tabindex="-1"></a><span class="cf">for</span> arg <span class="kw">in</span> <span class="pp">std::env::</span>args()<span class="op">.</span>skip(<span class="dv">1</span>) <span class="op">{</span></span>
+<span id="cb296-2"><a href="iterator-1.html#cb296-2" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb296-3"><a href="iterator-1.html#cb296-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>這是迭代命令引數，我們用skip跳過第一個命令(第一個字串是程式本身的名稱)</p>
+<p>take_while可以讓你決定在什麼狀況停止取值，skip_while則是在什麼狀況下開始取值：</p>
+<div class="sourceCode" id="cb297"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb297-1"><a href="iterator-1.html#cb297-1" tabindex="-1"></a><span class="kw">let</span> message <span class="op">=</span> <span class="st">"To Tom</span><span class="sc">\r\n\</span></span>
+<span id="cb297-2"><a href="iterator-1.html#cb297-2" tabindex="-1"></a><span class="st">              From: Bling&lt;whoareyouman0.4@gmail.com&gt;</span><span class="sc">\r\n\</span></span>
+<span id="cb297-3"><a href="iterator-1.html#cb297-3" tabindex="-1"></a><span class="st">              </span><span class="sc">\r\n\</span></span>
+<span id="cb297-4"><a href="iterator-1.html#cb297-4" tabindex="-1"></a><span class="st">              Did you get any writting done today?</span><span class="sc">\r\n</span></span>
+<span id="cb297-5"><a href="iterator-1.html#cb297-5" tabindex="-1"></a><span class="st">              when will you stop wasting time?</span><span class="sc">\r\n</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb297-6"><a href="iterator-1.html#cb297-6" tabindex="-1"></a></span>
+<span id="cb297-7"><a href="iterator-1.html#cb297-7" tabindex="-1"></a></span>
+<span id="cb297-8"><a href="iterator-1.html#cb297-8" tabindex="-1"></a><span class="cf">for</span> body <span class="kw">in</span> message<span class="op">.</span>lines()<span class="op">.</span>skip_while(<span class="op">|</span>l<span class="op">|</span> <span class="op">!</span>l<span class="op">.</span>is_empty())<span class="op">.</span>skip(<span class="dv">1</span>) <span class="op">{</span></span>
+<span id="cb297-9"><a href="iterator-1.html#cb297-9" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> body)<span class="op">;</span></span>
+<span id="cb297-10"><a href="iterator-1.html#cb297-10" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb297-11"><a href="iterator-1.html#cb297-11" tabindex="-1"></a>#<span class="op">&gt;</span> Did you get any writting done today<span class="op">?</span></span>
+<span id="cb297-12"><a href="iterator-1.html#cb297-12" tabindex="-1"></a>#<span class="op">&gt;</span> </span>
+<span id="cb297-13"><a href="iterator-1.html#cb297-13" tabindex="-1"></a>#<span class="op">&gt;</span>               when will you stop wasting time<span class="op">?</span></span>
+<span id="cb297-14"><a href="iterator-1.html#cb297-14" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<div id="peekable" class="section level3" number="16.3.6">
+<h3>
+<span class="header-section-number">16.3.6</span> peekable<a class="anchor" aria-label="anchor" href="#peekable"><i class="fas fa-link"></i></a>
+</h3>
+<p>peekable可以讓你偷看一下項目，而不實際耗用：</p>
+<div class="sourceCode" id="cb298"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb298-1"><a href="iterator-1.html#cb298-1" tabindex="-1"></a><span class="kw">fn</span> peekable(<span class="kw">self</span>) <span class="op">-&gt;</span> <span class="pp">std::iter::</span>Peekable<span class="op">&lt;</span><span class="dt">Self</span><span class="op">&gt;</span></span>
+<span id="cb298-2"><a href="iterator-1.html#cb298-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">;</span></span></code></pre></div>
+<p>這裡的Peekable<self>實作了Iterator&lt;Item=Self::Item&gt;的結構，屬於一種iterator型態</self></p>
+<p>Peekable iterator有一個額外的peek方法，它會回傳一個Option&lt;&amp;Item&gt;，</p>
+</div>
+<div id="fuse" class="section level3" number="16.3.7">
+<h3>
+<span class="header-section-number">16.3.7</span> fuse<a class="anchor" aria-label="anchor" href="#fuse"><i class="fas fa-link"></i></a>
+</h3>
+<p>Iterator在回傳None之後，trait並未規定再次呼叫它的next方法時該怎麼辦。大多數的iterator都會直接回傳None，當並非全都如此。</p>
+<p>fuse adapter接受任何iterator，並產生一個iterator，那個iterator會在第一次回傳None之後，繼續回傳None。</p>
+<div class="sourceCode" id="cb299"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb299-1"><a href="iterator-1.html#cb299-1" tabindex="-1"></a><span class="kw">struct</span> Flaky(<span class="dt">bool</span>)<span class="op">;</span></span>
+<span id="cb299-2"><a href="iterator-1.html#cb299-2" tabindex="-1"></a></span>
+<span id="cb299-3"><a href="iterator-1.html#cb299-3" tabindex="-1"></a><span class="kw">impl</span> <span class="bu">Iterator</span> <span class="cf">for</span> Flaky <span class="op">{</span></span>
+<span id="cb299-4"><a href="iterator-1.html#cb299-4" tabindex="-1"></a>  <span class="kw">type</span> Item <span class="op">=</span> <span class="op">&amp;</span><span class="ot">'static</span> <span class="dt">str</span><span class="op">;</span></span>
+<span id="cb299-5"><a href="iterator-1.html#cb299-5" tabindex="-1"></a>  <span class="kw">fn</span> next(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb299-6"><a href="iterator-1.html#cb299-6" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">self</span><span class="op">.</span><span class="dv">0</span> <span class="op">{</span></span>
+<span id="cb299-7"><a href="iterator-1.html#cb299-7" tabindex="-1"></a>      <span class="kw">self</span><span class="op">.</span><span class="dv">0</span> <span class="op">=</span> <span class="cn">false</span><span class="op">;</span></span>
+<span id="cb299-8"><a href="iterator-1.html#cb299-8" tabindex="-1"></a>      <span class="cn">Some</span>(<span class="st">"totally the last item)</span></span>
+<span id="cb299-9"><a href="iterator-1.html#cb299-9" tabindex="-1"></a><span class="st">    }else{</span></span>
+<span id="cb299-10"><a href="iterator-1.html#cb299-10" tabindex="-1"></a><span class="st">      self.0 = true; // 注意個行為</span></span>
+<span id="cb299-11"><a href="iterator-1.html#cb299-11" tabindex="-1"></a><span class="st">      None</span></span>
+<span id="cb299-12"><a href="iterator-1.html#cb299-12" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb299-13"><a href="iterator-1.html#cb299-13" tabindex="-1"></a><span class="st">  }</span></span>
+<span id="cb299-14"><a href="iterator-1.html#cb299-14" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb299-15"><a href="iterator-1.html#cb299-15" tabindex="-1"></a></span>
+<span id="cb299-16"><a href="iterator-1.html#cb299-16" tabindex="-1"></a><span class="st">let mut flaky = Flaky(true);</span></span>
+<span id="cb299-17"><a href="iterator-1.html#cb299-17" tabindex="-1"></a><span class="st">rprintln!("</span><span class="op">{}</span><span class="st">" ,flaky.next());</span></span>
+<span id="cb299-18"><a href="iterator-1.html#cb299-18" tabindex="-1"></a><span class="st">rprintln!("</span><span class="op">{}</span><span class="st">" ,flaky.next());</span></span>
+<span id="cb299-19"><a href="iterator-1.html#cb299-19" tabindex="-1"></a><span class="st">rprintln!("</span><span class="op">{}</span><span class="st">" ,flaky.next());</span></span>
+<span id="cb299-20"><a href="iterator-1.html#cb299-20" tabindex="-1"></a></span>
+<span id="cb299-21"><a href="iterator-1.html#cb299-21" tabindex="-1"></a><span class="st">let mut flaky = Flaky(true).fuse();</span></span>
+<span id="cb299-22"><a href="iterator-1.html#cb299-22" tabindex="-1"></a><span class="st">rprintln!("</span><span class="op">{}</span><span class="st">" ,flaky.next());</span></span>
+<span id="cb299-23"><a href="iterator-1.html#cb299-23" tabindex="-1"></a><span class="st">rprintln!("</span><span class="op">{}</span><span class="st">" ,flaky.next());</span></span>
+<span id="cb299-24"><a href="iterator-1.html#cb299-24" tabindex="-1"></a><span class="st">rprintln!("</span><span class="op">{}</span><span class="st">" ,flaky.next());</span></span></code></pre></div>
+<p>因為Flaky的next方法會在true與false之間循環，導致並非item清空後不停回完<code>None</code>，如果你需要這樣的特性，fuse可以為你校正這件事。</p>
+</div>
+<div id="可逆的iterator與rev" class="section level3" number="16.3.8">
+<h3>
+<span class="header-section-number">16.3.8</span> 可逆的iterator與rev<a class="anchor" aria-label="anchor" href="#%E5%8F%AF%E9%80%86%E7%9A%84iterator%E8%88%87rev"><i class="fas fa-link"></i></a>
+</h3>
+<p>在有序的集合中，你可能會想從兩頭取出項目，只要實作<code>std::iter::DoubleEndedIterator</code>，它的簽章是：</p>
+<div class="sourceCode" id="cb300"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb300-1"><a href="iterator-1.html#cb300-1" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">DoubleEndedIterator</span><span class="op">:</span> <span class="bu">Iterator</span> <span class="op">{</span></span>
+<span id="cb300-2"><a href="iterator-1.html#cb300-2" tabindex="-1"></a>  <span class="kw">fn</span> next_back(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">Self</span><span class="pp">::</span>item<span class="op">&gt;;</span></span>
+<span id="cb300-3"><a href="iterator-1.html#cb300-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>它繼承iterator，並有一個next_back方法，用來取出末端的值</p>
+<div class="sourceCode" id="cb301"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb301-1"><a href="iterator-1.html#cb301-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> fruit <span class="op">=</span> [<span class="st">"apple"</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">,</span> <span class="st">"grape"</span>]<span class="op">;</span></span>
+<span id="cb301-2"><a href="iterator-1.html#cb301-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iter <span class="op">=</span> fruit<span class="op">.</span>into_iter()<span class="op">;</span></span>
+<span id="cb301-3"><a href="iterator-1.html#cb301-3" tabindex="-1"></a></span>
+<span id="cb301-4"><a href="iterator-1.html#cb301-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iter<span class="op">.</span>next_back())<span class="op">;</span></span>
+<span id="cb301-5"><a href="iterator-1.html#cb301-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iter<span class="op">.</span>next_back())<span class="op">;</span></span>
+<span id="cb301-6"><a href="iterator-1.html#cb301-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"grape"</span>)</span>
+<span id="cb301-7"><a href="iterator-1.html#cb301-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"banana"</span>)</span></code></pre></div>
+<p>如果iterator是雙端的，你可以用rev adapter將它倒過來，它的簽章是：</p>
+<div class="sourceCode" id="cb302"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb302-1"><a href="iterator-1.html#cb302-1" tabindex="-1"></a><span class="kw">fn</span> rev(<span class="kw">self</span>) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="op">&gt;</span></span>
+<span id="cb302-2"><a href="iterator-1.html#cb302-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span> <span class="op">+</span> <span class="bu">DoubleEndedIterator</span><span class="op">;</span></span></code></pre></div>
+<p>它回傳的iterator也是雙端，因爲它顛倒整個顛倒整個序列：</p>
+<div class="sourceCode" id="cb303"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb303-1"><a href="iterator-1.html#cb303-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> fruit <span class="op">=</span> [<span class="st">"apple"</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">,</span> <span class="st">"grape"</span>]<span class="op">;</span></span>
+<span id="cb303-2"><a href="iterator-1.html#cb303-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iter <span class="op">=</span> fruit<span class="op">.</span>into_iter()<span class="op">.</span>rev()<span class="op">;</span></span>
+<span id="cb303-3"><a href="iterator-1.html#cb303-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iter)<span class="op">;</span></span>
+<span id="cb303-4"><a href="iterator-1.html#cb303-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> iter<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb303-5"><a href="iterator-1.html#cb303-5" tabindex="-1"></a></span>
+<span id="cb303-6"><a href="iterator-1.html#cb303-6" tabindex="-1"></a>#<span class="op">&gt;</span> Rev <span class="op">{</span> iter<span class="op">:</span> IntoIter([<span class="st">"apple"</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">,</span> <span class="st">"grape"</span>]) <span class="op">}</span></span>
+<span id="cb303-7"><a href="iterator-1.html#cb303-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="st">"grape"</span>)</span></code></pre></div>
+</div>
+<div id="inspect" class="section level3" number="16.3.9">
+<h3>
+<span class="header-section-number">16.3.9</span> inspect<a class="anchor" aria-label="anchor" href="#inspect"><i class="fas fa-link"></i></a>
+</h3>
+<p>inspect adapter可對iterator adapter進行流水線的偵錯，它僅將項目的共享參考傳給closure，不會影響項目，這適合拿來印出項目與製作它們斷言。</p>
+<p>在這個例子中，將一個字串轉換成大寫</p>
+<div class="sourceCode" id="cb304"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb304-1"><a href="iterator-1.html#cb304-1" tabindex="-1"></a><span class="kw">let</span> uppercase<span class="op">:</span> <span class="dt">String</span> <span class="op">=</span> <span class="st">"james"</span><span class="op">.</span>chars()</span>
+<span id="cb304-2"><a href="iterator-1.html#cb304-2" tabindex="-1"></a>    <span class="op">.</span>inspect(<span class="op">|</span>c<span class="op">|</span> <span class="pp">rprint!</span>(<span class="st">"before : {:?}</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> c ))</span>
+<span id="cb304-3"><a href="iterator-1.html#cb304-3" tabindex="-1"></a>    <span class="op">.</span>flat_map(<span class="dt">char</span><span class="pp">::</span>to_uppercase)</span>
+<span id="cb304-4"><a href="iterator-1.html#cb304-4" tabindex="-1"></a>    <span class="op">.</span>inspect(<span class="op">|</span>c<span class="op">|</span> <span class="pp">rprint!</span>(<span class="st">"after :     {:?}</span><span class="sc">\n</span><span class="st">"</span><span class="op">,</span> c ))</span>
+<span id="cb304-5"><a href="iterator-1.html#cb304-5" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb304-6"><a href="iterator-1.html#cb304-6" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> uppercase)<span class="op">;</span></span>
+<span id="cb304-7"><a href="iterator-1.html#cb304-7" tabindex="-1"></a>#<span class="op">&gt;</span> before <span class="op">:</span> <span class="ch">'j'</span></span>
+<span id="cb304-8"><a href="iterator-1.html#cb304-8" tabindex="-1"></a>#<span class="op">&gt;</span> after <span class="op">:</span>     <span class="ch">'J'</span></span>
+<span id="cb304-9"><a href="iterator-1.html#cb304-9" tabindex="-1"></a>#<span class="op">&gt;</span> before <span class="op">:</span> <span class="ch">'a'</span></span>
+<span id="cb304-10"><a href="iterator-1.html#cb304-10" tabindex="-1"></a>#<span class="op">&gt;</span> after <span class="op">:</span>     <span class="ch">'A'</span></span>
+<span id="cb304-11"><a href="iterator-1.html#cb304-11" tabindex="-1"></a>#<span class="op">&gt;</span> before <span class="op">:</span> <span class="ch">'m'</span></span>
+<span id="cb304-12"><a href="iterator-1.html#cb304-12" tabindex="-1"></a>#<span class="op">&gt;</span> after <span class="op">:</span>     <span class="ch">'M'</span></span>
+<span id="cb304-13"><a href="iterator-1.html#cb304-13" tabindex="-1"></a>#<span class="op">&gt;</span> before <span class="op">:</span> <span class="ch">'e'</span></span>
+<span id="cb304-14"><a href="iterator-1.html#cb304-14" tabindex="-1"></a>#<span class="op">&gt;</span> after <span class="op">:</span>     <span class="ch">'E'</span></span>
+<span id="cb304-15"><a href="iterator-1.html#cb304-15" tabindex="-1"></a>#<span class="op">&gt;</span> before <span class="op">:</span> <span class="ch">'s'</span></span>
+<span id="cb304-16"><a href="iterator-1.html#cb304-16" tabindex="-1"></a>#<span class="op">&gt;</span> after <span class="op">:</span>     <span class="ch">'S'</span></span>
+<span id="cb304-17"><a href="iterator-1.html#cb304-17" tabindex="-1"></a>#<span class="op">&gt;</span> JAMES</span></code></pre></div>
+</div>
+<div id="chain" class="section level3" number="16.3.10">
+<h3>
+<span class="header-section-number">16.3.10</span> chain<a class="anchor" aria-label="anchor" href="#chain"><i class="fas fa-link"></i></a>
+</h3>
+<p>chain adapter可以將iterator附加至另一個iterator。更準確的說，i1.chain(i2)會回傳一個iterator，該iterator會從i1取出項目，耗盡之後再從i2取出項目，它的簽章是如此：</p>
+<div class="sourceCode" id="cb305"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb305-1"><a href="iterator-1.html#cb305-1" tabindex="-1"></a><span class="kw">fn</span> chain<span class="op">&lt;</span>U<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> other<span class="op">:</span> U) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="bu">Iterator</span><span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;</span></span>
+<span id="cb305-2"><a href="iterator-1.html#cb305-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> U<span class="op">:</span> Intoiterator<span class="op">&lt;</span>Item<span class="op">=</span><span class="dt">Self</span><span class="pp">::</span>Item<span class="op">&gt;;</span></span></code></pre></div>
+<p>換句話說，你可以將一個iterator與產生同一型態項目的任何iterable串接起來：</p>
+<div class="sourceCode" id="cb306"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb306-1"><a href="iterator-1.html#cb306-1" tabindex="-1"></a><span class="kw">let</span> v<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="dv">1</span><span class="op">..</span><span class="dv">4</span>)<span class="op">.</span>chain([<span class="dv">20</span><span class="op">,</span> <span class="dv">30</span><span class="op">,</span> <span class="dv">40</span>])<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb306-2"><a href="iterator-1.html#cb306-2" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> v)<span class="op">;</span></span>
+<span id="cb306-3"><a href="iterator-1.html#cb306-3" tabindex="-1"></a>#<span class="op">&gt;</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">20</span><span class="op">,</span> <span class="dv">30</span><span class="op">,</span> <span class="dv">40</span>]</span></code></pre></div>
+</div>
+<div id="enumerate" class="section level3" number="16.3.11">
+<h3>
+<span class="header-section-number">16.3.11</span> enumerate<a class="anchor" aria-label="anchor" href="#enumerate"><i class="fas fa-link"></i></a>
+</h3>
+<p>enumerate adapter可將ㄧ個運行索引附加至序列，如”apple”, “banana”, “grape”為item的iterator附加後回傳(0, “apple”)、(1, “banna”)、(2, “grape”)</p>
+<div class="sourceCode" id="cb307"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb307-1"><a href="iterator-1.html#cb307-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> fruit <span class="op">=</span> [<span class="st">"apple"</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">,</span> <span class="st">"grape"</span>]<span class="op">;</span></span>
+<span id="cb307-2"><a href="iterator-1.html#cb307-2" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> name) <span class="kw">in</span> fruit<span class="op">.</span>into_iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb307-3"><a href="iterator-1.html#cb307-3" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"i: {}, name: {}"</span><span class="op">,</span> i<span class="op">,</span> name)<span class="op">;</span></span>
+<span id="cb307-4"><a href="iterator-1.html#cb307-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb307-5"><a href="iterator-1.html#cb307-5" tabindex="-1"></a>#<span class="op">&gt;</span> i<span class="op">:</span> <span class="dv">0</span><span class="op">,</span> name<span class="op">:</span> apple</span>
+<span id="cb307-6"><a href="iterator-1.html#cb307-6" tabindex="-1"></a>#<span class="op">&gt;</span> i<span class="op">:</span> <span class="dv">1</span><span class="op">,</span> name<span class="op">:</span> banana</span>
+<span id="cb307-7"><a href="iterator-1.html#cb307-7" tabindex="-1"></a>#<span class="op">&gt;</span> i<span class="op">:</span> <span class="dv">2</span><span class="op">,</span> name<span class="op">:</span> grape</span>
+<span id="cb307-8"><a href="iterator-1.html#cb307-8" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<div id="zip" class="section level3" number="16.3.12">
+<h3>
+<span class="header-section-number">16.3.12</span> zip<a class="anchor" aria-label="anchor" href="#zip"><i class="fas fa-link"></i></a>
+</h3>
+<p>zip adapter可以將兩個iterator結合成一個，但不是串接，而是類似enumerate產生一對值，例如下面例子中，我們將無界限的0..與另一個iterator來產生與enumerate adapter的效果：</p>
+<div class="sourceCode" id="cb308"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb308-1"><a href="iterator-1.html#cb308-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> fruit <span class="op">=</span> [<span class="st">"apple"</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">,</span> <span class="st">"grape"</span>]<span class="op">;</span></span>
+<span id="cb308-2"><a href="iterator-1.html#cb308-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iter<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> (<span class="dv">0</span><span class="op">..</span>)<span class="op">.</span>zip(fruit)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb308-3"><a href="iterator-1.html#cb308-3" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> name) <span class="kw">in</span> fruit<span class="op">.</span>into_iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb308-4"><a href="iterator-1.html#cb308-4" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"i: {}, name: {}"</span><span class="op">,</span> i<span class="op">,</span> name)<span class="op">;</span></span>
+<span id="cb308-5"><a href="iterator-1.html#cb308-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb308-6"><a href="iterator-1.html#cb308-6" tabindex="-1"></a>#<span class="op">&gt;</span> i<span class="op">:</span> <span class="dv">0</span><span class="op">,</span> name<span class="op">:</span> apple</span>
+<span id="cb308-7"><a href="iterator-1.html#cb308-7" tabindex="-1"></a>#<span class="op">&gt;</span> i<span class="op">:</span> <span class="dv">1</span><span class="op">,</span> name<span class="op">:</span> banana</span>
+<span id="cb308-8"><a href="iterator-1.html#cb308-8" tabindex="-1"></a>#<span class="op">&gt;</span> i<span class="op">:</span> <span class="dv">2</span><span class="op">,</span> name<span class="op">:</span> grape</span>
+<span id="cb308-9"><a href="iterator-1.html#cb308-9" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>你可以把zip視為更廣義的enumerate，enumerate在可協助提供處理項目資訊時使用，zip可以附加任何東西，不需要是iterator，可以是iterable</p>
+<div class="sourceCode" id="cb309"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb309-1"><a href="iterator-1.html#cb309-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::iter::</span>repeat<span class="op">;</span></span>
+<span id="cb309-2"><a href="iterator-1.html#cb309-2" tabindex="-1"></a></span>
+<span id="cb309-3"><a href="iterator-1.html#cb309-3" tabindex="-1"></a><span class="kw">let</span> transportions <span class="op">=</span> <span class="pp">vec!</span>[<span class="st">"car"</span><span class="op">,</span> <span class="st">"bus"</span><span class="op">,</span> <span class="st">"MRT"</span>]<span class="op">;</span></span>
+<span id="cb309-4"><a href="iterator-1.html#cb309-4" tabindex="-1"></a></span>
+<span id="cb309-5"><a href="iterator-1.html#cb309-5" tabindex="-1"></a><span class="kw">let</span> songs <span class="op">:</span><span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> repeat(<span class="st">"by"</span>)</span>
+<span id="cb309-6"><a href="iterator-1.html#cb309-6" tabindex="-1"></a>    <span class="op">.</span>zip(transportions)</span>
+<span id="cb309-7"><a href="iterator-1.html#cb309-7" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb309-8"><a href="iterator-1.html#cb309-8" tabindex="-1"></a>    </span>
+<span id="cb309-9"><a href="iterator-1.html#cb309-9" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> songs)<span class="op">;</span></span>
+<span id="cb309-10"><a href="iterator-1.html#cb309-10" tabindex="-1"></a>#<span class="op">&gt;</span> [(<span class="st">"by"</span><span class="op">,</span> <span class="st">"car"</span>)<span class="op">,</span> (<span class="st">"by"</span><span class="op">,</span> <span class="st">"bus"</span>)<span class="op">,</span> (<span class="st">"by"</span><span class="op">,</span> <span class="st">"MRT"</span>)]</span></code></pre></div>
+</div>
+<div id="by_ref" class="section level3" number="16.3.13">
+<h3>
+<span class="header-section-number">16.3.13</span> by_ref<a class="anchor" aria-label="anchor" href="#by_ref"><i class="fas fa-link"></i></a>
+</h3>
+<p>當你將adapter附加至itrator，你通常不能解除取回底層iterator所有權。</p>
+<p>而iterator的by_ref方法可以借一個可變參考給iterator，在你使用adapter後，卸除它，結束借用並重新取得原始的iterator使用權。</p>
+<p>本章稍早曾使用take_while與skip_while分別截取正文與標題，你可以用不同的iterator來做這件事，或如下例中，<code>iter.by_ref().take_while</code>把一個可變參考給take_while，完成後，取回底下的iterator。</p>
+<div class="sourceCode" id="cb310"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb310-1"><a href="iterator-1.html#cb310-1" tabindex="-1"></a></span>
+<span id="cb310-2"><a href="iterator-1.html#cb310-2" tabindex="-1"></a><span class="kw">let</span> message <span class="op">=</span> <span class="st">"To Tom</span><span class="sc">\r\n\</span></span>
+<span id="cb310-3"><a href="iterator-1.html#cb310-3" tabindex="-1"></a><span class="st">From: Bling&lt;whoareyouman0.4@gmail.com&gt;</span><span class="sc">\r\n\</span></span>
+<span id="cb310-4"><a href="iterator-1.html#cb310-4" tabindex="-1"></a><span class="sc">\r\n\</span></span>
+<span id="cb310-5"><a href="iterator-1.html#cb310-5" tabindex="-1"></a><span class="st">Did you get any writting done today?</span><span class="sc">\r\n\</span></span>
+<span id="cb310-6"><a href="iterator-1.html#cb310-6" tabindex="-1"></a><span class="st">when will you stop wasting time?</span><span class="sc">\r\n</span><span class="st">"</span><span class="op">;</span></span>
+<span id="cb310-7"><a href="iterator-1.html#cb310-7" tabindex="-1"></a></span>
+<span id="cb310-8"><a href="iterator-1.html#cb310-8" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iter <span class="op">=</span> message<span class="op">.</span>lines()<span class="op">;</span></span>
+<span id="cb310-9"><a href="iterator-1.html#cb310-9" tabindex="-1"></a></span>
+<span id="cb310-10"><a href="iterator-1.html#cb310-10" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"Headers："</span>)<span class="op">;</span></span>
+<span id="cb310-11"><a href="iterator-1.html#cb310-11" tabindex="-1"></a><span class="cf">for</span> body <span class="kw">in</span> iter<span class="op">.</span>by_ref()<span class="op">.</span>take_while(<span class="op">|</span>l<span class="op">|</span> <span class="op">!</span>l<span class="op">.</span>is_empty()) <span class="op">{</span></span>
+<span id="cb310-12"><a href="iterator-1.html#cb310-12" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> body)<span class="op">;</span></span>
+<span id="cb310-13"><a href="iterator-1.html#cb310-13" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb310-14"><a href="iterator-1.html#cb310-14" tabindex="-1"></a></span>
+<span id="cb310-15"><a href="iterator-1.html#cb310-15" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Body："</span>)<span class="op">;</span></span>
+<span id="cb310-16"><a href="iterator-1.html#cb310-16" tabindex="-1"></a><span class="cf">for</span> body <span class="kw">in</span> iter<span class="op">{</span></span>
+<span id="cb310-17"><a href="iterator-1.html#cb310-17" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> body)<span class="op">;</span></span>
+<span id="cb310-18"><a href="iterator-1.html#cb310-18" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb310-19"><a href="iterator-1.html#cb310-19" tabindex="-1"></a></span>
+<span id="cb310-20"><a href="iterator-1.html#cb310-20" tabindex="-1"></a>#<span class="op">&gt;</span> Headers：</span>
+<span id="cb310-21"><a href="iterator-1.html#cb310-21" tabindex="-1"></a>#<span class="op">&gt;</span> To Tom</span>
+<span id="cb310-22"><a href="iterator-1.html#cb310-22" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="bu">From</span><span class="op">:</span> Bling<span class="op">&lt;</span>whoareyouman0<span class="op">.</span><span class="dv">4</span><span class="op">@</span>gmail<span class="op">.</span>com<span class="op">&gt;</span></span>
+<span id="cb310-23"><a href="iterator-1.html#cb310-23" tabindex="-1"></a>#<span class="op">&gt;</span> </span>
+<span id="cb310-24"><a href="iterator-1.html#cb310-24" tabindex="-1"></a>#<span class="op">&gt;</span> Body：</span>
+<span id="cb310-25"><a href="iterator-1.html#cb310-25" tabindex="-1"></a>#<span class="op">&gt;</span> Did you get any writting done today<span class="op">?</span></span>
+<span id="cb310-26"><a href="iterator-1.html#cb310-26" tabindex="-1"></a>#<span class="op">&gt;</span> when will you stop wasting time<span class="op">?</span></span>
+<span id="cb310-27"><a href="iterator-1.html#cb310-27" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<div id="cloned-copied" class="section level3" number="16.3.14">
+<h3>
+<span class="header-section-number">16.3.14</span> cloned, copied<a class="anchor" aria-label="anchor" href="#cloned-copied"><i class="fas fa-link"></i></a>
+</h3>
+<p>cloned adapter接受一個產生參考的iterator，並回傳那些參考來產生值的iterator。當然，參考對象型態必須實作Clone。</p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb311-1"><a href="iterator-1.html#cb311-1" tabindex="-1"></a><span class="kw">let</span> a <span class="op">=</span> [<span class="ch">'1'</span><span class="op">,</span> <span class="ch">'2'</span><span class="op">,</span> <span class="ch">'3'</span><span class="op">,</span> <span class="ch">'4'</span>]<span class="op">;</span></span>
+<span id="cb311-2"><a href="iterator-1.html#cb311-2" tabindex="-1"></a></span>
+<span id="cb311-3"><a href="iterator-1.html#cb311-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> a<span class="op">.</span>iter()<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb311-4"><a href="iterator-1.html#cb311-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> a<span class="op">.</span>iter()<span class="op">.</span>cloned()<span class="op">.</span>next())<span class="op">;</span></span>
+<span id="cb311-5"><a href="iterator-1.html#cb311-5" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="ch">'1'</span>)</span>
+<span id="cb311-6"><a href="iterator-1.html#cb311-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="ch">'1'</span>)</span></code></pre></div>
+<p>cloned adapter很像對iterator呼叫<code>iter.map(|item| item.clone())</code>，copied adapter的運作幾乎相同，但更嚴格。通常實作了copied的型態也會實作cloned。</p>
+</div>
+<div id="cycle" class="section level3" number="16.3.15">
+<h3>
+<span class="header-section-number">16.3.15</span> cycle<a class="anchor" aria-label="anchor" href="#cycle"><i class="fas fa-link"></i></a>
+</h3>
+<p>cycle adapter可以讓iterataor無限循環，它利用的是Clone可以無限複製的特性，所以底層的iterator必須實作<code>std::clone::Clone</code>，好讓cycle可以儲存它的初始狀態。</p>
+<p>例如：</p>
+<div class="sourceCode" id="cb312"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb312-1"><a href="iterator-1.html#cb312-1" tabindex="-1"></a><span class="kw">let</span> fruit <span class="op">=</span> [<span class="st">"apple"</span><span class="op">,</span> <span class="st">"banana"</span><span class="op">,</span> <span class="st">"grape"</span>]<span class="op">;</span></span>
+<span id="cb312-2"><a href="iterator-1.html#cb312-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> iter <span class="op">=</span> fruit<span class="op">.</span>iter()<span class="op">.</span>cycle()<span class="op">;</span></span>
+<span id="cb312-3"><a href="iterator-1.html#cb312-3" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="dv">0</span><span class="op">..</span><span class="dv">10</span> <span class="op">{</span></span>
+<span id="cb312-4"><a href="iterator-1.html#cb312-4" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">let</span> <span class="cn">Some</span>(val) <span class="op">=</span> iter<span class="op">.</span>next() <span class="op">{</span></span>
+<span id="cb312-5"><a href="iterator-1.html#cb312-5" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> val)<span class="op">;</span></span>
+<span id="cb312-6"><a href="iterator-1.html#cb312-6" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb312-7"><a href="iterator-1.html#cb312-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb312-8"><a href="iterator-1.html#cb312-8" tabindex="-1"></a>#<span class="op">&gt;</span> apple</span>
+<span id="cb312-9"><a href="iterator-1.html#cb312-9" tabindex="-1"></a>#<span class="op">&gt;</span> banana</span>
+<span id="cb312-10"><a href="iterator-1.html#cb312-10" tabindex="-1"></a>#<span class="op">&gt;</span> grape</span>
+<span id="cb312-11"><a href="iterator-1.html#cb312-11" tabindex="-1"></a>#<span class="op">&gt;</span> apple</span>
+<span id="cb312-12"><a href="iterator-1.html#cb312-12" tabindex="-1"></a>#<span class="op">&gt;</span> banana</span>
+<span id="cb312-13"><a href="iterator-1.html#cb312-13" tabindex="-1"></a>#<span class="op">&gt;</span> grape</span>
+<span id="cb312-14"><a href="iterator-1.html#cb312-14" tabindex="-1"></a>#<span class="op">&gt;</span> apple</span>
+<span id="cb312-15"><a href="iterator-1.html#cb312-15" tabindex="-1"></a>#<span class="op">&gt;</span> banana</span>
+<span id="cb312-16"><a href="iterator-1.html#cb312-16" tabindex="-1"></a>#<span class="op">&gt;</span> grape</span>
+<span id="cb312-17"><a href="iterator-1.html#cb312-17" tabindex="-1"></a>#<span class="op">&gt;</span> apple</span>
+<span id="cb312-18"><a href="iterator-1.html#cb312-18" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>另外是要設計一個小小的公因數遊戲，可被3整除的數字換成fizz，可倍5整除的換成buzz，兩者皆可的萬成fizzbuzz</p>
+<div class="sourceCode" id="cb313"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb313-1"><a href="iterator-1.html#cb313-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::iter::</span><span class="op">{</span>once<span class="op">,</span> repeat<span class="op">};</span></span>
+<span id="cb313-2"><a href="iterator-1.html#cb313-2" tabindex="-1"></a></span>
+<span id="cb313-3"><a href="iterator-1.html#cb313-3" tabindex="-1"></a><span class="kw">let</span> fizzes <span class="op">=</span> repeat(<span class="st">""</span>)<span class="op">.</span>take(<span class="dv">2</span>)<span class="op">.</span>chain(once(<span class="st">"fizz"</span>))<span class="op">.</span>cycle()<span class="op">;</span></span>
+<span id="cb313-4"><a href="iterator-1.html#cb313-4" tabindex="-1"></a><span class="kw">let</span> buzzes <span class="op">=</span> repeat(<span class="st">""</span>)<span class="op">.</span>take(<span class="dv">4</span>)<span class="op">.</span>chain(once(<span class="st">"buzz"</span>))<span class="op">.</span>cycle()<span class="op">;</span></span>
+<span id="cb313-5"><a href="iterator-1.html#cb313-5" tabindex="-1"></a><span class="kw">let</span> fizzes_buzzes <span class="op">=</span> fizzes<span class="op">.</span>zip(buzzes)<span class="op">;</span></span>
+<span id="cb313-6"><a href="iterator-1.html#cb313-6" tabindex="-1"></a></span>
+<span id="cb313-7"><a href="iterator-1.html#cb313-7" tabindex="-1"></a><span class="kw">let</span> fizz_buzz  <span class="op">=</span> (<span class="dv">1</span><span class="op">..</span><span class="dv">16</span>)<span class="op">.</span>zip(fizzes_buzzes)</span>
+<span id="cb313-8"><a href="iterator-1.html#cb313-8" tabindex="-1"></a>    <span class="op">.</span>map(<span class="op">|</span>tuple<span class="op">|</span></span>
+<span id="cb313-9"><a href="iterator-1.html#cb313-9" tabindex="-1"></a>           <span class="cf">match</span> tuple <span class="op">{</span></span>
+<span id="cb313-10"><a href="iterator-1.html#cb313-10" tabindex="-1"></a>             (i<span class="op">,</span> (<span class="st">""</span><span class="op">,</span> <span class="st">""</span>)) <span class="op">=&gt;</span> i<span class="op">.</span>to_string()<span class="op">,</span></span>
+<span id="cb313-11"><a href="iterator-1.html#cb313-11" tabindex="-1"></a>             (_<span class="op">,</span> (fizz<span class="op">,</span> buzz)) <span class="op">=&gt;</span> <span class="pp">format!</span>(<span class="st">"{}{}"</span><span class="op">,</span> fizz<span class="op">,</span> buzz)</span>
+<span id="cb313-12"><a href="iterator-1.html#cb313-12" tabindex="-1"></a>           <span class="op">}</span>)<span class="op">;</span></span>
+<span id="cb313-13"><a href="iterator-1.html#cb313-13" tabindex="-1"></a></span>
+<span id="cb313-14"><a href="iterator-1.html#cb313-14" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> fizz_buzz <span class="op">{</span></span>
+<span id="cb313-15"><a href="iterator-1.html#cb313-15" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> x)<span class="op">;</span></span>
+<span id="cb313-16"><a href="iterator-1.html#cb313-16" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb313-17"><a href="iterator-1.html#cb313-17" tabindex="-1"></a></span>
+<span id="cb313-18"><a href="iterator-1.html#cb313-18" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span></span>
+<span id="cb313-19"><a href="iterator-1.html#cb313-19" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">2</span></span>
+<span id="cb313-20"><a href="iterator-1.html#cb313-20" tabindex="-1"></a>#<span class="op">&gt;</span> fizz</span>
+<span id="cb313-21"><a href="iterator-1.html#cb313-21" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">4</span></span>
+<span id="cb313-22"><a href="iterator-1.html#cb313-22" tabindex="-1"></a>#<span class="op">&gt;</span> buzz</span>
+<span id="cb313-23"><a href="iterator-1.html#cb313-23" tabindex="-1"></a>#<span class="op">&gt;</span> fizz</span>
+<span id="cb313-24"><a href="iterator-1.html#cb313-24" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">7</span></span>
+<span id="cb313-25"><a href="iterator-1.html#cb313-25" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">8</span></span>
+<span id="cb313-26"><a href="iterator-1.html#cb313-26" tabindex="-1"></a>#<span class="op">&gt;</span> fizz</span>
+<span id="cb313-27"><a href="iterator-1.html#cb313-27" tabindex="-1"></a>#<span class="op">&gt;</span> buzz</span>
+<span id="cb313-28"><a href="iterator-1.html#cb313-28" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">11</span></span>
+<span id="cb313-29"><a href="iterator-1.html#cb313-29" tabindex="-1"></a>#<span class="op">&gt;</span> fizz</span>
+<span id="cb313-30"><a href="iterator-1.html#cb313-30" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">13</span></span>
+<span id="cb313-31"><a href="iterator-1.html#cb313-31" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">14</span></span>
+<span id="cb313-32"><a href="iterator-1.html#cb313-32" tabindex="-1"></a>#<span class="op">&gt;</span> fizzbuzz</span>
+<span id="cb313-33"><a href="iterator-1.html#cb313-33" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+</div>
+<div id="耗用iterator" class="section level2" number="16.4">
+<h2>
+<span class="header-section-number">16.4</span> 耗用iterator<a class="anchor" aria-label="anchor" href="#%E8%80%97%E7%94%A8iterator"><i class="fas fa-link"></i></a>
+</h2>
+<p>你可以用for迴圈來耗用iterator，或明確的呼叫next，並用它們實作其他方法。但在標準庫中有許多已建立的方法能節省你重複標寫的時間。</p>
+<div id="簡單累計count-sum-product" class="section level3" number="16.4.1">
+<h3>
+<span class="header-section-number">16.4.1</span> 簡單累計：count, sum, product<a class="anchor" aria-label="anchor" href="#%E7%B0%A1%E5%96%AE%E7%B4%AF%E8%A8%88count-sum-product"><i class="fas fa-link"></i></a>
+</h3>
+<p>count方法會從iterator取出項目直至回傳None為止，並告訴你總共取得多少，下面此裡是在計算標準輸入的行數：</p>
+<div class="sourceCode" id="cb314"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb314-1"><a href="iterator-1.html#cb314-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::io::prelude::</span><span class="op">*;</span></span>
+<span id="cb314-2"><a href="iterator-1.html#cb314-2" tabindex="-1"></a></span>
+<span id="cb314-3"><a href="iterator-1.html#cb314-3" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb314-4"><a href="iterator-1.html#cb314-4" tabindex="-1"></a>  <span class="kw">let</span> stdin <span class="op">=</span> <span class="pp">std::io::</span>stdin()<span class="op">;</span></span>
+<span id="cb314-5"><a href="iterator-1.html#cb314-5" tabindex="-1"></a>  <span class="pp">println!</span>(<span class="st">"{}"</span><span class="op">,</span> stdin<span class="op">.</span>lock()<span class="op">.</span>lines()<span class="op">.</span>count())<span class="op">;</span></span>
+<span id="cb314-6"><a href="iterator-1.html#cb314-6" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>sum與product可以計算總和與乘積，那些項目必須是整數或浮點數：</p>
+<div class="sourceCode" id="cb315"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb315-1"><a href="iterator-1.html#cb315-1" tabindex="-1"></a><span class="kw">fn</span> triangle(n<span class="op">:</span> <span class="dt">u64</span>) <span class="op">-&gt;</span> <span class="dt">u64</span> <span class="op">{</span></span>
+<span id="cb315-2"><a href="iterator-1.html#cb315-2" tabindex="-1"></a>  (<span class="dv">1</span><span class="op">..=</span>n)<span class="op">.</span>sum()</span>
+<span id="cb315-3"><a href="iterator-1.html#cb315-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb315-4"><a href="iterator-1.html#cb315-4" tabindex="-1"></a></span>
+<span id="cb315-5"><a href="iterator-1.html#cb315-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> triangle(<span class="dv">10</span>))<span class="op">;</span></span>
+<span id="cb315-6"><a href="iterator-1.html#cb315-6" tabindex="-1"></a></span>
+<span id="cb315-7"><a href="iterator-1.html#cb315-7" tabindex="-1"></a><span class="kw">fn</span> factorial(n<span class="op">:</span> <span class="dt">u64</span>) <span class="op">-&gt;</span> <span class="dt">u64</span> <span class="op">{</span></span>
+<span id="cb315-8"><a href="iterator-1.html#cb315-8" tabindex="-1"></a>  (<span class="dv">1</span><span class="op">..=</span>n)<span class="op">.</span>product()</span>
+<span id="cb315-9"><a href="iterator-1.html#cb315-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb315-10"><a href="iterator-1.html#cb315-10" tabindex="-1"></a></span>
+<span id="cb315-11"><a href="iterator-1.html#cb315-11" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> factorial(<span class="dv">10</span>))<span class="op">;</span></span>
+<span id="cb315-12"><a href="iterator-1.html#cb315-12" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">55</span></span>
+<span id="cb315-13"><a href="iterator-1.html#cb315-13" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">3628800</span></span></code></pre></div>
+</div>
+<div id="max-min" class="section level3" number="16.4.2">
+<h3>
+<span class="header-section-number">16.4.2</span> max, min<a class="anchor" aria-label="anchor" href="#max-min"><i class="fas fa-link"></i></a>
+</h3>
+<p>Iterator的max與min方法回傳iterator最小與最大的項目。iterator必須實作<code>std::cmp::Ord</code>，以便讓項目可互相比較：</p>
+<div class="sourceCode" id="cb316"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb316-1"><a href="iterator-1.html#cb316-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> x <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">.</span>iter()<span class="op">;</span></span>
+<span id="cb316-2"><a href="iterator-1.html#cb316-2" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> x<span class="op">.</span>clone()<span class="op">.</span>max())<span class="op">;</span></span>
+<span id="cb316-3"><a href="iterator-1.html#cb316-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> x<span class="op">.</span>min())<span class="op">;</span></span>
+<span id="cb316-4"><a href="iterator-1.html#cb316-4" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">3</span>)</span>
+<span id="cb316-5"><a href="iterator-1.html#cb316-5" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="op">-</span><span class="dv">1</span>)</span></code></pre></div>
+<p>f64與f32只實作了<code>std::cmp::PartialOrd</code>，因此你不能用這兩個方法，這樣看起來很不討喜，但它為你避免遇到IEEe與NaN時發生錯誤。假如你決定處理NaN值，你可以改用<code>max_by</code>與<code>min_by</code>。</p>
+</div>
+<div id="max_by-min_by" class="section level3" number="16.4.3">
+<h3>
+<span class="header-section-number">16.4.3</span> max_by, min_by<a class="anchor" aria-label="anchor" href="#max_by-min_by"><i class="fas fa-link"></i></a>
+</h3>
+<p>max_by與min_by方法可以回傳iterator產生的最大或最小項目，它接受你提供的比較函式來決定結果：</p>
+<div class="sourceCode" id="cb317"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb317-1"><a href="iterator-1.html#cb317-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::cmp::</span>Ordering<span class="op">;</span></span>
+<span id="cb317-2"><a href="iterator-1.html#cb317-2" tabindex="-1"></a></span>
+<span id="cb317-3"><a href="iterator-1.html#cb317-3" tabindex="-1"></a><span class="kw">fn</span> cmp(lhs<span class="op">:</span> <span class="op">&amp;</span><span class="dt">f64</span><span class="op">,</span> rhs<span class="op">:</span> <span class="op">&amp;</span><span class="dt">f64</span>) <span class="op">-&gt;</span> Ordering <span class="op">{</span></span>
+<span id="cb317-4"><a href="iterator-1.html#cb317-4" tabindex="-1"></a>  lhs<span class="op">.</span>partial_cmp(rhs)<span class="op">.</span>unwrap()</span>
+<span id="cb317-5"><a href="iterator-1.html#cb317-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb317-6"><a href="iterator-1.html#cb317-6" tabindex="-1"></a></span>
+<span id="cb317-7"><a href="iterator-1.html#cb317-7" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">1.0</span><span class="op">,</span> <span class="dv">2.0</span><span class="op">,</span> <span class="dv">3.0</span>]<span class="op">;</span></span>
+<span id="cb317-8"><a href="iterator-1.html#cb317-8" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers<span class="op">.</span>iter()<span class="op">.</span>copied()<span class="op">.</span>max_by(cmp))<span class="op">;</span></span>
+<span id="cb317-9"><a href="iterator-1.html#cb317-9" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers<span class="op">.</span>iter()<span class="op">.</span>copied()<span class="op">.</span>min_by(cmp))<span class="op">;</span></span>
+<span id="cb317-10"><a href="iterator-1.html#cb317-10" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">3.0</span>)</span>
+<span id="cb317-11"><a href="iterator-1.html#cb317-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">1.0</span>)</span></code></pre></div>
+</div>
+<div id="max_by_key-min_by_key" class="section level3" number="16.4.4">
+<h3>
+<span class="header-section-number">16.4.4</span> max_by_key, min_by_key<a class="anchor" aria-label="anchor" href="#max_by_key-min_by_key"><i class="fas fa-link"></i></a>
+</h3>
+<div class="sourceCode" id="cb318"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb318-1"><a href="iterator-1.html#cb318-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::collections::</span>HashMap<span class="op">;</span></span>
+<span id="cb318-2"><a href="iterator-1.html#cb318-2" tabindex="-1"></a></span>
+<span id="cb318-3"><a href="iterator-1.html#cb318-3" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> populations <span class="op">=</span> <span class="pp">HashMap::</span>new()<span class="op">;</span></span>
+<span id="cb318-4"><a href="iterator-1.html#cb318-4" tabindex="-1"></a>populations<span class="op">.</span>insert(<span class="st">"台北"</span><span class="op">,</span> <span class="dv">555_555</span>)<span class="op">;</span></span>
+<span id="cb318-5"><a href="iterator-1.html#cb318-5" tabindex="-1"></a>populations<span class="op">.</span>insert(<span class="st">"南投"</span><span class="op">,</span> <span class="dv">321_321</span>)<span class="op">;</span></span>
+<span id="cb318-6"><a href="iterator-1.html#cb318-6" tabindex="-1"></a>populations<span class="op">.</span>insert(<span class="st">"高雄"</span><span class="op">,</span> <span class="dv">428_428</span>)<span class="op">;</span></span>
+<span id="cb318-7"><a href="iterator-1.html#cb318-7" tabindex="-1"></a></span>
+<span id="cb318-8"><a href="iterator-1.html#cb318-8" tabindex="-1"></a><span class="kw">let</span> max_city <span class="op">=</span> <span class="op">&amp;</span>populations<span class="op">.</span>iter()<span class="op">.</span>max_by_key(<span class="op">|&amp;</span>(name<span class="op">,</span> pop)<span class="op">|</span> pop)<span class="op">;</span></span>
+<span id="cb318-9"><a href="iterator-1.html#cb318-9" tabindex="-1"></a><span class="kw">let</span> min_city <span class="op">=</span> <span class="op">&amp;</span>populations<span class="op">.</span>iter()<span class="op">.</span>min_by_key(<span class="op">|&amp;</span>(name<span class="op">,</span> pop)<span class="op">|</span> pop)<span class="op">;</span></span>
+<span id="cb318-10"><a href="iterator-1.html#cb318-10" tabindex="-1"></a></span>
+<span id="cb318-11"><a href="iterator-1.html#cb318-11" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"人口最多的城市是：{:?}"</span><span class="op">,</span> max_city<span class="op">.</span>unwrap()<span class="op">.</span><span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb318-12"><a href="iterator-1.html#cb318-12" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"人口最多的城市是：{:?}"</span><span class="op">,</span> min_city<span class="op">.</span>unwrap()<span class="op">.</span><span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb318-13"><a href="iterator-1.html#cb318-13" tabindex="-1"></a>#<span class="op">&gt;</span> 人口最多的城市是：<span class="st">"台北"</span></span>
+<span id="cb318-14"><a href="iterator-1.html#cb318-14" tabindex="-1"></a>#<span class="op">&gt;</span> 人口最多的城市是：<span class="st">"南投"</span></span></code></pre></div>
+</div>
+<div id="any與all" class="section level3" number="16.4.5">
+<h3>
+<span class="header-section-number">16.4.5</span> any與all<a class="anchor" aria-label="anchor" href="#any%E8%88%87all"><i class="fas fa-link"></i></a>
+</h3>
+<p>any對iterator產生的項目呼叫一個closure，並在得到第一次true時回傳。</p>
+<p>all則在所有項目皆回傳true時才會回傳true</p>
+<div class="sourceCode" id="cb319"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb319-1"><a href="iterator-1.html#cb319-1" tabindex="-1"></a><span class="kw">let</span> id <span class="op">=</span> <span class="st">"Iterator"</span><span class="op">;</span></span>
+<span id="cb319-2"><a href="iterator-1.html#cb319-2" tabindex="-1"></a><span class="pp">assert!</span>( id<span class="op">.</span>chars()<span class="op">.</span>any(<span class="dt">char</span><span class="pp">::</span>is_uppercase))<span class="op">;</span></span>
+<span id="cb319-3"><a href="iterator-1.html#cb319-3" tabindex="-1"></a><span class="pp">assert!</span>(<span class="op">!</span>id<span class="op">.</span>chars()<span class="op">.</span>all(<span class="dt">char</span><span class="pp">::</span>is_uppercase))<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="position-rposistion與-exactsizeiterator" class="section level3" number="16.4.6">
+<h3>
+<span class="header-section-number">16.4.6</span> position, rposistion與 ExactSizeIterator<a class="anchor" aria-label="anchor" href="#position-rposistion%E8%88%87-exactsizeiterator"><i class="fas fa-link"></i></a>
+</h3>
+<p>position方法會接受item並呼叫ㄧ個closure，當clousre回傳true時回傳該item的索引。確切來說，它是回傳一個Option，當所有項目都無法讓closure回傳true時回傳None。</p>
+<div class="sourceCode" id="cb320"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb320-1"><a href="iterator-1.html#cb320-1" tabindex="-1"></a><span class="kw">let</span> text <span class="op">=</span> <span class="st">"Allies"</span><span class="op">;</span></span>
+<span id="cb320-2"><a href="iterator-1.html#cb320-2" tabindex="-1"></a></span>
+<span id="cb320-3"><a href="iterator-1.html#cb320-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> text<span class="op">.</span>chars()<span class="op">.</span>position(<span class="op">|</span>c<span class="op">|</span> c <span class="op">==</span> <span class="ch">'l'</span>))<span class="op">;</span></span>
+<span id="cb320-4"><a href="iterator-1.html#cb320-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> text<span class="op">.</span>chars()<span class="op">.</span>position(<span class="op">|</span>c<span class="op">|</span> c <span class="op">==</span> <span class="ch">'b'</span>))<span class="op">;</span></span>
+<span id="cb320-5"><a href="iterator-1.html#cb320-5" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">1</span>)</span>
+<span id="cb320-6"><a href="iterator-1.html#cb320-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">None</span></span></code></pre></div>
+<p>rposition也相同，只是會從右方開始：</p>
+<div class="sourceCode" id="cb321"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb321-1"><a href="iterator-1.html#cb321-1" tabindex="-1"></a><span class="kw">let</span> text <span class="op">=</span> <span class="st">b"Allies"</span><span class="op">;</span></span>
+<span id="cb321-2"><a href="iterator-1.html#cb321-2" tabindex="-1"></a></span>
+<span id="cb321-3"><a href="iterator-1.html#cb321-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> text<span class="op">.</span>iter()<span class="op">.</span>rposition(<span class="op">|&amp;</span>c<span class="op">|</span> c <span class="op">==</span> <span class="ch">b'l'</span>))<span class="op">;</span></span>
+<span id="cb321-4"><a href="iterator-1.html#cb321-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> text<span class="op">.</span>iter()<span class="op">.</span>rposition(<span class="op">|&amp;</span>c<span class="op">|</span> c <span class="op">==</span> <span class="ch">b'b'</span>))<span class="op">;</span></span>
+<span id="cb321-5"><a href="iterator-1.html#cb321-5" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Some</span>(<span class="dv">2</span>)</span>
+<span id="cb321-6"><a href="iterator-1.html#cb321-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">None</span></span></code></pre></div>
+<p>要注意，使用rposition方法必須實作<code>std::iter::ExactSizeIterator trait</code>，也就是有精確數量的迭代器：</p>
+<div class="sourceCode" id="cb322"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb322-1"><a href="iterator-1.html#cb322-1" tabindex="-1"></a><span class="kw">trait</span> <span class="bu">ExactSizeIterator</span><span class="op">:</span> <span class="bu">Iterator</span> <span class="op">{</span></span>
+<span id="cb322-2"><a href="iterator-1.html#cb322-2" tabindex="-1"></a>  <span class="kw">fn</span> len(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">usize</span> <span class="op">{...}</span></span>
+<span id="cb322-3"><a href="iterator-1.html#cb322-3" tabindex="-1"></a>  <span class="kw">fn</span> is_empty(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">bool</span> <span class="op">{...}</span></span>
+<span id="cb322-4"><a href="iterator-1.html#cb322-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>len方法會回傳剩餘的項目數量，is_empty方法則會在迭代完成後回傳true。</p>
+<p>當一個iterator無法預先知道它將產生多少項目，例如<code>str::chars iterator</code>就無法知道，所以你不能對字串使用rposition。</p>
+</div>
+<div id="fold與rfold" class="section level3" number="16.4.7">
+<h3>
+<span class="header-section-number">16.4.7</span> fold與rfold<a class="anchor" aria-label="anchor" href="#fold%E8%88%87rfold"><i class="fas fa-link"></i></a>
+</h3>
+<p>fold方法可以實現許多基礎功能，用來對整個項目做累計結果。你提供一個初始值(accumulator)給fold，它會反覆用closure來處理當前的accumulator與iterator產生的下一個項目。此時accummulartor會變成新的，當所有項目都處理完成時accumulator就是回傳值。</p>
+<p>前面提到的許多耗用accumulator也可以用fold完成：</p>
+<div class="sourceCode" id="cb323"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb323-1"><a href="iterator-1.html#cb323-1" tabindex="-1"></a><span class="kw">let</span> a <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
+<span id="cb323-2"><a href="iterator-1.html#cb323-2" tabindex="-1"></a><span class="kw">let</span> count <span class="op">=</span> a<span class="op">.</span>iter()<span class="op">.</span>fold(<span class="dv">0</span><span class="op">,</span> <span class="op">|</span>n<span class="op">,</span> _<span class="op">|</span> n<span class="op">+</span><span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb323-3"><a href="iterator-1.html#cb323-3" tabindex="-1"></a><span class="kw">let</span> sum <span class="op">=</span> a<span class="op">.</span>iter()<span class="op">.</span>fold(<span class="dv">0</span><span class="op">,</span> <span class="op">|</span>n<span class="op">,</span> i<span class="op">|</span> n<span class="op">+</span>i)<span class="op">;</span></span>
+<span id="cb323-4"><a href="iterator-1.html#cb323-4" tabindex="-1"></a><span class="kw">let</span> product <span class="op">=</span> a<span class="op">.</span>iter()<span class="op">.</span>fold(<span class="dv">1</span><span class="op">,</span> <span class="op">|</span>n<span class="op">,</span> i<span class="op">|</span> n<span class="op">*</span>i)<span class="op">;</span></span>
+<span id="cb323-5"><a href="iterator-1.html#cb323-5" tabindex="-1"></a></span>
+<span id="cb323-6"><a href="iterator-1.html#cb323-6" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"count:{}</span><span class="sc">\n</span><span class="st">sum:{}</span><span class="sc">\n</span><span class="st">product:{}"</span><span class="op">,</span> count<span class="op">,</span> sum<span class="op">,</span> product)<span class="op">;</span></span>
+<span id="cb323-7"><a href="iterator-1.html#cb323-7" tabindex="-1"></a>#<span class="op">&gt;</span> count<span class="op">:</span><span class="dv">4</span></span>
+<span id="cb323-8"><a href="iterator-1.html#cb323-8" tabindex="-1"></a>#<span class="op">&gt;</span> sum<span class="op">:</span><span class="dv">10</span></span>
+<span id="cb323-9"><a href="iterator-1.html#cb323-9" tabindex="-1"></a>#<span class="op">&gt;</span> product<span class="op">:</span><span class="dv">24</span></span></code></pre></div>
+<p>fold的簽章是：</p>
+<div class="sourceCode" id="cb324"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb324-1"><a href="iterator-1.html#cb324-1" tabindex="-1"></a><span class="kw">fn</span> fold<span class="op">&lt;</span>A<span class="op">,</span> F<span class="op">&gt;</span>(<span class="kw">self</span><span class="op">,</span> init<span class="op">:</span> A<span class="op">,</span> f<span class="op">:</span> F) <span class="op">-&gt;</span> A</span>
+<span id="cb324-2"><a href="iterator-1.html#cb324-2" tabindex="-1"></a>    <span class="kw">where</span> <span class="dt">Self</span><span class="op">:</span> <span class="bu">Sized</span><span class="op">,</span> F<span class="op">:</span> <span class="bu">FnMut</span>(A<span class="op">,</span> <span class="dt">Self</span><span class="pp">::</span>Item) <span class="op">-&gt;</span> A</span></code></pre></div>
+<p>A是accumulator型態。init引數是個A，closure的第一個引數和回傳值以及fold本身的回傳值也是A。</p>
+<div class="sourceCode" id="cb325"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb325-1"><a href="iterator-1.html#cb325-1" tabindex="-1"></a><span class="kw">let</span> a <span class="op">=</span> [<span class="st">"你好"</span><span class="op">,</span> <span class="st">"，"</span><span class="op">,</span> <span class="st">"我是一個機器人"</span><span class="op">,</span> <span class="st">"，"</span><span class="op">,</span> <span class="st">"很高興為您服務"</span>]<span class="op">;</span></span>
+<span id="cb325-2"><a href="iterator-1.html#cb325-2" tabindex="-1"></a></span>
+<span id="cb325-3"><a href="iterator-1.html#cb325-3" tabindex="-1"></a><span class="kw">let</span> <span class="dt">String</span> <span class="op">=</span> a<span class="op">.</span>iter()<span class="op">.</span>fold(<span class="dt">String</span><span class="pp">::</span>new()<span class="op">,</span> <span class="op">|</span>s<span class="op">,</span>w<span class="op">|</span> s<span class="op">+</span>w)<span class="op">;</span></span>
+<span id="cb325-4"><a href="iterator-1.html#cb325-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> <span class="dt">String</span>)<span class="op">;</span></span>
+<span id="cb325-5"><a href="iterator-1.html#cb325-5" tabindex="-1"></a>#<span class="op">&gt;</span> 你好，我是一個機器人，很高興為您服務</span></code></pre></div>
+<p>rfold方法與fold很像，但是它需要雙端iterator，它會從最後面到最前面處理項目</p>
+<div class="sourceCode" id="cb326"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb326-1"><a href="iterator-1.html#cb326-1" tabindex="-1"></a><span class="kw">let</span> a <span class="op">=</span> [<span class="st">"你好"</span><span class="op">,</span> <span class="st">"，"</span><span class="op">,</span> <span class="st">"我是一個機器人"</span><span class="op">,</span> <span class="st">"，"</span><span class="op">,</span> <span class="st">"很高興為您服務"</span>]<span class="op">;</span></span>
+<span id="cb326-2"><a href="iterator-1.html#cb326-2" tabindex="-1"></a></span>
+<span id="cb326-3"><a href="iterator-1.html#cb326-3" tabindex="-1"></a><span class="kw">let</span> <span class="dt">String</span> <span class="op">=</span> a<span class="op">.</span>iter()<span class="op">.</span>rfold(<span class="dt">String</span><span class="pp">::</span>new()<span class="op">,</span> <span class="op">|</span>s<span class="op">,</span>w<span class="op">|</span> s<span class="op">+</span>w)<span class="op">;</span></span>
+<span id="cb326-4"><a href="iterator-1.html#cb326-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> <span class="dt">String</span><span class="op">.</span>chars()<span class="op">.</span>count())<span class="op">;</span></span>
+<span id="cb326-5"><a href="iterator-1.html#cb326-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> <span class="dt">String</span><span class="op">.</span>chars()<span class="op">.</span>count())<span class="op">;</span></span>
+<span id="cb326-6"><a href="iterator-1.html#cb326-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">18</span></span>
+<span id="cb326-7"><a href="iterator-1.html#cb326-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">18</span></span></code></pre></div>
+
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="r_unique.html"><span class="header-section-number">15</span> R_unique</a></div>
+<div class="empty"></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#iterator-1"><span class="header-section-number">16</span> Iterator</a></li>
+<li>
+<a class="nav-link" href="#%E5%BB%BA%E7%AB%8Biterator-1"><span class="header-section-number">16.1</span> 建立Iterator</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#iter%E8%88%87iter_mut%E6%96%B9%E6%B3%95-1"><span class="header-section-number">16.1.1</span> iter與iter_mut方法</a></li>
+<li><a class="nav-link" href="#intoiterator-1"><span class="header-section-number">16.1.2</span> IntoIterator</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#form_fn-%E8%88%87-successors-1"><span class="header-section-number">16.2</span> form_fn 與 successors</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#darin%E6%96%B9%E6%B3%95-1"><span class="header-section-number">16.2.1</span> darin方法</a></li></ul>
+</li>
+<li>
+<a class="nav-link" href="#iterator%E6%94%B9%E9%80%A0%E6%96%B9%E6%B3%95-1"><span class="header-section-number">16.3</span> Iterator改造方法</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#map%E8%88%87filter-1"><span class="header-section-number">16.3.1</span> map與filter</a></li>
+<li><a class="nav-link" href="#filter_map%E8%88%87fat_map-1"><span class="header-section-number">16.3.2</span> filter_map與fat_map</a></li>
+<li><a class="nav-link" href="#flatten-1"><span class="header-section-number">16.3.3</span> flatten</a></li>
+<li><a class="nav-link" href="#take%E8%88%87-take_while"><span class="header-section-number">16.3.4</span> take與 take_while</a></li>
+<li><a class="nav-link" href="#skip%E8%88%87skip_while"><span class="header-section-number">16.3.5</span> skip與skip_while</a></li>
+<li><a class="nav-link" href="#peekable"><span class="header-section-number">16.3.6</span> peekable</a></li>
+<li><a class="nav-link" href="#fuse"><span class="header-section-number">16.3.7</span> fuse</a></li>
+<li><a class="nav-link" href="#%E5%8F%AF%E9%80%86%E7%9A%84iterator%E8%88%87rev"><span class="header-section-number">16.3.8</span> 可逆的iterator與rev</a></li>
+<li><a class="nav-link" href="#inspect"><span class="header-section-number">16.3.9</span> inspect</a></li>
+<li><a class="nav-link" href="#chain"><span class="header-section-number">16.3.10</span> chain</a></li>
+<li><a class="nav-link" href="#enumerate"><span class="header-section-number">16.3.11</span> enumerate</a></li>
+<li><a class="nav-link" href="#zip"><span class="header-section-number">16.3.12</span> zip</a></li>
+<li><a class="nav-link" href="#by_ref"><span class="header-section-number">16.3.13</span> by_ref</a></li>
+<li><a class="nav-link" href="#cloned-copied"><span class="header-section-number">16.3.14</span> cloned, copied</a></li>
+<li><a class="nav-link" href="#cycle"><span class="header-section-number">16.3.15</span> cycle</a></li>
+</ul>
+</li>
+<li>
+<a class="nav-link" href="#%E8%80%97%E7%94%A8iterator"><span class="header-section-number">16.4</span> 耗用iterator</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E7%B0%A1%E5%96%AE%E7%B4%AF%E8%A8%88count-sum-product"><span class="header-section-number">16.4.1</span> 簡單累計：count, sum, product</a></li>
+<li><a class="nav-link" href="#max-min"><span class="header-section-number">16.4.2</span> max, min</a></li>
+<li><a class="nav-link" href="#max_by-min_by"><span class="header-section-number">16.4.3</span> max_by, min_by</a></li>
+<li><a class="nav-link" href="#max_by_key-min_by_key"><span class="header-section-number">16.4.4</span> max_by_key, min_by_key</a></li>
+<li><a class="nav-link" href="#any%E8%88%87all"><span class="header-section-number">16.4.5</span> any與all</a></li>
+<li><a class="nav-link" href="#position-rposistion%E8%88%87-exactsizeiterator"><span class="header-section-number">16.4.6</span> position, rposistion與 ExactSizeIterator</a></li>
+<li><a class="nav-link" href="#fold%E8%88%87rfold"><span class="header-section-number">16.4.7</span> fold與rfold</a></li>
+</ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/%E3%84%A3.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/%E3%84%A3.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-08-10.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

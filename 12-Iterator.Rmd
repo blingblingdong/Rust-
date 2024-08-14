@@ -1,0 +1,905 @@
+# Day12-Iterator
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(distill)
+xaringanExtra::use_panelset()
+library(rmarkdown)
+library(rextendr)
+```
+
+iterator 就是實作了std::iter::Iterator trait的任何值
+
+```{Rust}
+trait Iterator {
+  type Item;
+  fn next(&mut self) -> Option<Self::Item>;
+  ...// 許多其他方法
+}
+```
+
+Item 是iterator產生的值的型態。next方法會回傳Some(v)，v是iterator的下一個值，當序列結束，會回傳None。
+
+如果某個型態可以用自然的方式迭代，你可以為那個型態實作`std::iter::IntoIterator`，他的into_iter方法會接受一個值，並回傳它的`iterator`：
+
+```{Rust}
+trait IntoIterator where Self::IntoIter: Iterator<Item=Self::Item> {
+  typ Item;
+  type IntoIter: Iterator;
+  fn into_iter(self) -> Self::IntoIter;
+}
+```
+
+
+Rust的for迴圈就是如此整合上面的元素，假設你要迭代一個向量印出他們：
+
+```{extnedr}
+println!("There's:");
+let v = vec!["a", "b", "c"];
+
+for element in &v {
+  println!("{}", element);
+}
+```
+
+
+在底層，for迴圈其實就是呼叫IntoIterator與Iterator方法的簡寫而已
+
+```{Rust}
+let mut iterator = (&v).into_iter();
+while let Some(element) = iterator.next {
+  println!("{}", element);
+}
+```
+
+
+我們來了解一下iterator的術語：
+
+- 之前說過，iterator是實作了Iterator的任何型態
+
+- iterable是可以實作Interator的任何型態。
+
+- iterator會產生值
+
+- iterator產生的值稱為項目(item)。在此，項目是"a"、"b"、"c"
+
+- 接受iterator產生的值的項目是consumer，在上面例子，for迴圈是consumer
+
+## 建立Iterator
+
+### iter與iter_mut方法
+
+大多數的集合型態都提供iter與iter_mut方法，這些方法會回傳迭代該型態的iterator，可產生每一個項目的共享或可變參考。&[T]與&mut [T]這種陣列slice也有iter與iter_mut方法，如果不用for迴圈，以下是最常用來取得iterator方法：
+
+```{extendr}
+let v = vec![1,2,3,4,5];
+let mut iterator = v.iter();
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+```
+
+每個型態實作的iter與iter_mut後的iterator可能有些不同，例如std::path::Path的iter方法回傳一個iterator，它每次會回傳一個路徑組件，這些項目型態是&std::ffi::OsStor。
+
+```{extendr}
+use std::ffi::OsStr;
+use std::path::Path;
+
+let path = Path::new("C:/User/JimB/Dowloads/Fedora.iso");
+let mut iterator = path.iter();
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+rprintln!("{:?}", iterator.next());
+```
+
+如果某種型態迭代不只一種，那種型態通常為各種遍歷方式提供轉數的方法，例如&str字串就沒有iter方法，而是有`s.bytes()`與`s.chars()`來取代。
+
+### IntoIterator
+
+如果型態實作了IntoIterator，你可以自己呼叫它的into_iter方法，就像for迴圈的做法
+
+```{extendr}
+use std::collections::BTreeSet;
+let mut favorites = BTreeSet::new();
+favorites.insert("Lucky in the Sky With Diamonds".to_string());
+favorites.insert("Liebestraume No. 3".to_string());
+
+let mut it = favorites.into_iter();
+rprintln!("{:?}", it.next());
+rprintln!("{:?}", it.next());
+rprintln!("{:?}", it.next());
+```
+
+不同狀況的iterator會產生不同的item，來處理共享參考(&T)、可變參考(&mut T)與移動(T)：
+
+- 當into_iter接收集合的共享參考後，它會回傳一個iterator，這個iterator會產生項目的共享參考。例如，上面的程式中，(&favorite).into_iter()會回傳一個iterator，它的Item型態是&String
+
+- 當into_iter收到集合的可變參考後，它會回傳一個iterator，這個iterator會產生項目的可變參考。例如，如果vector是Vec<String>，那麽呼叫(&mut vector).into_iter()會回傳一個iterator，它的Item型態是&mut String
+
+- 當into_iter以值收到集合後，into_iter會回傳一個iterator，該iterator擁有集合的所有權，並以值回傳項目；項目的所有權會從集合移交給耗用者，原始的集合在過程中會被耗用。例如上述的程式中呼叫favorites.into_iter()會回傳一個iterator，它會以值產生每個字串，耗用者將每一個字串的所有權。當iterator被卸除時，在BTreeSet裡面剩餘的任何元素也會被卸除，然後集合的空殼也會被丟棄。
+
+
+也並非每一個型態都會實作三種情況，例如HashSet、BTreeSet與BinaryHeap未實作處理可變參考的Iterator，因為修改本身會違反型態的不可變性：如修改過後產生不同的雜湊值，或與臨值的排列不同。
+
+而有些僅部分可變，如HashMap產生的項目值的可變參考，但只有索引鍵是共享參考。
+
+slice本身不擁有它的元素，所以不能以**值**參考，只實作共享參考與可變參考
+
+另外，`favorites.iter()`與`(&favorites).into_iter()`都是以共享參考作為迭代，但前者更加簡潔與易懂
+
+IntoIterator在泛型程式也很有用，使用`T: IntoIterator`來將型態變數T限制為可以迭代的型態。進一步可以用`T: IntoIterator<Item=U>`  來要求迭代特並型態U。
+
+```{Rust}
+use std::fmt::Debug;
+
+fn dump<T, U>(t: T)
+    where T: IntoIterator<Item=U>,
+    U: debug
+{
+  for u in t {
+    println!("{:?}", u);
+  }
+}
+```
+
+## form_fn 與 successors
+
+若要產生一系列的值，一種簡單的方式是提供一個回傳他們的closure。
+
+
+當`std::iter::form_fn`接受一個回傳`Option<T>`的closure，並回傳iterator不停呼叫這個函式來產生值，搭配`take()`函式可以限制產生的數字。
+
+```{Rust}
+use rand::random;
+use std::iter::form_fn;
+
+// 產生1000個隨機線段的長度
+// 會在[0,1]區間內產生值
+let lengths: Vec<f64> =
+    form_fn(|| Some((random::<f64>() - random::<f64>()).abs()))
+    .take(1000)
+    .collect();
+```
+
+
+如果每個項目依賴前一個項目，`std::iter::successors`函式可以很好的運作
+
+```{extendr}
+use std::iter::successors;
+
+let start = 1;
+
+let mut iter = successors(Some(start), |&x| Some(x+2) );
+
+for _ in 0..5 {
+  if let Some(val) = iter.next() {
+    rprintln!("{}", val);
+  }
+}
+```
+
+successors接受兩個參數，1是初始值，2是一個回傳值的closure。第一次迭代中，closure的參數是初始值(上例中的`start`)，隨後回傳值(回傳`Some(start+2)`)。第二次迭代，closure的參數是上一次迭代的值(上例中的`start+2`)...
+
+
+form_fn與successor兩者都可以接受`FnMut closure`，用來捕捉作用域的變數並修改它。例如，這個`fibonacci`函式使用一個`move
+closure`來捕捉變數，並將它當成它的運作狀態來使用
+
+```{extendr}
+use std::iter::from_fn;
+
+fn fibonacci() -> impl Iterator<Item=usize> {
+  let mut state = (0,1);
+  std::iter::from_fn(move || {
+    state = (state.1, state.0 + state.1);
+    Some(state.0)
+  })
+}
+
+let mut x = fibonacci().take(0);
+for _ in 0..8 {
+  if let Some(val) = x.next() {
+    rprintln!("{}", val);
+  }
+}
+```
+
+
+from_fn與successor方法很靈活，幾乎可以用在所有iterator的地方，來讓你的程式更簡潔與，但它們相較於常用模式，較難說明資料如何在計算過程中移動。
+
+### darin方法
+
+
+如果型態可以用範圍檢索，例如String、向量與VecDeque，drain方法可以擷取範圍內的item。
+
+```{extendr}
+
+let mut outer = "Rust".to_string();
+let inner = String::from_iter(outer.drain(1..3));
+
+rprintln!("outer：{}", outer);
+rprintln!("inner：{}", inner);
+```
+
+## Iterator改造方法
+
+關於Iterator有兩個重點：
+
+1.對著iterator呼叫adapter不會耗用任何值，而是**回傳一個新iterator**
+
+以下這段程式不會印出任何值：
+
+```{Rust}
+["Java", "Rust", "css", "R"]
+  .iter().map(|elt| println!("{}", elt));
+```
+
+程式會警告你：`note: iterators are lazy and do nothing unless consumed`。
+
+`iter()`方法會回傳ㄧ個迭代陣列元素吧iterator，接著map會回傳第二個iterator，但沒人呼叫鍵索取值，也就是完全沒有人呼叫`next()`來讓這個iterator工作。
+
+2.iterator是抽象零成本的。如map、filter都是泛型，所以執行它們時，當對著iterator執行它們時，Rust會根據參與其中的iterator類型量身打造程式碼，因此它有足夠的資訊將各個iterator的next方法內連至它的耗用者裡面，然後將整個安排視為一個單位，翻譯成機器碼，讓它與你親自撰寫函式來過濾執行ㄧ樣高效。
+
+
+
+### map與filter
+
+map adapter可對iterator的項目執行一個closure，filter adpater則可從iterator篩選項目，用closure來決定保留項目。
+
+假設你要迭代多行文字，並省略每一行的空格與結尾，使用map來呼叫trim方法就非常適合
+
+```{extendr}
+let text = "hello, RUST!\n 妳好，羅斯特\n Java is better\n QQ".to_string();
+
+let v: Vec<&str> = text.lines()
+    .map(str::trim)
+    .collect();
+    
+for word in v {
+  rprintln!("{}", word);
+}
+```
+
+map完的iterator還可以繼續改造，假如你想過濾有Java的字串，你可以使用filter：
+
+
+```{extendr}
+let text = "hello, RUST!\n 妳好，羅斯特\n Java is better\n QQ".to_string();
+
+let v: Vec<&str> = text.lines()
+    .map(str::trim)
+    .filter(|s| !s.contains("Java"))
+    .collect();
+    
+for word in v {
+  rprintln!("{}", word);
+}
+```
+
+iterator的adapter的寫法很容易閱讀，每一個adapter都有一個目的，並且有續的把改造結果往下傳
+
+
+這些adpater的簽章：
+
+```{Rust}
+fn map<B, F>(self, f:F) -> impl Iterator<Item=B>
+  where Self: Sized, F: FnMut(Self::Item) -> B;
+
+fn filter<P>(self, predicate: P) -> impl Iterator<Item=Self::Item>
+    where Self: Sized, P: FnMut(&Self::Item) -> bool;
+```
+
+map iterator將每個項目以值傳給他的closure，並依序將closure產生的結果的所有權交給它的耗用者。filter iterator以共享參考傳給它的closure，因此有時在使用filter要注意解參考，如：`filter(|s| *s != QQ);`參數型是`&&str`，要解參考後才能直接比較。
+
+### filter_map與fat_map
+
+map adapter最適合處理每一個項目都要產生下一個項目，而filter adapter適合回傳零或ㄧ個目，但如果以想將項目一次轉換成一個或多個項目呢？或是想刪除某個項目而不處理呢？
+
+filter_map就如語意上的使用方式，就是map+filter，它可以讓vlosure轉換成新項目或選擇卸除，以下是它的簽章：
+
+```{Rust}
+fn filter_map<B, F>(self, f: F) -> impl Iterator<Item=B>
+    where Self: Sized, F: FnMut(Self::Item) -> Option<B>;
+```
+
+這個簽章與mapㄧ樣，但它回傳的是Option<B>，而不是B。當closure回傳`None`時，項目會卸除值，當它回傳`Some(b)`時，b是filter_map iterator產生的下一個項目。
+
+例如，我們要從字串提取數字，必須先以空格分開後，找出單詞後卸除無法解析的詞：
+
+```{extendr}
+use std::str::FromStr;
+
+let text = "11\n found .25 289 \n 3.1415 kkday\n";
+
+let numbers: Vec<f64> = text.split_whitespace()
+    .filter_map(|t| f64::from_str(t).ok())
+    .collect();
+    
+rprintln!("{:?}", numbers);
+    
+```
+
+
+當filter_map的closure試著使用`f64::from_str`來解析各個以空白分開的slice，並回傳Result<f64, ParseFloatError>，它的.ok()會轉換成Option<f64>：解析錯誤會變成None，而成功的解析則是Some(v)
+
+而flat_map則是可以回傳不只一個項目或零個，而是任意數量的項目，它的簽章如此：
+
+```{Rust}
+fn flat_map<U, F>(self, f:F) -> impl Iterator<Item=U::Item>
+   where F: FnMut(Self::Item) -> U, U: IntoIterator;
+```
+
+傳給flat_map的closure必須回傳一個**iterable**，但任何形式的iterable都可以。
+
+```{extendr}
+use std::collections::HashMap;
+
+let mut major_cities = HashMap::new();
+major_cities.insert ("Japan", vec! ["Tokyo", "Kyoto"]);
+major_cities.insert("TheUnitedStates", vec!["Portland","Nashville"]);
+major_cities.insert("Brazil", vec! ["São Paulo","Brasilia"]);
+major_cities.insert("Kenya", vec! ["Nairobi","Mombasa" ]);
+
+let countries = ["Japan", "Brazil", "Kenya"];
+
+for &city in countries.iter().flat_map(|country| &major_cities[country]) {
+  rprintln!("{}", city);
+}
+```
+
+
+### flatten
+
+flatten adapter會串接iterator的項目，將數個項目輾平成單層，回傳一個傳遞所有元素的iterator
+
+```{extendr}
+use std::collections::HashMap;
+
+let mut transportions = HashMap::new();
+transportions.insert("陸地", vec!["火車","公車"]);
+transportions.insert("海上", vec!["渡輪", "獨木舟"]);
+transportions.insert("空中", vec!["客機", "直升機"]);
+
+let all_transportions:Vec<_> = transportions.values().flatten().collect();
+
+for transportion in &all_transportions {
+  rprintln!("{}", transportion);
+}
+```
+
+flatten的簽章是長這樣的：
+
+```{Rust}
+fn flatten(self) -> impl Iterator<Item=Self::Item::Item>
+   when Self::Item: IntoIterator;
+```
+
+
+換句話說，上一層的iterator必須實作IntoIterator，並且再沒有呼叫next的耗用者出現部會運作。
+
+
+flatten除了輾平雙層結構，有幾個神奇的運作方式，例如你有一個Vec<Option<...>>，而你只想迭代Some值，用一個簡單的flatten就可以做到這件事。
+
+```{extendr}
+let x = vec![None, Some("a"), None, Some("b")]
+        .into_iter()
+        .flatten()
+        .collect::<Vec<_>>();
+        
+for item_x in x {
+  rprintln!("{:?}", item_x);
+}
+
+```
+
+
+flatten+map的組合很常見，將元素是iterator的集合先以map方法執行某個函式(closure)，之後用flatten來將iterator輾平取出元素，參考下面這段程式：
+
+```{Rust}
+fn to_uppercase(&self) -> Sring {
+  self.chars()
+      .map(char::to_uppercase)
+      .flatten()
+      .collect()
+}
+```
+
+要用這種組合技的原因是`to::uppercase()`不是回傳一個字元，而是回傳一個iterator，可產生ㄧ個或多個字元，flatten負責接受這些iterator，把他們輾平拼接成一個String。
+
+但不要忘了我們才剛介紹過的flat_map，事實上，它完全可以更輕鬆快速地做到這件事：
+
+```{Rust}
+fn to_uppercase(&self) -> Sring {
+  self.chars()
+      .flat_map(char::to_uppercase)
+      .collect()
+}
+```
+
+### take與 take_while
+
+你可以用這兩個方法告訴你的Iterator什麼時候結束迭代，在某個數量或某種情況，它們的簽章是：
+
+```{Rust}
+fn take(self, n: usize) -> impl Iterator<Item=Self::Item>
+    where Self: Sized;
+
+fn take_while<P>(self, predicate: P) -> impl Iterator<Item=Self::Item>
+   where Self: Sized, P: FnMut(&Self::Item) -> bool;
+```
+
+
+它們接受一個iterator的所有權，同時回傳一個新的iterator。take iterator會在產生最多n個項目後回傳None。take_while會對每個項目執行predicate，並在回傳第一個讓predicate回傳flase的地方回傳`None`。
+
+例如，如果有一封email中間與標題正文之間有空行，使用`take_while`來迭代標題：
+
+```{extendr}
+let message = "To Tom\r\n\
+              From: Bling<whoareyouman0.4@gmail.com>\r\n\
+              \r\n\
+              Did you get any writting done today?\r\n
+              when will you stop wasting time?\r\n";
+
+for headers in message.lines().take_while(|l| !l.is_empty()) {
+  rprintln!("{}", headers);
+}
+```
+
+我們在過去說過，字串裡面的一行文字結尾是反斜線時，Rust不會加入下一排的縮排，所以字串的每一行的開頭都沒有空格。這意味訊息第三行是空的，take_while 在看到空行時立即終止迭代，只會印出前兩行
+
+### skip與skip_while
+
+
+Iterator trait的skip與skip_while方法是take與take_while的相反：它們在迭代開始時卸出某個數量的項目，或是一直卸除項目，直到closure找到可接受時為止，將剩餘項目包在iterator傳出
+
+```{Rust}
+fn skip(self, n: usize) -> impl Iterator<Item=Self::Item>
+    where Self: Sized;
+
+fn slkip_while<P>(self, predicate: P) -> impl Iterator<Item=Self::Item>
+    where Self: Sized, P: FnMut(&Self::Item) -> bool
+```
+
+如果你知道要從哪裡開始，你可以用`skip`來指定要跳過的項目數：
+
+```{Rust}
+for arg in std::env::args().skip(1) {
+  ...
+}
+```
+
+這是迭代命令引數，我們用skip跳過第一個命令(第一個字串是程式本身的名稱)
+
+take_while可以讓你決定在什麼狀況停止取值，skip_while則是在什麼狀況下開始取值：
+
+```{extendr}
+let message = "To Tom\r\n\
+              From: Bling<whoareyouman0.4@gmail.com>\r\n\
+              \r\n\
+              Did you get any writting done today?\r\n
+              when will you stop wasting time?\r\n";
+
+
+for body in message.lines().skip_while(|l| !l.is_empty()).skip(1) {
+  rprintln!("{}", body);
+}
+```
+
+### peekable
+
+peekable可以讓你偷看一下項目，而不實際耗用：
+
+```{Rust}
+fn peekable(self) -> std::iter::Peekable<Self>
+    where Self: Sized;
+```
+
+這裡的Peekable<Self>實作了Iterator<Item=Self::Item>的結構，屬於一種iterator型態
+
+Peekable iterator有一個額外的peek方法，它會回傳一個Option<&Item>，
+
+### fuse
+
+Iterator在回傳None之後，trait並未規定再次呼叫它的next方法時該怎麼辦。大多數的iterator都會直接回傳None，當並非全都如此。
+
+fuse adapter接受任何iterator，並產生一個iterator，那個iterator會在第一次回傳None之後，繼續回傳None。
+
+```{Rust}
+struct Flaky(bool);
+
+impl Iterator for Flaky {
+  type Item = &'static str;
+  fn next(&mut self) -> Option<Self::Item> {
+    if self.0 {
+      self.0 = false;
+      Some("totally the last item)
+    }else{
+      self.0 = true; // 注意個行為
+      None
+    }
+  }
+}
+
+let mut flaky = Flaky(true);
+rprintln!("{}" ,flaky.next());
+rprintln!("{}" ,flaky.next());
+rprintln!("{}" ,flaky.next());
+
+let mut flaky = Flaky(true).fuse();
+rprintln!("{}" ,flaky.next());
+rprintln!("{}" ,flaky.next());
+rprintln!("{}" ,flaky.next());
+```
+
+因為Flaky的next方法會在true與false之間循環，導致並非item清空後不停回完`None`，如果你需要這樣的特性，fuse可以為你校正這件事。
+
+### 可逆的iterator與rev
+
+在有序的集合中，你可能會想從兩頭取出項目，只要實作`std::iter::DoubleEndedIterator`，它的簽章是：
+
+```{Rust}
+trait DoubleEndedIterator: Iterator {
+  fn next_back(&mut self) -> Option<Self::item>;
+}
+```
+
+它繼承iterator，並有一個next_back方法，用來取出末端的值
+
+```{extendr}
+let mut fruit = ["apple", "banana", "grape"];
+let mut iter = fruit.into_iter();
+
+rprintln!("{:?}", iter.next_back());
+rprintln!("{:?}", iter.next_back());
+```
+
+如果iterator是雙端的，你可以用rev adapter將它倒過來，它的簽章是：
+
+```{Rust}
+fn rev(self) -> impl Iterator<Item=Self>
+    where Self: Sized + DoubleEndedIterator;
+```
+
+它回傳的iterator也是雙端，因爲它顛倒整個顛倒整個序列：
+
+```{extendr}
+let mut fruit = ["apple", "banana", "grape"];
+let mut iter = fruit.into_iter().rev();
+rprintln!("{:?}", iter);
+rprintln!("{:?}", iter.next());
+
+```
+
+### inspect
+
+inspect adapter可對iterator adapter進行流水線的偵錯，它僅將項目的共享參考傳給closure，不會影響項目，這適合拿來印出項目與製作它們斷言。
+
+在這個例子中，將一個字串轉換成大寫
+
+```{extendr}
+let uppercase: String = "james".chars()
+    .inspect(|c| rprint!("before : {:?}\n", c ))
+    .flat_map(char::to_uppercase)
+    .inspect(|c| rprint!("after :     {:?}\n", c ))
+    .collect();
+rprintln!("{}", uppercase);
+```
+
+### chain
+
+chain adapter可以將iterator附加至另一個iterator。更準確的說，i1.chain(i2)會回傳一個iterator，該iterator會從i1取出項目，耗盡之後再從i2取出項目，它的簽章是如此：
+
+```{Rust}
+fn chain<U>(self, other: U) -> impl Iterator<Item=Self::Item>
+    where Self: Sized, U: Intoiterator<Item=Self::Item>;
+```
+
+換句話說，你可以將一個iterator與產生同一型態項目的任何iterable串接起來：
+
+```{extendr}
+let v: Vec<i32> = (1..4).chain([20, 30, 40]).collect();
+rprintln!("{:?}", v);
+```
+
+### enumerate
+
+enumerate adapter可將ㄧ個運行索引附加至序列，如"apple", "banana", "grape"為item的iterator附加後回傳(0, "apple")、(1, "banna")、(2, "grape")
+
+
+```{extendr}
+let mut fruit = ["apple", "banana", "grape"];
+for (i, name) in fruit.into_iter().enumerate() {
+  rprintln!("i: {}, name: {}", i, name);
+}
+```
+
+### zip
+ 
+zip adapter可以將兩個iterator結合成一個，但不是串接，而是類似enumerate產生一對值，例如下面例子中，我們將無界限的0..與另一個iterator來產生與enumerate adapter的效果：
+
+
+```{extendr}
+let mut fruit = ["apple", "banana", "grape"];
+let mut iter: Vec<_> = (0..).zip(fruit).collect();
+for (i, name) in fruit.into_iter().enumerate() {
+  rprintln!("i: {}, name: {}", i, name);
+}
+```
+
+你可以把zip視為更廣義的enumerate，enumerate在可協助提供處理項目資訊時使用，zip可以附加任何東西，不需要是iterator，可以是iterable
+
+```{extendr}
+use std::iter::repeat;
+
+let transportions = vec!["car", "bus", "MRT"];
+
+let songs :Vec<_> = repeat("by")
+    .zip(transportions)
+    .collect();
+    
+rprintln!("{:?}", songs);
+```
+
+### by_ref
+
+當你將adapter附加至itrator，你通常不能解除取回底層iterator所有權。
+
+而iterator的by_ref方法可以借一個可變參考給iterator，在你使用adapter後，卸除它，結束借用並重新取得原始的iterator使用權。
+
+本章稍早曾使用take_while與skip_while分別截取正文與標題，你可以用不同的iterator來做這件事，或如下例中，`iter.by_ref().take_while`把一個可變參考給take_while，完成後，取回底下的iterator。
+
+
+
+```{extendr}
+
+let message = "To Tom\r\n\
+From: Bling<whoareyouman0.4@gmail.com>\r\n\
+\r\n\
+Did you get any writting done today?\r\n\
+when will you stop wasting time?\r\n";
+
+let mut iter = message.lines();
+
+rprintln!("Headers：");
+for body in iter.by_ref().take_while(|l| !l.is_empty()) {
+  rprintln!("{}", body);
+}
+
+rprintln!("\nBody：");
+for body in iter{
+  rprintln!("{}", body);
+}
+
+```
+
+### cloned, copied
+
+cloned adapter接受一個產生參考的iterator，並回傳那些參考來產生值的iterator。當然，參考對象型態必須實作Clone。
+
+```{extendr}
+let a = ['1', '2', '3', '4'];
+
+rprintln!("{:?}", a.iter().next());
+rprintln!("{:?}", a.iter().cloned().next());
+```
+
+cloned adapter很像對iterator呼叫`iter.map(|item| item.clone())`，copied adapter的運作幾乎相同，但更嚴格。通常實作了copied的型態也會實作cloned。
+
+### cycle
+
+cycle adapter可以讓iterataor無限循環，它利用的是Clone可以無限複製的特性，所以底層的iterator必須實作`std::clone::Clone`，好讓cycle可以儲存它的初始狀態。
+
+例如：
+
+```{extendr}
+let fruit = ["apple", "banana", "grape"];
+let mut iter = fruit.iter().cycle();
+for _ in 0..10 {
+  if let Some(val) = iter.next() {
+    rprintln!("{}", val);
+  }
+}
+```
+
+另外是要設計一個小小的公因數遊戲，可被3整除的數字換成fizz，可倍5整除的換成buzz，兩者皆可的萬成fizzbuzz
+
+
+
+```{extendr}
+use std::iter::{once, repeat};
+
+let fizzes = repeat("").take(2).chain(once("fizz")).cycle();
+let buzzes = repeat("").take(4).chain(once("buzz")).cycle();
+let fizzes_buzzes = fizzes.zip(buzzes);
+
+let fizz_buzz  = (1..16).zip(fizzes_buzzes)
+    .map(|tuple|
+           match tuple {
+             (i, ("", "")) => i.to_string(),
+             (_, (fizz, buzz)) => format!("{}{}", fizz, buzz)
+           });
+
+for x in fizz_buzz {
+  rprintln!("{}", x);
+}
+
+```
+
+## 耗用iterator
+
+你可以用for迴圈來耗用iterator，或明確的呼叫next，並用它們實作其他方法。但在標準庫中有許多已建立的方法能節省你重複標寫的時間。
+
+### 簡單累計：count, sum, product
+
+count方法會從iterator取出項目直至回傳None為止，並告訴你總共取得多少，下面此裡是在計算標準輸入的行數：
+
+```{Rust}
+use std::io::prelude::*;
+
+fn main() {
+  let stdin = std::io::stdin();
+  println!("{}", stdin.lock().lines().count());
+}
+```
+
+
+sum與product可以計算總和與乘積，那些項目必須是整數或浮點數：
+
+```{extendr}
+fn triangle(n: u64) -> u64 {
+  (1..=n).sum()
+}
+
+rprintln!("{}", triangle(10));
+
+fn factorial(n: u64) -> u64 {
+  (1..=n).product()
+}
+
+rprintln!("{}", factorial(10));
+```
+
+### max, min
+
+Iterator的max與min方法回傳iterator最小與最大的項目。iterator必須實作`std::cmp::Ord`，以便讓項目可互相比較：
+
+```{extendr}
+let mut x = [-1, 0, 2, 3].iter();
+rprintln!("{:?}", x.clone().max());
+rprintln!("{:?}", x.min());
+```
+
+
+f64與f32只實作了`std::cmp::PartialOrd`，因此你不能用這兩個方法，這樣看起來很不討喜，但它為你避免遇到IEEe與NaN時發生錯誤。假如你決定處理NaN值，你可以改用`max_by`與`min_by`。
+
+### max_by, min_by
+
+max_by與min_by方法可以回傳iterator產生的最大或最小項目，它接受你提供的比較函式來決定結果：
+
+```{extendr}
+use std::cmp::Ordering;
+
+fn cmp(lhs: &f64, rhs: &f64) -> Ordering {
+  lhs.partial_cmp(rhs).unwrap()
+}
+
+let numbers = [1.0, 2.0, 3.0];
+rprintln!("{:?}", numbers.iter().copied().max_by(cmp));
+rprintln!("{:?}", numbers.iter().copied().min_by(cmp));
+```
+
+### max_by_key, min_by_key
+
+```{extendr}
+use std::collections::HashMap;
+
+let mut populations = HashMap::new();
+populations.insert("台北", 555_555);
+populations.insert("南投", 321_321);
+populations.insert("高雄", 428_428);
+
+let max_city = &populations.iter().max_by_key(|&(name, pop)| pop);
+let min_city = &populations.iter().min_by_key(|&(name, pop)| pop);
+
+rprintln!("人口最多的城市是：{:?}", max_city.unwrap().0);
+rprintln!("人口最多的城市是：{:?}", min_city.unwrap().0);
+```
+### any與all
+
+any對iterator產生的項目呼叫一個closure，並在得到第一次true時回傳。
+
+all則在所有項目皆回傳true時才會回傳true
+
+```{extendr}
+let id = "Iterator";
+assert!( id.chars().any(char::is_uppercase));
+assert!(!id.chars().all(char::is_uppercase));
+```
+
+### position, rposistion與 ExactSizeIterator
+
+position方法會接受item並呼叫ㄧ個closure，當clousre回傳true時回傳該item的索引。確切來說，它是回傳一個Option，當所有項目都無法讓closure回傳true時回傳None。
+
+```{extendr}
+let text = "Allies";
+
+rprintln!("{:?}", text.chars().position(|c| c == 'l'));
+rprintln!("{:?}", text.chars().position(|c| c == 'b'));
+```
+
+rposition也相同，只是會從右方開始：
+
+```{extendr}
+let text = b"Allies";
+
+rprintln!("{:?}", text.iter().rposition(|&c| c == b'l'));
+rprintln!("{:?}", text.iter().rposition(|&c| c == b'b'));
+```
+
+要注意，使用rposition方法必須實作`std::iter::ExactSizeIterator trait`，也就是有精確數量的迭代器：
+
+```{Rust}
+trait ExactSizeIterator: Iterator {
+  fn len(&self) -> usize {...}
+  fn is_empty(&self) -> bool {...}
+}
+```
+
+len方法會回傳剩餘的項目數量，is_empty方法則會在迭代完成後回傳true。
+
+當一個iterator無法預先知道它將產生多少項目，例如`str::chars iterator`就無法知道，所以你不能對字串使用rposition。
+
+
+### fold與rfold
+
+fold方法可以實現許多基礎功能，用來對整個項目做累計結果。你提供一個初始值(accumulator)給fold，它會反覆用closure來處理當前的accumulator與iterator產生的下一個項目。此時accummulartor會變成新的，當所有項目都處理完成時accumulator就是回傳值。
+
+前面提到的許多耗用accumulator也可以用fold完成：
+
+```{extendr}
+let a = [1, 2, 3, 4];
+let count = a.iter().fold(0, |n, _| n+1);
+let sum = a.iter().fold(0, |n, i| n+i);
+let product = a.iter().fold(1, |n, i| n*i);
+
+rprintln!("count:{}\nsum:{}\nproduct:{}", count, sum, product);
+```
+
+fold的簽章是：
+
+```{Rust}
+fn fold<A, F>(self, init: A, f: F) -> A
+    where Self: Sized, F: FnMut(A, Self::Item) -> A
+```
+
+A是accumulator型態。init引數是個A，closure的第一個引數和回傳值以及fold本身的回傳值也是A。
+
+
+
+```{extendr}
+let a = ["你好", "，", "我是一個機器人", "，", "很高興為您服務"];
+
+let String = a.iter().fold(String::new(), |s,w| s+w);
+rprintln!("{}", String);
+```
+
+rfold方法與fold很像，但是它需要雙端iterator，它會從最後面到最前面處理項目
+
+```{extendr}
+let a = ["你好", "，", "我是一個機器人", "，", "很高興為您服務"];
+
+let String = a.iter().rfold(String::new(), |s,w| s+w);
+rprintln!("{}", String.chars().count());
+rprintln!("{}", String.chars().count());
+```
+
+```{extendr}
+let String = ("哈囉你好\n我是機器人\n趁熱吃比較好\n比比怎麼中吃\n").to_string();
+for line in String.lines() {
+  for b in line.bytes() {
+    rprintln!("{b}");
+  } 
+}
+```

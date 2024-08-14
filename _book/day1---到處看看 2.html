@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 2 Day1 - 到處看看 | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="2.1 安裝rust 這會安裝最新版本的Rust，並且會自動更新。 curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh 如果成功，會得到以下訊息： Rust is installed now. Great! 檢查版本 rustc --version  2.1.1 相關工具...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 2 Day1 - 到處看看 | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="2.1 安裝rust 這會安裝最新版本的Rust，並且會自動更新。 curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh 如果成功，會得到以下訊息： Rust is installed now. Great! 檢查版本 rustc --version  2.1.1 相關工具...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 2 Day1 - 到處看看 | Rust之書">
+<meta name="twitter:description" content="2.1 安裝rust 這會安裝最新版本的Rust，並且會自動更新。 curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh 如果成功，會得到以下訊息： Rust is installed now. Great! 檢查版本 rustc --version  2.1.1 相關工具...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="active" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">8</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="day1---到處看看" class="section level1" number="2">
+<h1>
+<span class="header-section-number">2</span> Day1 - 到處看看<a class="anchor" aria-label="anchor" href="#day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B"><i class="fas fa-link"></i></a>
+</h1>
+<div id="安裝rust" class="section level2" number="2.1">
+<h2>
+<span class="header-section-number">2.1</span> 安裝rust<a class="anchor" aria-label="anchor" href="#%E5%AE%89%E8%A3%9Drust"><i class="fas fa-link"></i></a>
+</h2>
+<p>這會安裝最新版本的Rust，並且會自動更新。</p>
+<pre><code>curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh</code></pre>
+<p>如果成功，會得到以下訊息：</p>
+<pre><code>Rust is installed now. Great!</code></pre>
+<p>檢查版本</p>
+<pre><code>rustc --version</code></pre>
+<div id="相關工具" class="section level3" number="2.1.1">
+<h3>
+<span class="header-section-number">2.1.1</span> 相關工具<a class="anchor" aria-label="anchor" href="#%E7%9B%B8%E9%97%9C%E5%B7%A5%E5%85%B7"><i class="fas fa-link"></i></a>
+</h3>
+<p>安裝完Rust，我們來檢查其他三個相關的指令工具</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb4-1" tabindex="-1"></a><span class="ex">cargo</span> <span class="at">--version</span></span>
+<span id="cb4-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb4-2" tabindex="-1"></a><span class="ex">rustc</span> <span class="at">--version</span></span>
+<span id="cb4-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb4-3" tabindex="-1"></a><span class="ex">rustdoc</span> <span class="at">--version</span></span>
+<span id="cb4-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb4-4" tabindex="-1"></a><span class="co">#&gt; cargo 1.75.0 (1d8b05cdd 2023-11-20)</span></span>
+<span id="cb4-5"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb4-5" tabindex="-1"></a><span class="co">#&gt; rustc 1.75.0 (82e1608df 2023-12-21)</span></span>
+<span id="cb4-6"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb4-6" tabindex="-1"></a><span class="co">#&gt; rustdoc 1.75.0 (82e1608df 2023-12-21)</span></span></code></pre></div>
+<p>如預期的，他應該要跟我們分別回報版本，而這三個工具分別用來:</p>
+<ol style="list-style-type: decimal">
+<li><p>cargo是Rust專門的編譯管理器與萬能的工具包，例如建立新專案，組建專案與執行專案，之後我們會頻繁使用。</p></li>
+<li><p>rustc也是rust的編譯器，但我們通常都是透過cargo來為我們統一編譯及管理。</p></li>
+<li><p>rustdoc是文件工具，你以特定代碼在rs檔裡撰寫文件，rustdoc可以用它們來建立正確的HTML，但這件事我們同樣交由cargo處理。</p></li>
+</ol>
+</div>
+</div>
+<div id="hello.rs" class="section level2" number="2.2">
+<h2>
+<span class="header-section-number">2.2</span> hello.rs<a class="anchor" aria-label="anchor" href="#hello.rs"><i class="fas fa-link"></i></a>
+</h2>
+<p>首先，執行以下指令，建立一個暫時新的專案：</p>
+<pre><code>mkdir tmp
+cd tmp</code></pre>
+<p>接著。寫入一個如下列的程式碼，並且儲存成 <code>hello.rs</code>：</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb6-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb6-1" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb6-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb6-2" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"Hello, world!"</span>)<span class="op">;</span></span>
+<span id="cb6-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb6-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>fn代表定義的函式，這裡的函式就是main()</p>
+<p>println!是顯示文字的巨集</p>
+<p>接著，讓我們來編譯這個代碼：</p>
+<pre class="terminal"><code>rustc hello.rs
+./hello</code></pre>
+<pre class="extender"><code>rprintln!("Hello, world!");</code></pre>
+</div>
+<div id="第一個專案-猜猜數字" class="section level2" number="2.3">
+<h2>
+<span class="header-section-number">2.3</span> 第一個專案-猜猜數字<a class="anchor" aria-label="anchor" href="#%E7%AC%AC%E4%B8%80%E5%80%8B%E5%B0%88%E6%A1%88-%E7%8C%9C%E7%8C%9C%E6%95%B8%E5%AD%97"><i class="fas fa-link"></i></a>
+</h2>
+<pre class="terminal"><code>cargo new guess # create a new project</code></pre>
+<p>跳往新目錄並且檢視</p>
+<pre class="terminal"><code>cd guess
+tree</code></pre>
+<p>新建成的專案目錄結構如下：</p>
+<pre><code>.
+├── Cargo.toml
+└── src
+    └── main.rs</code></pre>
+<p>Cargo.toml 是專案的設定檔，src/main.rs 是程式碼的檔案。</p>
+<p>使用指令創建的main.rs內容如下：</p>
+<pre><code>fn main() {
+    println!("Hello, world!");
+}</code></pre>
+<p>所有的執行黨都是從main函數開始執行的</p>
+<p>而所有函式都會回傳一個值，在rust中，我們以箭頭與型別名稱表示</p>
+<p>例如：-&gt; u32 表示回傳一個無符號(unsigned integer)32位元整數</p>
+<p>而main函數的回傳值是()，表示沒有回傳值，因此回傳的是Rust unit type</p>
+<p>接著，我們來執行這個專案：</p>
+<pre class="terminal"><code>cargo run</code></pre>
+<pre><code>#&gt; Hello, world!</code></pre>
+<div id="宣告變數" class="section level3" number="2.3.1">
+<h3>
+<span class="header-section-number">2.3.1</span> 宣告變數<a class="anchor" aria-label="anchor" href="#%E5%AE%A3%E5%91%8A%E8%AE%8A%E6%95%B8"><i class="fas fa-link"></i></a>
+</h3>
+<p>Rust的變數型態是精華，我們會在明天討論它，但現在我們先來看看如何宣告變數。</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb15-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb15-1" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb15-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb15-2" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"The value of x is: {}"</span><span class="op">,</span> x)<span class="op">;</span></span></code></pre></div>
+<p>接著，我們宣告一個隨機數，我們會用到rand crate</p>
+<p>所以，請打開Cargo.toml，並且加入rand依賴，讓編譯器知道我們要使用這個套件：</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode toml"><code class="sourceCode toml"><span id="cb16-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-1" tabindex="-1"></a><span class="kw">[</span><span class="dt">package</span><span class="kw">]</span></span>
+<span id="cb16-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-2" tabindex="-1"></a><span class="dt">name</span> <span class="op">=</span> <span class="st">"guess"</span></span>
+<span id="cb16-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-3" tabindex="-1"></a><span class="dt">version</span> <span class="op">=</span> <span class="st">"0.1.0"</span></span>
+<span id="cb16-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-4" tabindex="-1"></a><span class="dt">edition</span> <span class="op">=</span> <span class="st">"2021"</span></span>
+<span id="cb16-5"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-5" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-6" tabindex="-1"></a><span class="co"># See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html</span></span>
+<span id="cb16-7"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-7" tabindex="-1"></a><span class="kw">[</span><span class="dt">dependencies</span><span class="kw">]</span></span>
+<span id="cb16-8"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb16-8" tabindex="-1"></a><span class="dt">rand</span> <span class="op">=</span> <span class="st">"0.8.4"</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb17-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb17-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">rand::</span>Rng<span class="op">;</span></span>
+<span id="cb17-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb17-2" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb17-3" tabindex="-1"></a><span class="kw">let</span> secret_number <span class="op">=</span> <span class="pp">rand::</span>thread_rng()<span class="op">.</span>gen_range(<span class="dv">1</span><span class="op">..=</span><span class="dv">10</span>)<span class="op">;</span></span>
+<span id="cb17-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb17-4" tabindex="-1"></a><span class="pp">println!</span>(<span class="st">"The secret number is: {}"</span><span class="op">,</span> secret_number)<span class="op">;</span></span></code></pre></div>
+<p>現在有一個隨機數了！接下來，我們要處理如何讓使用者輸入數字。這裡我們會用到std::io這個標準程式庫，因此只需引用它，而不需要再cargo.toml中加入依賴。</p>
+<p><code>use std::io;</code></p>
+<p>在terminal接收任何輸入，會被預期是字串，思路是：先接收字串，並且用字串提供的方法轉換成數字。</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb18-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> guess <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>new()<span class="op">;</span></span>
+<span id="cb18-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-2" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-3" tabindex="-1"></a><span class="pp">io::</span>stdin()<span class="op">.</span>read_line(<span class="op">&amp;</span><span class="kw">mut</span> guess)</span>
+<span id="cb18-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-4" tabindex="-1"></a>    <span class="op">.</span>expect(<span class="st">"閱讀失敗！請輸入數字"</span>)<span class="op">;</span></span>
+<span id="cb18-5"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-5" tabindex="-1"></a>  </span>
+<span id="cb18-6"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-6" tabindex="-1"></a><span class="kw">let</span> guess<span class="op">:</span> <span class="dt">u32</span> <span class="op">=</span> <span class="cf">match</span> guess<span class="op">.</span>trim()<span class="op">.</span>parse() <span class="op">{</span></span>
+<span id="cb18-7"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-7" tabindex="-1"></a>    <span class="cn">Ok</span>(num) <span class="op">=&gt;</span> num<span class="op">,</span></span>
+<span id="cb18-8"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-8" tabindex="-1"></a>    <span class="cn">Err</span>(_) <span class="op">=&gt;</span> <span class="cf">continue</span><span class="op">,</span></span>
+<span id="cb18-9"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb18-9" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>guess在第ㄧ次被宣告是一個字串，並且接受使用者的輸入</p>
+<p>接著，第二次將其宣告為u32整數，是透過將字串轉換成數字。</p>
+<p>parrse()會回傳一個Result型別，成功的OK(num)或是失敗的Err(_)，我們用match來處理這兩種情況。</p>
+<p>接著我們要比較使用者輸入的數字與隨機數，並且給予提示。你可以用if-else來處理這個問題。</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb19-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-1" tabindex="-1"></a><span class="cf">if</span> guess <span class="op">&lt;</span> secret_number <span class="op">{</span></span>
+<span id="cb19-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-2" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"太小了！"</span>)<span class="op">;</span></span>
+<span id="cb19-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-3" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> guess <span class="op">&gt;</span> secret_number <span class="op">{</span></span>
+<span id="cb19-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-4" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"太大了！"</span>)<span class="op">;</span></span>
+<span id="cb19-5"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-5" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb19-6"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-6" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"猜對了！"</span>)<span class="op">;</span></span>
+<span id="cb19-7"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-7" tabindex="-1"></a>    <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb19-8"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb19-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>或是用match與odering來處理(記得聲明引用程式庫<code>use std::cmp::Ordering;</code>)</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb20-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-1" tabindex="-1"></a><span class="cf">match</span> guess<span class="op">.</span>cmp(<span class="op">&amp;</span>secret_number)<span class="op">{</span></span>
+<span id="cb20-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-2" tabindex="-1"></a>    Ordering<span class="op">:</span>Less <span class="op">=&gt;</span> <span class="pp">rprintln!</span>(<span class="st">"太小了！"</span>)<span class="op">,</span></span>
+<span id="cb20-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-3" tabindex="-1"></a>    Ordering<span class="op">:</span>Greater <span class="op">=&gt;</span> <span class="pp">rprintln!</span>(<span class="st">"太大了！"</span>)<span class="op">,</span></span>
+<span id="cb20-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-4" tabindex="-1"></a>    Ordering<span class="op">:</span>Equal <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb20-5"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-5" tabindex="-1"></a>        <span class="pp">rprintln!</span>(<span class="st">"猜對了！"</span>)<span class="op">;</span></span>
+<span id="cb20-6"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-6" tabindex="-1"></a>        <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb20-7"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-7" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb20-8"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb20-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>完整的程式碼與執行結果應該如下：</p>
+</div>
+</div>
+<div class="panelset">
+<div id="程式碼" class="section level2 panel-name panel" number="2.4">
+<h2>
+<span class="header-section-number">2.4</span> 程式碼<a class="anchor" aria-label="anchor" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb21-1"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">rand::</span>Rng<span class="op">;</span></span>
+<span id="cb21-2"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-2" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::cmp::</span>Ordering<span class="op">;</span></span>
+<span id="cb21-3"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-3" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::</span>io<span class="op">;</span></span>
+<span id="cb21-4"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-4" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-5" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb21-6"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-6" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"1~10猜數字！"</span>)<span class="op">;</span></span>
+<span id="cb21-7"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-7" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-8" tabindex="-1"></a>    <span class="kw">let</span> secret_number <span class="op">=</span> <span class="pp">rand::</span>thread_rng()<span class="op">.</span>gen_range(<span class="dv">1</span><span class="op">..=</span><span class="dv">10</span>)<span class="op">;</span></span>
+<span id="cb21-9"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-9" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-10" tabindex="-1"></a>    <span class="cf">loop</span> <span class="op">{</span></span>
+<span id="cb21-11"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-11" tabindex="-1"></a>        <span class="pp">println!</span>(<span class="st">"請輸入數字"</span>)<span class="op">;</span></span>
+<span id="cb21-12"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-12" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-13" tabindex="-1"></a>        <span class="kw">let</span> <span class="kw">mut</span> guess <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>new()<span class="op">;</span></span>
+<span id="cb21-14"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-14" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-15" tabindex="-1"></a>        <span class="pp">io::</span>stdin()</span>
+<span id="cb21-16"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-16" tabindex="-1"></a>            <span class="op">.</span>read_line(<span class="op">&amp;</span><span class="kw">mut</span> guess)</span>
+<span id="cb21-17"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-17" tabindex="-1"></a>            <span class="op">.</span>expect(<span class="st">"解析失敗"</span>)<span class="op">;</span></span>
+<span id="cb21-18"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-18" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-19" tabindex="-1"></a>        <span class="kw">let</span> guess<span class="op">:</span> <span class="dt">u32</span> <span class="op">=</span> <span class="cf">match</span> guess<span class="op">.</span>trim()<span class="op">.</span>parse() <span class="op">{</span></span>
+<span id="cb21-20"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-20" tabindex="-1"></a>            <span class="cn">Ok</span>(num) <span class="op">=&gt;</span> num<span class="op">,</span></span>
+<span id="cb21-21"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-21" tabindex="-1"></a>            <span class="cn">Err</span>(_) <span class="op">=&gt;</span> <span class="cf">continue</span><span class="op">,</span></span>
+<span id="cb21-22"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-22" tabindex="-1"></a>        <span class="op">};</span></span>
+<span id="cb21-23"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-23" tabindex="-1"></a></span>
+<span id="cb21-24"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-24" tabindex="-1"></a>        <span class="pp">println!</span>(<span class="st">"你猜的數字是: {guess}"</span>)<span class="op">;</span></span>
+<span id="cb21-25"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-25" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-26" tabindex="-1"></a>        <span class="cf">match</span> guess<span class="op">.</span>cmp(<span class="op">&amp;</span>secret_number) <span class="op">{</span></span>
+<span id="cb21-27"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-27" tabindex="-1"></a>            <span class="pp">Ordering::</span>Less <span class="op">=&gt;</span> <span class="pp">println!</span>(<span class="st">"太小了!"</span>)<span class="op">,</span></span>
+<span id="cb21-28"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-28" tabindex="-1"></a>            <span class="pp">Ordering::</span>Greater <span class="op">=&gt;</span> <span class="pp">println!</span>(<span class="st">"太大了!"</span>)<span class="op">,</span></span>
+<span id="cb21-29"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-29" tabindex="-1"></a>            <span class="pp">Ordering::</span>Equal <span class="op">=&gt;</span> <span class="op">{</span></span>
+<span id="cb21-30"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-30" tabindex="-1"></a>                <span class="pp">println!</span>(<span class="st">"恭喜獲勝!"</span>)<span class="op">;</span></span>
+<span id="cb21-31"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-31" tabindex="-1"></a>                <span class="cf">break</span><span class="op">;</span></span>
+<span id="cb21-32"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-32" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb21-33"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-33" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb21-34"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-34" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb21-35"><a href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html#cb21-35" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="結果" class="section level2 panel-name panel" number="2.5">
+<h2>
+<span class="header-section-number">2.5</span> 結果<a class="anchor" aria-label="anchor" href="#%E7%B5%90%E6%9E%9C"><i class="fas fa-link"></i></a>
+</h2>
+<p>1~10猜數字！<br>
+請輸入數字<br>
+1<br>
+你猜的數字是: 1<br>
+太小了!<br>
+請輸入數字<br>
+7<br>
+你猜的數字是: 7<br>
+太大了!<br>
+請輸入數字<br>
+5<br>
+你猜的數字是: 5<br>
+太小了!<br>
+請輸入數字<br>
+6<br>
+你猜的數字是: 6<br>
+恭喜獲勝!</p>
+</div>
+</div>
+
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="index.html"><span class="header-section-number">1</span> About</a></div>
+<div class="next"><a href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li>
+<a class="nav-link" href="#%E5%AE%89%E8%A3%9Drust"><span class="header-section-number">2.1</span> 安裝rust</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#%E7%9B%B8%E9%97%9C%E5%B7%A5%E5%85%B7"><span class="header-section-number">2.1.1</span> 相關工具</a></li></ul>
+</li>
+<li><a class="nav-link" href="#hello.rs"><span class="header-section-number">2.2</span> hello.rs</a></li>
+<li>
+<a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E5%80%8B%E5%B0%88%E6%A1%88-%E7%8C%9C%E7%8C%9C%E6%95%B8%E5%AD%97"><span class="header-section-number">2.3</span> 第一個專案-猜猜數字</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#%E5%AE%A3%E5%91%8A%E8%AE%8A%E6%95%B8"><span class="header-section-number">2.3.1</span> 宣告變數</a></li></ul>
+</li>
+<li><a class="nav-link" href="#%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="header-section-number">2.4</span> 程式碼</a></li>
+<li><a class="nav-link" href="#%E7%B5%90%E6%9E%9C"><span class="header-section-number">2.5</span> 結果</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/01-Day1.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/01-Day1.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-07-12.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

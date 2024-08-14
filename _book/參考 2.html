@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 5 參考 | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="在上一章看到的所有指標，從Boxheap指標，以及String與Vec的內部指標，都擁有所有權：也就是說，當所有權人被卸除時，他的參考對象也隨之卸除。Rust也有無所有權指標，稱為參考，不會影響參考對象的生命週期。 參考的概念就是取得位址，但在Rust中，參考的生命週期絕對不能超過參考的生命週期，來保證運作的安全性，換言之，正確理解Rust參考的方式是「借用值」，總有一天要歸還給所有權人。...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 5 參考 | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="在上一章看到的所有指標，從Boxheap指標，以及String與Vec的內部指標，都擁有所有權：也就是說，當所有權人被卸除時，他的參考對象也隨之卸除。Rust也有無所有權指標，稱為參考，不會影響參考對象的生命週期。 參考的概念就是取得位址，但在Rust中，參考的生命週期絕對不能超過參考的生命週期，來保證運作的安全性，換言之，正確理解Rust參考的方式是「借用值」，總有一天要歸還給所有權人。...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 5 參考 | Rust之書">
+<meta name="twitter:description" content="在上一章看到的所有指標，從Boxheap指標，以及String與Vec的內部指標，都擁有所有權：也就是說，當所有權人被卸除時，他的參考對象也隨之卸除。Rust也有無所有權指標，稱為參考，不會影響參考對象的生命週期。 參考的概念就是取得位址，但在Rust中，參考的生命週期絕對不能超過參考的生命週期，來保證運作的安全性，換言之，正確理解Rust參考的方式是「借用值」，總有一天要歸還給所有權人。...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="active" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">8</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="參考" class="section level1" number="5">
+<h1>
+<span class="header-section-number">5</span> 參考<a class="anchor" aria-label="anchor" href="#%E5%8F%83%E8%80%83"><i class="fas fa-link"></i></a>
+</h1>
+<p>在上一章看到的所有指標，從Box<t>heap指標，以及String與Vec的內部指標，都擁有所有權：也就是說，當所有權人被卸除時，他的參考對象也隨之卸除。Rust也有<strong>無所有權指標</strong>，稱為參考，不會影響參考對象的生命週期。</t></p>
+<p>參考的概念就是取得位址，但在Rust中，<strong>參考的生命週期絕對不能超過參考的生命週期</strong>，來保證運作的安全性，換言之，正確理解Rust參考的方式是「借用值」，總有一天要歸還給所有權人。</p>
+<div id="值的參考" class="section level2" number="5.1">
+<h2>
+<span class="header-section-number">5.1</span> 值的參考<a class="anchor" aria-label="anchor" href="#%E5%80%BC%E7%9A%84%E5%8F%83%E8%80%83"><i class="fas fa-link"></i></a>
+</h2>
+<p>我們要製作單曲與其歌手的表格，可以用雜湊表(HashMap)來儲存，並寫一個<code>show</code>函式來顯示表格</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb65-1"><a href="%E5%8F%83%E8%80%83.html#cb65-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">std::collections::</span>HashMap<span class="op">;</span></span>
+<span id="cb65-2"><a href="%E5%8F%83%E8%80%83.html#cb65-2" tabindex="-1"></a><span class="kw">type</span> Table <span class="op">=</span> HashMap<span class="op">&lt;</span><span class="dt">String</span><span class="op">,</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">String</span><span class="op">&gt;&gt;;</span></span>
+<span id="cb65-3"><a href="%E5%8F%83%E8%80%83.html#cb65-3" tabindex="-1"></a></span>
+<span id="cb65-4"><a href="%E5%8F%83%E8%80%83.html#cb65-4" tabindex="-1"></a><span class="kw">fn</span> show(table<span class="op">:</span> Table)<span class="op">{</span></span>
+<span id="cb65-5"><a href="%E5%8F%83%E8%80%83.html#cb65-5" tabindex="-1"></a>  <span class="cf">for</span>(artist<span class="op">,</span> album) <span class="kw">in</span> table <span class="op">{</span></span>
+<span id="cb65-6"><a href="%E5%8F%83%E8%80%83.html#cb65-6" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"{}的單曲："</span><span class="op">,</span> artist)<span class="op">;</span></span>
+<span id="cb65-7"><a href="%E5%8F%83%E8%80%83.html#cb65-7" tabindex="-1"></a>    <span class="cf">for</span> song <span class="kw">in</span> album <span class="op">{</span></span>
+<span id="cb65-8"><a href="%E5%8F%83%E8%80%83.html#cb65-8" tabindex="-1"></a>      <span class="pp">rprintln!</span>(<span class="st">" {}"</span><span class="op">,</span> song)<span class="op">;</span></span>
+<span id="cb65-9"><a href="%E5%8F%83%E8%80%83.html#cb65-9" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb65-10"><a href="%E5%8F%83%E8%80%83.html#cb65-10" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb65-11"><a href="%E5%8F%83%E8%80%83.html#cb65-11" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>在主要函式中，只要插入元素，並使用上面的函式即可</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb66-1"><a href="%E5%8F%83%E8%80%83.html#cb66-1" tabindex="-1"></a></span>
+<span id="cb66-2"><a href="%E5%8F%83%E8%80%83.html#cb66-2" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb66-3"><a href="%E5%8F%83%E8%80%83.html#cb66-3" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> table <span class="op">=</span> <span class="pp">Table::</span>new()<span class="op">;</span></span>
+<span id="cb66-4"><a href="%E5%8F%83%E8%80%83.html#cb66-4" tabindex="-1"></a>  </span>
+<span id="cb66-5"><a href="%E5%8F%83%E8%80%83.html#cb66-5" tabindex="-1"></a>  table<span class="op">.</span>insert(<span class="st">"周杰倫"</span><span class="op">.</span>to_string()<span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"青花瓷"</span><span class="op">.</span>to_string()<span class="op">,</span> <span class="st">"稻香"</span><span class="op">.</span>to_string()])<span class="op">;</span></span>
+<span id="cb66-6"><a href="%E5%8F%83%E8%80%83.html#cb66-6" tabindex="-1"></a>  table<span class="op">.</span>insert(<span class="st">"蔡依林"</span><span class="op">.</span>to_string()<span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"倒帶"</span><span class="op">.</span>to_string()<span class="op">,</span> <span class="st">"愛情三十六計"</span><span class="op">.</span>to_string()])<span class="op">;</span></span>
+<span id="cb66-7"><a href="%E5%8F%83%E8%80%83.html#cb66-7" tabindex="-1"></a>  table<span class="op">.</span>insert(<span class="st">"張學友"</span><span class="op">.</span>to_string()<span class="op">,</span> <span class="pp">vec!</span>[<span class="st">"吻別"</span><span class="op">.</span>to_string()<span class="op">,</span> <span class="st">"當愛已成往事"</span><span class="op">.</span>to_string()])<span class="op">;</span></span>
+<span id="cb66-8"><a href="%E5%8F%83%E8%80%83.html#cb66-8" tabindex="-1"></a>  </span>
+<span id="cb66-9"><a href="%E5%8F%83%E8%80%83.html#cb66-9" tabindex="-1"></a>  show(table)<span class="op">;</span></span>
+<span id="cb66-10"><a href="%E5%8F%83%E8%80%83.html#cb66-10" tabindex="-1"></a>  </span>
+<span id="cb66-11"><a href="%E5%8F%83%E8%80%83.html#cb66-11" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>輕鬆執行</p>
+<pre><code>#&gt;  [1m [32m    Finished [0m dev [unoptimized + debuginfo] target(s) in 0.00s
+#&gt;  [1m [32m     Running [0m `artist/target/debug/artist`
+#&gt; 周杰倫的單曲：
+#&gt;  青花瓷
+#&gt;  稻香
+#&gt; 蔡依林的單曲：
+#&gt;  倒帶
+#&gt;  愛情三十六計
+#&gt; 張學友的單曲：
+#&gt;  吻別
+#&gt;  當愛已成往事</code></pre>
+<p>在看完前一章後，你會問HashMap的值如何傳遞的？那恭喜你，HashMap是以動態配置一個表，當你呼叫show(table)時，整個table會被移入函式，由for取得所有權，並ㄧ層ㄧ層的耗用，直到全部被銷毀。</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb68-1"><a href="%E5%8F%83%E8%80%83.html#cb68-1" tabindex="-1"></a>show(table)<span class="op">;</span></span>
+<span id="cb68-2"><a href="%E5%8F%83%E8%80%83.html#cb68-2" tabindex="-1"></a><span class="pp">assert_eq!</span>(table[<span class="st">"周杰倫"</span>]<span class="op">,</span> [<span class="st">"青花瓷"</span><span class="op">,</span> <span class="st">"稻香"</span>])<span class="op">;</span></span></code></pre></div>
+<p>會產生錯誤告訴你，table已經被用掉了，應該用reference來取代</p>
+<pre><code>error[E0382]: borrow of moved value: `table`
+  --&gt; src/main.rs:23:14
+   |
+16 |   let mut table = Table::new();
+   |       --------- move occurs because `table` has type `HashMap&lt;String, Vec&lt;String&gt;&gt;`, which does not implement the `Copy` trait
+...
+22 |   show(table);
+   |        ----- value moved here
+23 |   assert_eq!(table["周杰倫"], ["青花瓷", "稻香"]);
+   |              ^^^^^ value borrowed here after move
+   |
+note: consider changing this parameter type in function `show` to borrow instead if owning the value isn't necessary
+  --&gt; src/main.rs:5:16
+   |
+5  | fn show(table: Table){
+   |    ----        ^^^^^ this parameter takes ownership of the value
+   |    |
+   |    in this function
+help: consider cloning the value if the performance cost is acceptable
+   |
+22 |   show(table.clone());
+   |             ++++++++</code></pre>
+<p>那又要使用哪種參考呢？</p>
+<ul>
+<li><p>共享參考(shared reference)：可以讓任意數量的共享參考指向同一個值，但不能修改參考值。&amp;e會產生e的共享參考，e的型態是T，&amp;e的型態是&amp;T。</p></li>
+<li><p>可變參考(mut reference)：只能有一個可變參考指向同一個值，但可以修改參考值。&amp;mut e會產生e的可變參考，e的型態是T，&amp;mut e的型別是&amp;mut T。<strong>他不是Copy</strong></p></li>
+</ul>
+<p>你可以用「多個讀取方」與「單一寫入方」來區分，當你使用共享參考時，「任何人」都無法修改值，即使是原本的所有權人。相反，在可變參考出現時，只有在其消滅時，方能再次使用。</p>
+<p>回到上面範例，show函式僅需要讀取table，因此我們已共享參考的方式改寫，只需要將show函式的參數型態改為&amp;Table即可，同時記得在主要函式中，要放入&amp;table。</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb70-1"><a href="%E5%8F%83%E8%80%83.html#cb70-1" tabindex="-1"></a><span class="kw">fn</span> show(table<span class="op">:</span> <span class="op">&amp;</span>Table)<span class="op">{</span></span>
+<span id="cb70-2"><a href="%E5%8F%83%E8%80%83.html#cb70-2" tabindex="-1"></a>  <span class="cf">for</span>(artist<span class="op">,</span> album) <span class="kw">in</span> table <span class="op">{</span></span>
+<span id="cb70-3"><a href="%E5%8F%83%E8%80%83.html#cb70-3" tabindex="-1"></a>    <span class="pp">println!</span>(<span class="st">"{}的單曲："</span><span class="op">,</span> artist)<span class="op">;</span></span>
+<span id="cb70-4"><a href="%E5%8F%83%E8%80%83.html#cb70-4" tabindex="-1"></a>    <span class="cf">for</span> song <span class="kw">in</span> album <span class="op">{</span></span>
+<span id="cb70-5"><a href="%E5%8F%83%E8%80%83.html#cb70-5" tabindex="-1"></a>      <span class="pp">println!</span>(<span class="st">" {}"</span><span class="op">,</span> song)<span class="op">;</span></span>
+<span id="cb70-6"><a href="%E5%8F%83%E8%80%83.html#cb70-6" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb70-7"><a href="%E5%8F%83%E8%80%83.html#cb70-7" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb70-8"><a href="%E5%8F%83%E8%80%83.html#cb70-8" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb70-9"><a href="%E5%8F%83%E8%80%83.html#cb70-9" tabindex="-1"></a></span>
+<span id="cb70-10"><a href="%E5%8F%83%E8%80%83.html#cb70-10" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb70-11"><a href="%E5%8F%83%E8%80%83.html#cb70-11" tabindex="-1"></a>  </span>
+<span id="cb70-12"><a href="%E5%8F%83%E8%80%83.html#cb70-12" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb70-13"><a href="%E5%8F%83%E8%80%83.html#cb70-13" tabindex="-1"></a>  </span>
+<span id="cb70-14"><a href="%E5%8F%83%E8%80%83.html#cb70-14" tabindex="-1"></a>  show(<span class="op">&amp;</span>table)<span class="op">;</span></span>
+<span id="cb70-15"><a href="%E5%8F%83%E8%80%83.html#cb70-15" tabindex="-1"></a>  <span class="pp">assert_eq!</span>(table[<span class="st">"周杰倫"</span>]<span class="op">,</span> [<span class="st">"青花瓷"</span><span class="op">,</span> <span class="st">"稻香"</span>])<span class="op">;</span></span>
+<span id="cb70-16"><a href="%E5%8F%83%E8%80%83.html#cb70-16" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>只需改變最上層的型態，如當Table變為&amp;Table時，Vec<string>會變為&amp;Vec<string>，String會變為&amp;String，這樣就可以達到「借用值」的目的。</string></string></p>
+<p>而如果你想修改或是用方法，記得用可變參考，如用sort方法來排序歌曲</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb71-1"><a href="%E5%8F%83%E8%80%83.html#cb71-1" tabindex="-1"></a><span class="kw">fn</span> sort_album(table<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Table)<span class="op">{</span></span>
+<span id="cb71-2"><a href="%E5%8F%83%E8%80%83.html#cb71-2" tabindex="-1"></a>  <span class="cf">for</span>(_<span class="op">,</span> album) <span class="kw">in</span> table <span class="op">{</span></span>
+<span id="cb71-3"><a href="%E5%8F%83%E8%80%83.html#cb71-3" tabindex="-1"></a>    album<span class="op">.</span>sort()<span class="op">;</span></span>
+<span id="cb71-4"><a href="%E5%8F%83%E8%80%83.html#cb71-4" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb71-5"><a href="%E5%8F%83%E8%80%83.html#cb71-5" tabindex="-1"></a><span class="op">}</span>)</span></code></pre></div>
+</div>
+<div id="隱性參考" class="section level2" number="5.2">
+<h2>
+<span class="header-section-number">5.2</span> 隱性參考<a class="anchor" aria-label="anchor" href="#%E9%9A%B1%E6%80%A7%E5%8F%83%E8%80%83"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb72"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb72-1"><a href="%E5%8F%83%E8%80%83.html#cb72-1" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb72-2"><a href="%E5%8F%83%E8%80%83.html#cb72-2" tabindex="-1"></a><span class="kw">let</span> y <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>  <span class="co">//必須要嚴明參考</span></span>
+<span id="cb72-3"><a href="%E5%8F%83%E8%80%83.html#cb72-3" tabindex="-1"></a><span class="pp">assert!</span>(<span class="op">*</span>y <span class="op">==</span> <span class="dv">5</span>)<span class="op">;</span> <span class="co">//解參考時要明確</span></span>
+<span id="cb72-4"><a href="%E5%8F%83%E8%80%83.html#cb72-4" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>在可變參考時也相同：</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb73-1"><a href="%E5%8F%83%E8%80%83.html#cb73-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> x <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb73-2"><a href="%E5%8F%83%E8%80%83.html#cb73-2" tabindex="-1"></a><span class="kw">let</span> n <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> x<span class="op">;</span></span>
+<span id="cb73-3"><a href="%E5%8F%83%E8%80%83.html#cb73-3" tabindex="-1"></a><span class="op">*</span>n <span class="op">+=</span> <span class="dv">32</span><span class="op">;</span></span>
+<span id="cb73-4"><a href="%E5%8F%83%E8%80%83.html#cb73-4" tabindex="-1"></a><span class="pp">assert!</span>(<span class="op">*</span>n <span class="op">==</span> <span class="dv">37</span>)<span class="op">;</span></span></code></pre></div>
+<p>請再次觀察第一個例子，我們為何不用在使用元素時解參考呢？</p>
+<p>答案是，因為參考在Rust裡太常出現，運算子.可以用來隱性解參考</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb74-1"><a href="%E5%8F%83%E8%80%83.html#cb74-1" tabindex="-1"></a><span class="kw">struct</span> Person <span class="op">{</span></span>
+<span id="cb74-2"><a href="%E5%8F%83%E8%80%83.html#cb74-2" tabindex="-1"></a>  name<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb74-3"><a href="%E5%8F%83%E8%80%83.html#cb74-3" tabindex="-1"></a>  age<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span></span>
+<span id="cb74-4"><a href="%E5%8F%83%E8%80%83.html#cb74-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb74-5"><a href="%E5%8F%83%E8%80%83.html#cb74-5" tabindex="-1"></a><span class="kw">let</span> p <span class="op">=</span> Person <span class="op">{</span>name<span class="op">:</span> <span class="st">"John"</span><span class="op">.</span>to_string()<span class="op">,</span> age<span class="op">:</span> <span class="dv">32</span><span class="op">};</span></span>
+<span id="cb74-6"><a href="%E5%8F%83%E8%80%83.html#cb74-6" tabindex="-1"></a><span class="kw">let</span> p_ref <span class="op">=</span> <span class="op">&amp;</span>p<span class="op">;</span></span>
+<span id="cb74-7"><a href="%E5%8F%83%E8%80%83.html#cb74-7" tabindex="-1"></a></span>
+<span id="cb74-8"><a href="%E5%8F%83%E8%80%83.html#cb74-8" tabindex="-1"></a><span class="pp">assert_eq!</span>(p_ref<span class="op">.</span>name<span class="op">,</span> <span class="st">"John"</span>)<span class="op">;</span></span>
+<span id="cb74-9"><a href="%E5%8F%83%E8%80%83.html#cb74-9" tabindex="-1"></a><span class="co">//相當於</span></span>
+<span id="cb74-10"><a href="%E5%8F%83%E8%80%83.html#cb74-10" tabindex="-1"></a><span class="pp">assert_eq!</span>((<span class="op">*</span>p_ref)<span class="op">.</span>name<span class="op">,</span> <span class="st">"John"</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="參考的參考" class="section level2" number="5.3">
+<h2>
+<span class="header-section-number">5.3</span> 參考的參考<a class="anchor" aria-label="anchor" href="#%E5%8F%83%E8%80%83%E7%9A%84%E5%8F%83%E8%80%83"><i class="fas fa-link"></i></a>
+</h2>
+<p>Rust允許多重參考，可以一層一層直到借到一個值：</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb75-1"><a href="%E5%8F%83%E8%80%83.html#cb75-1" tabindex="-1"></a><span class="kw">let</span> p<span class="op">:</span><span class="dt">i32</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb75-2"><a href="%E5%8F%83%E8%80%83.html#cb75-2" tabindex="-1"></a><span class="kw">let</span> r1<span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span>p<span class="op">;</span></span>
+<span id="cb75-3"><a href="%E5%8F%83%E8%80%83.html#cb75-3" tabindex="-1"></a><span class="kw">let</span> r2<span class="op">:</span> <span class="op">&amp;&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span>r1<span class="op">;</span></span>
+<span id="cb75-4"><a href="%E5%8F%83%E8%80%83.html#cb75-4" tabindex="-1"></a><span class="kw">let</span> r3<span class="op">:</span> <span class="op">&amp;&amp;&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span>r2<span class="op">;</span></span>
+<span id="cb75-5"><a href="%E5%8F%83%E8%80%83.html#cb75-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{} {} {}"</span><span class="op">,</span> r1<span class="op">,</span> r2<span class="op">,</span> r3)<span class="op">;</span></span>
+<span id="cb75-6"><a href="%E5%8F%83%E8%80%83.html#cb75-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span></span></code></pre></div>
+<p>上面例子，r1借用p的值，r2會穿過r1到p借用值，也就是說，兩者值相同，但位址不同</p>
+<p>下面例子告訴你，==會自動指向最後的值，但std::ptr::eq會比較位址</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb76-1"><a href="%E5%8F%83%E8%80%83.html#cb76-1" tabindex="-1"></a><span class="kw">let</span> p<span class="op">:</span><span class="dt">i32</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb76-2"><a href="%E5%8F%83%E8%80%83.html#cb76-2" tabindex="-1"></a><span class="kw">let</span> c<span class="op">:</span><span class="dt">i32</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb76-3"><a href="%E5%8F%83%E8%80%83.html#cb76-3" tabindex="-1"></a></span>
+<span id="cb76-4"><a href="%E5%8F%83%E8%80%83.html#cb76-4" tabindex="-1"></a><span class="kw">let</span> r1<span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span>p<span class="op">;</span></span>
+<span id="cb76-5"><a href="%E5%8F%83%E8%80%83.html#cb76-5" tabindex="-1"></a><span class="kw">let</span> r2<span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span>c<span class="op">;</span></span>
+<span id="cb76-6"><a href="%E5%8F%83%E8%80%83.html#cb76-6" tabindex="-1"></a></span>
+<span id="cb76-7"><a href="%E5%8F%83%E8%80%83.html#cb76-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{} {}"</span><span class="op">,</span> r1<span class="op">,</span> r2)<span class="op">;</span></span>
+<span id="cb76-8"><a href="%E5%8F%83%E8%80%83.html#cb76-8" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> r1 <span class="op">==</span> r2)<span class="op">;</span></span>
+<span id="cb76-9"><a href="%E5%8F%83%E8%80%83.html#cb76-9" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span><span class="pp">std::ptr::</span>eq(r1<span class="op">,</span> r2))<span class="op">;</span></span>
+<span id="cb76-10"><a href="%E5%8F%83%E8%80%83.html#cb76-10" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span> <span class="dv">1</span></span>
+<span id="cb76-11"><a href="%E5%8F%83%E8%80%83.html#cb76-11" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">true</span></span>
+<span id="cb76-12"><a href="%E5%8F%83%E8%80%83.html#cb76-12" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">false</span></span></code></pre></div>
+<div id="借用任意運算式的參考" class="section level3" number="5.3.1">
+<h3>
+<span class="header-section-number">5.3.1</span> 借用任意運算式的參考<a class="anchor" aria-label="anchor" href="#%E5%80%9F%E7%94%A8%E4%BB%BB%E6%84%8F%E9%81%8B%E7%AE%97%E5%BC%8F%E7%9A%84%E5%8F%83%E8%80%83"><i class="fas fa-link"></i></a>
+</h3>
+<p>在Rust裡，你可以直接借用運算式的值(的參考)</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb77-1"><a href="%E5%8F%83%E8%80%83.html#cb77-1" tabindex="-1"></a><span class="kw">fn</span> factorial(n<span class="op">:</span> <span class="dt">usize</span>) <span class="op">-&gt;</span> <span class="dt">usize</span> <span class="op">{</span></span>
+<span id="cb77-2"><a href="%E5%8F%83%E8%80%83.html#cb77-2" tabindex="-1"></a>  (<span class="dv">1</span><span class="op">..</span>n<span class="op">+</span><span class="dv">1</span>)<span class="op">.</span>product()</span>
+<span id="cb77-3"><a href="%E5%8F%83%E8%80%83.html#cb77-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb77-4"><a href="%E5%8F%83%E8%80%83.html#cb77-4" tabindex="-1"></a></span>
+<span id="cb77-5"><a href="%E5%8F%83%E8%80%83.html#cb77-5" tabindex="-1"></a><span class="kw">let</span> r <span class="op">=</span> <span class="op">&amp;</span>factorial(<span class="dv">6</span>)<span class="op">;</span></span>
+<span id="cb77-6"><a href="%E5%8F%83%E8%80%83.html#cb77-6" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> r<span class="op">+&amp;</span>(<span class="dv">1</span><span class="op">+</span><span class="dv">2</span>))<span class="op">;</span></span>
+<span id="cb77-7"><a href="%E5%8F%83%E8%80%83.html#cb77-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">723</span></span></code></pre></div>
+<p>在借用的對象是運算式時，Rust會產生ㄧ個<strong>匿名變數來保存值</strong>，而這個變數的生命週期取決於使用參考的方式，若如同上面的&amp;factorial(6)，直接指派給r，那麽他的生命週期就隨r。反之，如&amp;(1+2)在封閉陳述式內，他的生命週期就是這個陳述式。</p>
+</div>
+</div>
+<div id="借用區域變數" class="section level2" number="5.4">
+<h2>
+<span class="header-section-number">5.4</span> 借用區域變數<a class="anchor" aria-label="anchor" href="#%E5%80%9F%E7%94%A8%E5%8D%80%E5%9F%9F%E8%AE%8A%E6%95%B8"><i class="fas fa-link"></i></a>
+</h2>
+<p>下面的案例，告訴你注意借用值的生面週期</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb78-1"><a href="%E5%8F%83%E8%80%83.html#cb78-1" tabindex="-1"></a><span class="kw">let</span> r<span class="op">;</span></span>
+<span id="cb78-2"><a href="%E5%8F%83%E8%80%83.html#cb78-2" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb78-3"><a href="%E5%8F%83%E8%80%83.html#cb78-3" tabindex="-1"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb78-4"><a href="%E5%8F%83%E8%80%83.html#cb78-4" tabindex="-1"></a>  r <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span></span>
+<span id="cb78-5"><a href="%E5%8F%83%E8%80%83.html#cb78-5" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb78-6"><a href="%E5%8F%83%E8%80%83.html#cb78-6" tabindex="-1"></a></span>
+<span id="cb78-7"><a href="%E5%8F%83%E8%80%83.html#cb78-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> <span class="op">*</span>r)<span class="op">;</span></span></code></pre></div>
+<p>會告訴你，因為x掛點了，但借用他值的r還活著，導致出現了懸空指標</p>
+<pre><code>✖ error[E0597]: `x` does not live long enough
+  --&gt; src/lib.rs:8:7
+   |
+7  |   let x = 5;
+   |       - binding `x` declared here
+8  |   r = &amp;x;
+   |       ^^ borrowed value does not live long enough
+9  |   }
+   |   - `x` dropped here while still borrowed
+10 |
+11 | rprintln!("{}", *r);
+   |                 -- borrow later used here</code></pre>
+<p>在處理一般的資料結構時，會順理成章的避免發生者種狀況，因為都是先有資料，參考都是在資料之後產生，因此解決這種「限制」的最好方式，就是安排好資料的生命週期與宣告順序。</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb80-1"><a href="%E5%8F%83%E8%80%83.html#cb80-1" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb80-2"><a href="%E5%8F%83%E8%80%83.html#cb80-2" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb80-3"><a href="%E5%8F%83%E8%80%83.html#cb80-3" tabindex="-1"></a>  <span class="kw">let</span> r <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span></span>
+<span id="cb80-4"><a href="%E5%8F%83%E8%80%83.html#cb80-4" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> r)<span class="op">;</span></span>
+<span id="cb80-5"><a href="%E5%8F%83%E8%80%83.html#cb80-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb80-6"><a href="%E5%8F%83%E8%80%83.html#cb80-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span></span>
+<span id="cb80-7"><a href="%E5%8F%83%E8%80%83.html#cb80-7" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<div id="用函式引數來接收參考" class="section level2" number="5.5">
+<h2>
+<span class="header-section-number">5.5</span> 用函式引數來接收參考<a class="anchor" aria-label="anchor" href="#%E7%94%A8%E5%87%BD%E5%BC%8F%E5%BC%95%E6%95%B8%E4%BE%86%E6%8E%A5%E6%94%B6%E5%8F%83%E8%80%83"><i class="fas fa-link"></i></a>
+</h2>
+<p>以函式引數接收參考時，同樣注意生命週期、可變性、型態等問題</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb81-1"><a href="%E5%8F%83%E8%80%83.html#cb81-1" tabindex="-1"></a><span class="co">// 以下無法成功編譯</span></span>
+<span id="cb81-2"><a href="%E5%8F%83%E8%80%83.html#cb81-2" tabindex="-1"></a><span class="kw">static</span> <span class="kw">mut</span> STASH<span class="op">:&amp;</span><span class="dt">i32</span><span class="op">;</span></span>
+<span id="cb81-3"><a href="%E5%8F%83%E8%80%83.html#cb81-3" tabindex="-1"></a><span class="kw">fn</span> f(p <span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span>) <span class="op">{</span></span>
+<span id="cb81-4"><a href="%E5%8F%83%E8%80%83.html#cb81-4" tabindex="-1"></a>  STASH <span class="op">=</span> p<span class="op">;</span></span>
+<span id="cb81-5"><a href="%E5%8F%83%E8%80%83.html#cb81-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>你可以將static理解為全域變數，會ㄧ直存在於整個執行期。而可變的static是不安全的，你只能在<code>unsafe</code>區塊中使用。其二，每一個static都必須初始化。</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb82-1"><a href="%E5%8F%83%E8%80%83.html#cb82-1" tabindex="-1"></a><span class="co">// 修改後依然有小錯誤</span></span>
+<span id="cb82-2"><a href="%E5%8F%83%E8%80%83.html#cb82-2" tabindex="-1"></a><span class="kw">static</span> <span class="kw">mut</span> STASH<span class="op">:&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span><span class="dv">10</span><span class="op">;</span></span>
+<span id="cb82-3"><a href="%E5%8F%83%E8%80%83.html#cb82-3" tabindex="-1"></a><span class="kw">fn</span> f(p <span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span>) <span class="op">{</span></span>
+<span id="cb82-4"><a href="%E5%8F%83%E8%80%83.html#cb82-4" tabindex="-1"></a><span class="kw">unsafe</span><span class="op">{</span></span>
+<span id="cb82-5"><a href="%E5%8F%83%E8%80%83.html#cb82-5" tabindex="-1"></a>  STASH <span class="op">=</span> p<span class="op">;</span></span>
+<span id="cb82-6"><a href="%E5%8F%83%E8%80%83.html#cb82-6" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb82-7"><a href="%E5%8F%83%E8%80%83.html#cb82-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>如果型態的問題已解決，讓我們來看看生命週期：</p>
+<p>完整的f是長<code>fn f&lt;'a&gt;(p : &amp;'a i32)</code></p>
+<p>’a的概念是任何生命週期，只要涵蓋f的區域即可。但static必須是整個生命週期，你必須很明確的指出，我們要的生命週期是static</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb83-1"><a href="%E5%8F%83%E8%80%83.html#cb83-1" tabindex="-1"></a><span class="co">// 終於解決問題</span></span>
+<span id="cb83-2"><a href="%E5%8F%83%E8%80%83.html#cb83-2" tabindex="-1"></a><span class="kw">static</span> <span class="kw">mut</span> STASH<span class="op">:&amp;</span><span class="dt">i32</span> <span class="op">=</span> <span class="op">&amp;</span><span class="dv">10</span><span class="op">;</span></span>
+<span id="cb83-3"><a href="%E5%8F%83%E8%80%83.html#cb83-3" tabindex="-1"></a><span class="kw">fn</span> f(p<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'static</span> <span class="dt">i32</span>) <span class="op">{</span></span>
+<span id="cb83-4"><a href="%E5%8F%83%E8%80%83.html#cb83-4" tabindex="-1"></a><span class="kw">unsafe</span><span class="op">{</span></span>
+<span id="cb83-5"><a href="%E5%8F%83%E8%80%83.html#cb83-5" tabindex="-1"></a>  STASH <span class="op">=</span> p<span class="op">;</span></span>
+<span id="cb83-6"><a href="%E5%8F%83%E8%80%83.html#cb83-6" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb83-7"><a href="%E5%8F%83%E8%80%83.html#cb83-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>退一步來說，雖然略為麻煩，但你可以從簽章看出一個函式的意圖，如從<code>fn f&lt;'a&gt;(p : &amp;'a i32)</code>到<code>fn f(p: &amp;'static i32)</code>，你可以從中看出生命週期，而不用重新閱讀一長串程式。</p>
+</div>
+<div id="回傳參考值" class="section level2" number="5.6">
+<h2>
+<span class="header-section-number">5.6</span> 回傳參考值<a class="anchor" aria-label="anchor" href="#%E5%9B%9E%E5%82%B3%E5%8F%83%E8%80%83%E5%80%BC"><i class="fas fa-link"></i></a>
+</h2>
+<p>在處理資料時，我們常傳入一部分資料，並回傳一個結果，例如以下要取得整個slice裡的最小值</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb84-1"><a href="%E5%8F%83%E8%80%83.html#cb84-1" tabindex="-1"></a><span class="kw">fn</span> smallest(v<span class="op">:&amp;</span>[<span class="dt">i32</span>]) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="dt">i32</span><span class="op">{</span></span>
+<span id="cb84-2"><a href="%E5%8F%83%E8%80%83.html#cb84-2" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> s <span class="op">=</span> <span class="op">&amp;</span>v[<span class="dv">0</span>]<span class="op">;</span></span>
+<span id="cb84-3"><a href="%E5%8F%83%E8%80%83.html#cb84-3" tabindex="-1"></a>  <span class="cf">for</span> r <span class="kw">in</span> <span class="op">&amp;</span>v[<span class="dv">1</span><span class="op">..</span>] <span class="op">{</span></span>
+<span id="cb84-4"><a href="%E5%8F%83%E8%80%83.html#cb84-4" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">*</span>r <span class="op">&lt;</span> <span class="op">*</span>s <span class="op">{</span></span>
+<span id="cb84-5"><a href="%E5%8F%83%E8%80%83.html#cb84-5" tabindex="-1"></a>      s <span class="op">=</span> r<span class="op">;</span></span>
+<span id="cb84-6"><a href="%E5%8F%83%E8%80%83.html#cb84-6" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb84-7"><a href="%E5%8F%83%E8%80%83.html#cb84-7" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb84-8"><a href="%E5%8F%83%E8%80%83.html#cb84-8" tabindex="-1"></a>  s</span>
+<span id="cb84-9"><a href="%E5%8F%83%E8%80%83.html#cb84-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb84-10"><a href="%E5%8F%83%E8%80%83.html#cb84-10" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>同樣的，以上函式省略了週期，明確地寫出會是<code>fn smallest&lt;'a&gt;(v:&amp;'a i32) -&gt; &amp;'a i32</code>，你可以看到，<strong>回傳值的生命週期與引數的生命週期相同</strong>，這是Rust預設的概念。</p>
+<p>因此，當回傳值的生命週期大於引數的生命週期，就會提醒你發生錯誤</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb85-1"><a href="%E5%8F%83%E8%80%83.html#cb85-1" tabindex="-1"></a><span class="kw">let</span> s<span class="op">;</span></span>
+<span id="cb85-2"><a href="%E5%8F%83%E8%80%83.html#cb85-2" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb85-3"><a href="%E5%8F%83%E8%80%83.html#cb85-3" tabindex="-1"></a>    <span class="kw">let</span> v <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span>]<span class="op">;</span></span>
+<span id="cb85-4"><a href="%E5%8F%83%E8%80%83.html#cb85-4" tabindex="-1"></a>    s <span class="op">=</span> smallest(<span class="op">&amp;</span>v)<span class="op">;</span></span>
+<span id="cb85-5"><a href="%E5%8F%83%E8%80%83.html#cb85-5" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb85-6"><a href="%E5%8F%83%E8%80%83.html#cb85-6" tabindex="-1"></a></span>
+<span id="cb85-7"><a href="%E5%8F%83%E8%80%83.html#cb85-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> s)<span class="op">;</span></span></code></pre></div>
+<pre><code>✖ error[E0597]: `v` does not live long enough
+  --&gt; src/lib.rs:20:18
+   |
+19 |     let v = [1, 2, 3, 4, 5];
+   |         - binding `v` declared here
+20 |     s = smallest(&amp;v);
+   |                  ^^ borrowed value does not live long enough
+21 |   }
+   |   - `v` dropped here while still borrowed
+22 |
+23 | rprintln!("{}", s);
+   |                 - borrow later used here</code></pre>
+<p>解決以上問題，只要注意生命週期即可</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb87-1"><a href="%E5%8F%83%E8%80%83.html#cb87-1" tabindex="-1"></a><span class="kw">let</span> s<span class="op">;</span></span>
+<span id="cb87-2"><a href="%E5%8F%83%E8%80%83.html#cb87-2" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb87-3"><a href="%E5%8F%83%E8%80%83.html#cb87-3" tabindex="-1"></a>    <span class="kw">let</span> v <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span>]<span class="op">;</span></span>
+<span id="cb87-4"><a href="%E5%8F%83%E8%80%83.html#cb87-4" tabindex="-1"></a>    s <span class="op">=</span> smallest(<span class="op">&amp;</span>v)<span class="op">;</span></span>
+<span id="cb87-5"><a href="%E5%8F%83%E8%80%83.html#cb87-5" tabindex="-1"></a>    <span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> s)<span class="op">;</span></span>
+<span id="cb87-6"><a href="%E5%8F%83%E8%80%83.html#cb87-6" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb87-7"><a href="%E5%8F%83%E8%80%83.html#cb87-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span></span>
+<span id="cb87-8"><a href="%E5%8F%83%E8%80%83.html#cb87-8" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<div id="包含參考的結構" class="section level2" number="5.7">
+<h2>
+<span class="header-section-number">5.7</span> 包含參考的結構<a class="anchor" aria-label="anchor" href="#%E5%8C%85%E5%90%AB%E5%8F%83%E8%80%83%E7%9A%84%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h2>
+<p>以下是過去錯誤的例子</p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb88-1"><a href="%E5%8F%83%E8%80%83.html#cb88-1" tabindex="-1"></a><span class="kw">struct</span> S <span class="op">{</span></span>
+<span id="cb88-2"><a href="%E5%8F%83%E8%80%83.html#cb88-2" tabindex="-1"></a> r<span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span></span>
+<span id="cb88-3"><a href="%E5%8F%83%E8%80%83.html#cb88-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb88-4"><a href="%E5%8F%83%E8%80%83.html#cb88-4" tabindex="-1"></a></span>
+<span id="cb88-5"><a href="%E5%8F%83%E8%80%83.html#cb88-5" tabindex="-1"></a><span class="kw">let</span> s<span class="op">;</span></span>
+<span id="cb88-6"><a href="%E5%8F%83%E8%80%83.html#cb88-6" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb88-7"><a href="%E5%8F%83%E8%80%83.html#cb88-7" tabindex="-1"></a>  <span class="kw">let</span> x <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb88-8"><a href="%E5%8F%83%E8%80%83.html#cb88-8" tabindex="-1"></a>  s <span class="op">=</span> S<span class="op">{</span>r<span class="op">:</span> <span class="op">&amp;</span>x<span class="op">};</span></span>
+<span id="cb88-9"><a href="%E5%8F%83%E8%80%83.html#cb88-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb88-10"><a href="%E5%8F%83%E8%80%83.html#cb88-10" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="op">*</span>s<span class="op">.</span>r<span class="op">,</span> <span class="dv">10</span>)<span class="op">;</span><span class="co">// 錯誤：x已被卸除</span></span></code></pre></div>
+<p>Rust就是如此嚴謹，即使放入結構中，也要注意週期的概念</p>
+<p>我們再次把完整的內容寫出來<code>struct S&lt;'a&gt; { r: &amp;'a i32 }</code>，於此，s的週期’a不會超過x</p>
+<p>如果我們要將<strong>有週期的參數型態</strong>，就要明確的指出，有兩個方法</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb89-1"><a href="%E5%8F%83%E8%80%83.html#cb89-1" tabindex="-1"></a><span class="kw">struct</span> S <span class="op">{</span></span>
+<span id="cb89-2"><a href="%E5%8F%83%E8%80%83.html#cb89-2" tabindex="-1"></a> r<span class="op">:</span> <span class="op">&amp;</span><span class="dt">i32</span></span>
+<span id="cb89-3"><a href="%E5%8F%83%E8%80%83.html#cb89-3" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb89-4"><a href="%E5%8F%83%E8%80%83.html#cb89-4" tabindex="-1"></a></span>
+<span id="cb89-5"><a href="%E5%8F%83%E8%80%83.html#cb89-5" tabindex="-1"></a><span class="co">//Rust會要求你寫出生命週期</span></span>
+<span id="cb89-6"><a href="%E5%8F%83%E8%80%83.html#cb89-6" tabindex="-1"></a><span class="kw">struct</span> D <span class="op">{</span></span>
+<span id="cb89-7"><a href="%E5%8F%83%E8%80%83.html#cb89-7" tabindex="-1"></a> s<span class="op">:</span> S</span>
+<span id="cb89-8"><a href="%E5%8F%83%E8%80%83.html#cb89-8" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb89-9"><a href="%E5%8F%83%E8%80%83.html#cb89-9" tabindex="-1"></a></span>
+<span id="cb89-10"><a href="%E5%8F%83%E8%80%83.html#cb89-10" tabindex="-1"></a><span class="co">//可以指定s為static</span></span>
+<span id="cb89-11"><a href="%E5%8F%83%E8%80%83.html#cb89-11" tabindex="-1"></a><span class="kw">struct</span> D <span class="op">{</span></span>
+<span id="cb89-12"><a href="%E5%8F%83%E8%80%83.html#cb89-12" tabindex="-1"></a> s<span class="op">:</span> S<span class="op">&lt;</span><span class="ot">'static</span><span class="op">&gt;</span></span>
+<span id="cb89-13"><a href="%E5%8F%83%E8%80%83.html#cb89-13" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb89-14"><a href="%E5%8F%83%E8%80%83.html#cb89-14" tabindex="-1"></a></span>
+<span id="cb89-15"><a href="%E5%8F%83%E8%80%83.html#cb89-15" tabindex="-1"></a><span class="co">//編譯器會提供你這個做法</span></span>
+<span id="cb89-16"><a href="%E5%8F%83%E8%80%83.html#cb89-16" tabindex="-1"></a><span class="kw">struct</span> D<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb89-17"><a href="%E5%8F%83%E8%80%83.html#cb89-17" tabindex="-1"></a> s<span class="op">:</span> S<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span></span>
+<span id="cb89-18"><a href="%E5%8F%83%E8%80%83.html#cb89-18" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div id="不同生命週期的結構" class="section level3" number="5.7.1">
+<h3>
+<span class="header-section-number">5.7.1</span> 不同生命週期的結構<a class="anchor" aria-label="anchor" href="#%E4%B8%8D%E5%90%8C%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E7%9A%84%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h3>
+<p>上面我們講到結構也要注意週期問題，以下例子有些弔詭，r與x的生命週期最長，次為y，最後是a。我們賦予r結構a的x值，並且在x未死亡前，在最後印出r的值。照理來說，牽涉r值的，僅有r本身與x，所以應該不會有問題。</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb90-1"><a href="%E5%8F%83%E8%80%83.html#cb90-1" tabindex="-1"></a><span class="kw">struct</span> s<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;{</span></span>
+<span id="cb90-2"><a href="%E5%8F%83%E8%80%83.html#cb90-2" tabindex="-1"></a>  x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">i32</span><span class="op">,</span></span>
+<span id="cb90-3"><a href="%E5%8F%83%E8%80%83.html#cb90-3" tabindex="-1"></a>  y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">i32</span><span class="op">,</span></span>
+<span id="cb90-4"><a href="%E5%8F%83%E8%80%83.html#cb90-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb90-5"><a href="%E5%8F%83%E8%80%83.html#cb90-5" tabindex="-1"></a></span>
+<span id="cb90-6"><a href="%E5%8F%83%E8%80%83.html#cb90-6" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="dv">20</span><span class="op">;</span></span>
+<span id="cb90-7"><a href="%E5%8F%83%E8%80%83.html#cb90-7" tabindex="-1"></a><span class="kw">let</span> r<span class="op">;</span></span>
+<span id="cb90-8"><a href="%E5%8F%83%E8%80%83.html#cb90-8" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb90-9"><a href="%E5%8F%83%E8%80%83.html#cb90-9" tabindex="-1"></a>  <span class="kw">let</span> y <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb90-10"><a href="%E5%8F%83%E8%80%83.html#cb90-10" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb90-11"><a href="%E5%8F%83%E8%80%83.html#cb90-11" tabindex="-1"></a>    <span class="kw">let</span> a <span class="op">=</span> s<span class="op">{</span>x<span class="op">:</span> <span class="op">&amp;</span>x<span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span>y<span class="op">};</span></span>
+<span id="cb90-12"><a href="%E5%8F%83%E8%80%83.html#cb90-12" tabindex="-1"></a>    r <span class="op">=</span> a<span class="op">.</span>x<span class="op">;</span></span>
+<span id="cb90-13"><a href="%E5%8F%83%E8%80%83.html#cb90-13" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb90-14"><a href="%E5%8F%83%E8%80%83.html#cb90-14" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb90-15"><a href="%E5%8F%83%E8%80%83.html#cb90-15" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> r)<span class="op">;</span></span></code></pre></div>
+<p>但是，Rust會告訴你，r的生命週期不夠長，因為y已經死亡…</p>
+<pre><code>✖ error[E0597]: `y` does not live long enough
+  --&gt; src/lib.rs:15:25
+   |
+13 |   let y = 10;
+   |       - binding `y` declared here
+14 |   {
+15 |     let a = s{x: &amp;x, y: &amp;y};
+   |                         ^^ borrowed value does not live long enough
+...
+18 | }
+   | - `y` dropped here while still borrowed
+19 | rprintln!("{}", r);
+   |                 - borrow later used here</code></pre>
+<p>其實，秘密就在預設結構的生命週期。結構中，x與y被預設為’a，而Rust會以較小的生命週期為主，如同上例中，即使x尚未死亡，但y的生命週期結束，結構中的x也被視為死亡。</p>
+<p>所以，你可以在結構中就預設不同的生命週期，可以避免這種窘境，並且讓所有人都知道這個結構的生命週期</p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb92-1"><a href="%E5%8F%83%E8%80%83.html#cb92-1" tabindex="-1"></a><span class="kw">struct</span> s<span class="op">&lt;</span><span class="ot">'a</span><span class="op">,</span> <span class="ot">'b</span><span class="op">&gt;{</span></span>
+<span id="cb92-2"><a href="%E5%8F%83%E8%80%83.html#cb92-2" tabindex="-1"></a>  x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">i32</span><span class="op">,</span></span>
+<span id="cb92-3"><a href="%E5%8F%83%E8%80%83.html#cb92-3" tabindex="-1"></a>  y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'b</span> <span class="dt">i32</span><span class="op">,</span></span>
+<span id="cb92-4"><a href="%E5%8F%83%E8%80%83.html#cb92-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb92-5"><a href="%E5%8F%83%E8%80%83.html#cb92-5" tabindex="-1"></a></span>
+<span id="cb92-6"><a href="%E5%8F%83%E8%80%83.html#cb92-6" tabindex="-1"></a><span class="kw">let</span> x <span class="op">=</span> <span class="dv">20</span><span class="op">;</span></span>
+<span id="cb92-7"><a href="%E5%8F%83%E8%80%83.html#cb92-7" tabindex="-1"></a><span class="kw">let</span> r<span class="op">;</span></span>
+<span id="cb92-8"><a href="%E5%8F%83%E8%80%83.html#cb92-8" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb92-9"><a href="%E5%8F%83%E8%80%83.html#cb92-9" tabindex="-1"></a>  <span class="kw">let</span> y <span class="op">=</span> <span class="dv">10</span><span class="op">;</span></span>
+<span id="cb92-10"><a href="%E5%8F%83%E8%80%83.html#cb92-10" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb92-11"><a href="%E5%8F%83%E8%80%83.html#cb92-11" tabindex="-1"></a>    <span class="kw">let</span> a <span class="op">=</span> s<span class="op">{</span>x<span class="op">:</span> <span class="op">&amp;</span>x<span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span>y<span class="op">};</span></span>
+<span id="cb92-12"><a href="%E5%8F%83%E8%80%83.html#cb92-12" tabindex="-1"></a>    r <span class="op">=</span> a<span class="op">.</span>x<span class="op">;</span></span>
+<span id="cb92-13"><a href="%E5%8F%83%E8%80%83.html#cb92-13" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb92-14"><a href="%E5%8F%83%E8%80%83.html#cb92-14" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb92-15"><a href="%E5%8F%83%E8%80%83.html#cb92-15" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> r)<span class="op">;</span></span>
+<span id="cb92-16"><a href="%E5%8F%83%E8%80%83.html#cb92-16" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">20</span></span></code></pre></div>
+</div>
+</div>
+<div id="共用與可變性的衝突" class="section level2" number="5.8">
+<h2>
+<span class="header-section-number">5.8</span> 共用與可變性的衝突<a class="anchor" aria-label="anchor" href="#%E5%85%B1%E7%94%A8%E8%88%87%E5%8F%AF%E8%AE%8A%E6%80%A7%E7%9A%84%E8%A1%9D%E7%AA%81"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb93"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb93-1"><a href="%E5%8F%83%E8%80%83.html#cb93-1" tabindex="-1"></a><span class="kw">fn</span> extend(v<span class="op">:&amp;</span><span class="kw">mut</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">f64</span><span class="op">&gt;,</span> slice<span class="op">:&amp;</span>[<span class="dt">f64</span>])<span class="op">{</span></span>
+<span id="cb93-2"><a href="%E5%8F%83%E8%80%83.html#cb93-2" tabindex="-1"></a>  <span class="cf">for</span> s <span class="kw">in</span> slice <span class="op">{</span></span>
+<span id="cb93-3"><a href="%E5%8F%83%E8%80%83.html#cb93-3" tabindex="-1"></a>    v<span class="op">.</span>push(<span class="op">*</span>s)<span class="op">;</span></span>
+<span id="cb93-4"><a href="%E5%8F%83%E8%80%83.html#cb93-4" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb93-5"><a href="%E5%8F%83%E8%80%83.html#cb93-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb93-6"><a href="%E5%8F%83%E8%80%83.html#cb93-6" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb94-1"><a href="%E5%8F%83%E8%80%83.html#cb94-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> s1 <span class="op">=</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">;</span></span>
+<span id="cb94-2"><a href="%E5%8F%83%E8%80%83.html#cb94-2" tabindex="-1"></a><span class="kw">let</span> s2 <span class="op">=</span> [<span class="dv">1.0</span><span class="op">,</span> <span class="dv">2.0</span><span class="op">,</span> <span class="dv">3.0</span>]<span class="op">;</span></span>
+<span id="cb94-3"><a href="%E5%8F%83%E8%80%83.html#cb94-3" tabindex="-1"></a><span class="kw">let</span> s3 <span class="op">=</span> [<span class="dv">4.0</span><span class="op">,</span> <span class="dv">5.0</span><span class="op">,</span> <span class="dv">6.0</span>]<span class="op">;</span></span>
+<span id="cb94-4"><a href="%E5%8F%83%E8%80%83.html#cb94-4" tabindex="-1"></a></span>
+<span id="cb94-5"><a href="%E5%8F%83%E8%80%83.html#cb94-5" tabindex="-1"></a>extend(<span class="op">&amp;</span><span class="kw">mut</span> s1<span class="op">,</span> <span class="op">&amp;</span>s2)<span class="op">;</span></span>
+<span id="cb94-6"><a href="%E5%8F%83%E8%80%83.html#cb94-6" tabindex="-1"></a>extend(<span class="op">&amp;</span><span class="kw">mut</span> s1<span class="op">,</span> <span class="op">&amp;</span>s3)<span class="op">;</span></span>
+<span id="cb94-7"><a href="%E5%8F%83%E8%80%83.html#cb94-7" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> s1)<span class="op">;</span></span>
+<span id="cb94-8"><a href="%E5%8F%83%E8%80%83.html#cb94-8" tabindex="-1"></a>#<span class="op">&gt;</span> [<span class="dv">1.0</span><span class="op">,</span> <span class="dv">2.0</span><span class="op">,</span> <span class="dv">3.0</span><span class="op">,</span> <span class="dv">4.0</span><span class="op">,</span> <span class="dv">5.0</span><span class="op">,</span> <span class="dv">6.0</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb95"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb95-1"><a href="%E5%8F%83%E8%80%83.html#cb95-1" tabindex="-1"></a>extend(<span class="op">&amp;</span><span class="kw">mut</span> s1<span class="op">,</span> <span class="op">&amp;</span>s1)<span class="op">;</span></span></code></pre></div>
+<pre><code>✖ error[E0502]: cannot borrow `s1` as immutable because it is also borrowed as mutable
+  --&gt; src/lib.rs:18:17
+   |
+18 | extend(&amp;mut s1, &amp;s1);
+   | ------ -------  ^^^ immutable borrow occurs here
+   | |      |
+   | |      mutable borrow occurs here
+   | mutable borrow later used by call</code></pre>
+<p>再次強調兩點：</p>
+<ul>
+<li><p>共用參考是唯獨的：你可以讓任意數兩的變數指向，但他不會是可變的，因為可變參考必定會修改或更動原本的值。</p></li>
+<li><p>可變參考是唯一的：只有一個可變參考指向同一個值，所以也不會出現與共用參考重疊生命週期。</p></li>
+</ul>
+<p>所以，上面的例子中，錯誤訊息告訴你，你不能再指向s1(共用參考)，因為在函式內已經建立「唯一」路徑(可變參考)。</p>
+<p>以機器面來說，當extend獲取第一個參數<code>&amp;mut s1</code>時，因為要加入更多元素，因此要重新配置記憶體。舊的記憶體會先被釋出，此時extend要讀取第二個參數<code>&amp;s1</code>，但這個參數指向的記憶體早已被釋出。</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb97-1"><a href="%E5%8F%83%E8%80%83.html#cb97-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> v <span class="op">=</span> (<span class="dv">1</span><span class="op">,</span><span class="dv">3</span>)<span class="op">;</span></span>
+<span id="cb97-2"><a href="%E5%8F%83%E8%80%83.html#cb97-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> r <span class="op">=</span> <span class="op">&amp;</span>v<span class="op">.</span><span class="dv">0</span><span class="op">;</span></span>
+<span id="cb97-3"><a href="%E5%8F%83%E8%80%83.html#cb97-3" tabindex="-1"></a><span class="kw">let</span> r1 <span class="op">=</span> <span class="op">&amp;</span><span class="kw">mut</span> r<span class="op">;</span></span>
+<span id="cb97-4"><a href="%E5%8F%83%E8%80%83.html#cb97-4" tabindex="-1"></a><span class="op">*</span>r1 <span class="op">=</span> <span class="op">&amp;</span><span class="dv">2</span><span class="op">;</span></span>
+<span id="cb97-5"><a href="%E5%8F%83%E8%80%83.html#cb97-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{}"</span><span class="op">,</span> v<span class="op">.</span><span class="dv">0</span>)<span class="op">;</span></span>
+<span id="cb97-6"><a href="%E5%8F%83%E8%80%83.html#cb97-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="dv">1</span></span></code></pre></div>
+</div>
+<div id="結論" class="section level2" number="5.9">
+<h2>
+<span class="header-section-number">5.9</span> 結論<a class="anchor" aria-label="anchor" href="#%E7%B5%90%E8%AB%96"><i class="fas fa-link"></i></a>
+</h2>
+<p>總言之，此章節對Rust的參考做了全面性的介紹，尤其注意到生命週期與可變性的概念，揭示了這是一門需要詳細規劃的預言。</p>
+<p>從自動記憶體管理出現的年代，物件之海成為習以為常的架構模式，它的確可以幫助我們快速開發。但同時，因為物件相互彼此依賴共生，要測試、修改、測試變得困難。</p>
+<p>而Rust的限制，讓你的架構從一開使就井然有序，因為Rust喜歡讓指標、所有權、資料等朝向同一個地方，這並不容易，所以請繼續往下努力，總有一天你可以建立起架構之海。</p>
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></div>
+<div class="next"><a href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E5%8F%83%E8%80%83"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="nav-link" href="#%E5%80%BC%E7%9A%84%E5%8F%83%E8%80%83"><span class="header-section-number">5.1</span> 值的參考</a></li>
+<li><a class="nav-link" href="#%E9%9A%B1%E6%80%A7%E5%8F%83%E8%80%83"><span class="header-section-number">5.2</span> 隱性參考</a></li>
+<li>
+<a class="nav-link" href="#%E5%8F%83%E8%80%83%E7%9A%84%E5%8F%83%E8%80%83"><span class="header-section-number">5.3</span> 參考的參考</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#%E5%80%9F%E7%94%A8%E4%BB%BB%E6%84%8F%E9%81%8B%E7%AE%97%E5%BC%8F%E7%9A%84%E5%8F%83%E8%80%83"><span class="header-section-number">5.3.1</span> 借用任意運算式的參考</a></li></ul>
+</li>
+<li><a class="nav-link" href="#%E5%80%9F%E7%94%A8%E5%8D%80%E5%9F%9F%E8%AE%8A%E6%95%B8"><span class="header-section-number">5.4</span> 借用區域變數</a></li>
+<li><a class="nav-link" href="#%E7%94%A8%E5%87%BD%E5%BC%8F%E5%BC%95%E6%95%B8%E4%BE%86%E6%8E%A5%E6%94%B6%E5%8F%83%E8%80%83"><span class="header-section-number">5.5</span> 用函式引數來接收參考</a></li>
+<li><a class="nav-link" href="#%E5%9B%9E%E5%82%B3%E5%8F%83%E8%80%83%E5%80%BC"><span class="header-section-number">5.6</span> 回傳參考值</a></li>
+<li>
+<a class="nav-link" href="#%E5%8C%85%E5%90%AB%E5%8F%83%E8%80%83%E7%9A%84%E7%B5%90%E6%A7%8B"><span class="header-section-number">5.7</span> 包含參考的結構</a><ul class="nav navbar-nav"><li><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%94%9F%E5%91%BD%E9%80%B1%E6%9C%9F%E7%9A%84%E7%B5%90%E6%A7%8B"><span class="header-section-number">5.7.1</span> 不同生命週期的結構</a></li></ul>
+</li>
+<li><a class="nav-link" href="#%E5%85%B1%E7%94%A8%E8%88%87%E5%8F%AF%E8%AE%8A%E6%80%A7%E7%9A%84%E8%A1%9D%E7%AA%81"><span class="header-section-number">5.8</span> 共用與可變性的衝突</a></li>
+<li><a class="nav-link" href="#%E7%B5%90%E8%AB%96"><span class="header-section-number">5.9</span> 結論</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/04-Day04.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/04-Day04.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-07-12.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

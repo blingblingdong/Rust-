@@ -1,0 +1,17 @@
+[package]
+name = "firedata"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = "1.0.204"
+firebase-rs = "2.1.2"
+tokio = { version = "1", features = ["full"] }
+serde_json = "1"
+chrono = "0.4"
+actix-web = '*'
+actix-files = '*'
+indexmap = { version = "1.7", features = ["serde-1"] }
+firebase-rs = {version = "2.1.2", features = ["serde-1"] }

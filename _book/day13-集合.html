@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 14 Day13-集合 | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="Rust的集合大多行為與其他語言相同，有所差異的在於我們重複強調的安全與性能： 1.移動與借用 在前面章節提到，Rust以移動避免深度複製，如在過去章節中提到Vec::push(item)以值接受引數，而不是以參考接受引數的原因。以此，不只省去複製字元資料的時間，也確保所有權始終明確。 2.沒有失效錯誤：...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 14 Day13-集合 | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="Rust的集合大多行為與其他語言相同，有所差異的在於我們重複強調的安全與性能： 1.移動與借用 在前面章節提到，Rust以移動避免深度複製，如在過去章節中提到Vec::push(item)以值接受引數，而不是以參考接受引數的原因。以此，不只省去複製字元資料的時間，也確保所有權始終明確。 2.沒有失效錯誤：...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 14 Day13-集合 | Rust之書">
+<meta name="twitter:description" content="Rust的集合大多行為與其他語言相同，有所差異的在於我們重複強調的安全與性能： 1.移動與借用 在前面章節提到，Rust以移動避免深度複製，如在過去章節中提到Vec::push(item)以值接受引數，而不是以參考接受引數的原因。以此，不只省去複製字元資料的時間，也確保所有權始終明確。 2.沒有失效錯誤：...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="day07---crate%E8%88%87%E6%A8%A1%E7%B5%84.html"><span class="header-section-number">8</span> Day07 - crate與模組</a></li>
+<li><a class="" href="day08---%E7%B5%90%E6%A7%8B.html"><span class="header-section-number">9</span> Day08 - 結構</a></li>
+<li><a class="" href="day09---enum%E8%88%87%E6%A8%A1%E5%BC%8F.html"><span class="header-section-number">10</span> Day09 - enum與模式</a></li>
+<li><a class="" href="day10-tarit%E8%88%87%E6%B3%9B%E5%9E%8B.html"><span class="header-section-number">11</span> Day10-tarit與泛型</a></li>
+<li><a class="" href="day11-closure.html"><span class="header-section-number">12</span> Day11-closure</a></li>
+<li><a class="" href="day12-iterator.html"><span class="header-section-number">13</span> Day12-Iterator</a></li>
+<li><a class="active" href="day13-%E9%9B%86%E5%90%88.html"><span class="header-section-number">14</span> Day13-集合</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">15</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="day13-集合" class="section level1" number="14">
+<h1>
+<span class="header-section-number">14</span> Day13-集合<a class="anchor" aria-label="anchor" href="#day13-%E9%9B%86%E5%90%88"><i class="fas fa-link"></i></a>
+</h1>
+<p>Rust的集合大多行為與其他語言相同，有所差異的在於我們重複強調的安全與性能：</p>
+<p>1.移動與借用</p>
+<p>在前面章節提到，Rust以移動避免深度複製，如在過去章節中提到Vec<t>::push(item)以值接受引數，而不是以參考接受引數的原因。以此，不只省去複製字元資料的時間，也確保所有權始終明確。</t></p>
+<p>2.沒有失效錯誤：</p>
+<p>失效錯誤是一種懸空指標的bug，當集合被改變大小或以其他方式改變，但程式仍然持有指向它資料的指標。</p>
+<p>3.沒有null</p>
+<p>Rust沒有null，而是以Option取代</p>
+<div id="vec" class="section level2" number="14.1">
+<h2>
+<span class="header-section-number">14.1</span> Vec<a class="anchor" aria-label="anchor" href="#vec"><i class="fas fa-link"></i></a>
+</h2>
+<p>建立向量最簡單的方式是用vec!巨集：</p>
+<div class="sourceCode" id="cb307"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb307-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-1" tabindex="-1"></a><span class="co">// 建立空向量</span></span>
+<span id="cb307-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> numbers<span class="op">:</span><span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="pp">vec!</span>[]<span class="op">;</span></span>
+<span id="cb307-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-3" tabindex="-1"></a></span>
+<span id="cb307-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-4" tabindex="-1"></a></span>
+<span id="cb307-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-5" tabindex="-1"></a><span class="co">// 指定內容建立向量</span></span>
+<span id="cb307-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-6" tabindex="-1"></a><span class="kw">let</span> words <span class="op">=</span> <span class="pp">vec!</span>[<span class="st">"step"</span><span class="op">,</span> <span class="st">"on"</span><span class="op">,</span> <span class="st">"no"</span><span class="op">,</span> <span class="st">"pets"</span>]<span class="op">;</span></span>
+<span id="cb307-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb307-7" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> buffer <span class="op">=</span> <span class="pp">vec!</span>[<span class="dv">0u8</span><span class="op">;</span> <span class="dv">1024</span>]<span class="op">;</span> <span class="co">// 1024個歸零的bytes</span></span></code></pre></div>
+<p>向量有三個欄位：長度、容量、儲存元素的heap指標。</p>
+<p>空向量numbers的初始向量是0，在沒有實際元素前不會配置heap記憶體。</p>
+<p>所有集合都實作了<code>std::iter::FromIterator</code>，所以你可以用<code>.collect()</code>方法來建立向量。</p>
+<div class="sourceCode" id="cb308"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb308-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb308-1" tabindex="-1"></a><span class="kw">let</span> my_vec <span class="op">=</span> my_set<span class="op">.</span>into_iter()<span class="op">.</span><span class="pp">collect::</span><span class="op">&lt;</span><span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">String</span><span class="op">&gt;&gt;</span>()<span class="op">;</span></span></code></pre></div>
+<div id="存取" class="section level3" number="14.1.1">
+<h3>
+<span class="header-section-number">14.1.1</span> 存取<a class="anchor" aria-label="anchor" href="#%E5%AD%98%E5%8F%96"><i class="fas fa-link"></i></a>
+</h3>
+<div class="sourceCode" id="cb309"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb309-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-1" tabindex="-1"></a><span class="co">// 取得元素的參考</span></span>
+<span id="cb309-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-2" tabindex="-1"></a><span class="kw">let</span> first_line <span class="op">=</span> <span class="op">&amp;</span>lines[<span class="dv">0</span>]<span class="op">;</span></span>
+<span id="cb309-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-3" tabindex="-1"></a></span>
+<span id="cb309-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-4" tabindex="-1"></a><span class="co">// 取得副本</span></span>
+<span id="cb309-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-5" tabindex="-1"></a><span class="kw">let</span> fifth_number <span class="op">=</span> numbers[<span class="dv">4</span>]<span class="op">;</span></span>
+<span id="cb309-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-6" tabindex="-1"></a><span class="kw">let</span> second_line <span class="op">=</span> lines[<span class="dv">1</span>]<span class="op">.</span>clone()<span class="op">;</span></span>
+<span id="cb309-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-7" tabindex="-1"></a></span>
+<span id="cb309-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-8" tabindex="-1"></a><span class="co">// 取得一個slice的參考</span></span>
+<span id="cb309-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-9" tabindex="-1"></a><span class="kw">let</span> my_ref <span class="op">=</span> <span class="op">&amp;</span>buffer[<span class="dv">4</span><span class="op">..</span><span class="dv">12</span>]<span class="op">;</span></span>
+<span id="cb309-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-10" tabindex="-1"></a></span>
+<span id="cb309-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-11" tabindex="-1"></a><span class="co">// 取得一個slice的副本</span></span>
+<span id="cb309-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb309-12" tabindex="-1"></a><span class="kw">let</span> my_copy <span class="op">=</span> buffer[<span class="dv">4</span><span class="op">..</span><span class="dv">12</span>]<span class="op">.</span>to_vec()<span class="op">;</span><span class="co">//需要Clone</span></span></code></pre></div>
+<p>當索引超出邊界時，這些寫法會panic。</p>
+<p>所有索引都必須是usize，適當的<code>n as usize</code>是必須的。</p>
+<p>下面幾種方法也是取得向量元素的好做法：</p>
+<p><code>slice.first()</code>、<code>slice.last()</code>：</p>
+<div class="indent-2">
+<p>回傳slice的第一個、最後一個元素的參考，型態是Option<t>，空回傳<code>None</code>，不是空的則回傳Some(&amp;slice[0])</t></p>
+<div class="sourceCode" id="cb310"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb310-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb310-1" tabindex="-1"></a><span class="cf">if</span> <span class="kw">let</span> <span class="cn">Some</span>(item) <span class="op">=</span> v<span class="op">.</span>first() <span class="op">{</span></span>
+<span id="cb310-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb310-2" tabindex="-1"></a>  <span class="pp">println!</span>(<span class="st">"We got one {item}"</span>)<span class="op">;</span></span>
+<span id="cb310-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb310-3" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<p><code>slice.get(index)</code>：</p>
+<div class="indent-2">
+<p>回傳slice[index]的Some參考，型態是Option<t>，當索引元素是空的會回傳None</t></p>
+<div class="sourceCode" id="cb311"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb311-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb311-1" tabindex="-1"></a><span class="kw">let</span> slice <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span><span class="dv">1</span><span class="op">,</span><span class="dv">2</span><span class="op">,</span><span class="dv">3</span>]<span class="op">;</span></span>
+<span id="cb311-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb311-2" tabindex="-1"></a><span class="pp">assert_eq!</span>(slice<span class="op">.</span>get(<span class="dv">2</span>)<span class="op">,</span> <span class="cn">Some</span>(<span class="op">&amp;</span><span class="dv">2</span>))<span class="op">;</span></span>
+<span id="cb311-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb311-3" tabindex="-1"></a><span class="pp">assert_eq!</span>(slice<span class="op">.</span>get(<span class="dv">4</span>)<span class="op">,</span> <span class="cn">None</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.first_mut()</code>、<code>slice.last_mut()</code>、<code>slice.get_mut(index)</code></p>
+<div class="indent-2">
+<p>類似上面的方法，只是借用值可變參考</p>
+<div class="sourceCode" id="cb312"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb312-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> slice <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">;</span></span>
+<span id="cb312-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-2" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb312-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-3" tabindex="-1"></a>  <span class="kw">let</span> last <span class="op">=</span> slice<span class="op">.</span>last_mut()<span class="op">.</span>unwrap()<span class="op">;</span> <span class="co">// last的型態是: &amp;mut i32</span></span>
+<span id="cb312-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-4" tabindex="-1"></a>  <span class="pp">assert_eq!</span>(<span class="op">*</span>last<span class="op">,</span> <span class="dv">3</span>)<span class="op">;</span></span>
+<span id="cb312-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-5" tabindex="-1"></a>  <span class="op">*</span>last <span class="op">=</span> <span class="dv">100</span><span class="op">;</span></span>
+<span id="cb312-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-6" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb312-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb312-7" tabindex="-1"></a><span class="pp">assert_eq!</span>(slice<span class="op">,</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">100</span>])<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.to_vec()</code></p>
+<div class="indent-2">
+<p>複製整個slice，回傳一個新向量</p>
+<div class="sourceCode" id="cb313"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb313-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb313-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> slice <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">;</span></span>
+<span id="cb313-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb313-2" tabindex="-1"></a><span class="pp">assert_eq!</span>(slice<span class="op">.</span>to_vec()<span class="op">,</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>])<span class="op">;</span></span>
+<span id="cb313-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb313-3" tabindex="-1"></a><span class="pp">assert_eq!</span>(slice[<span class="dv">0</span><span class="op">..</span><span class="dv">2</span>]<span class="op">.</span>to_vec()<span class="op">,</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>])<span class="op">;</span></span></code></pre></div>
+<p>這個方法只能用在元素都是cloneable時</p>
+</div>
+</div>
+<div id="迭代" class="section level3" number="14.1.2">
+<h3>
+<span class="header-section-number">14.1.2</span> 迭代<a class="anchor" aria-label="anchor" href="#%E8%BF%AD%E4%BB%A3"><i class="fas fa-link"></i></a>
+</h3>
+<p>向量、陣列與slice都是iterable，無論是以值還是以參考，都遵循上一章節所講的模式：</p>
+<ul>
+<li><p>迭代Vec<t>或陣列[T; N]會產生T型態的N個項目，元素會被一個接一個移出向量或陣列並耗用</t></p></li>
+<li><p>迭代&amp;[T; N]、&amp;[T]或&amp;Vec<t>型態的值(也就是陣列、slice或向量的參考)會產生&amp;T型態的項目，即指向個個元素的參考，它們不會被移除</t></p></li>
+<li><p>迭代&amp;mut [T; N]、&amp;mut[T]或&amp;mut Vec<t>型態的值會產生&amp;mut T型態的參考</t></p></li>
+</ul>
+<p>要創建產生參考的iterator可以用<code>.iter()</code>與<code>iter_mut</code>方法</p>
+</div>
+<div id="增長與收縮向量" class="section level3" number="14.1.3">
+<h3>
+<span class="header-section-number">14.1.3</span> 增長與收縮向量<a class="anchor" aria-label="anchor" href="#%E5%A2%9E%E9%95%B7%E8%88%87%E6%94%B6%E7%B8%AE%E5%90%91%E9%87%8F"><i class="fas fa-link"></i></a>
+</h3>
+<p>陣列、slice與向量的長度是他們裡面元素的數量</p>
+<p><code>slice.len()</code></p>
+<div class="indent-2">
+<p>回傳slice的長度，單位是usize</p>
+</div>
+<p><code>slice.is_empty()</code></p>
+<div class="indent-2">
+<p>若slice裡面沒有元素，回傳true。</p>
+</div>
+<p>因為只有向量可以增長與收縮，建立之後就無法改變大小的slice與陣列都沒有這些方法。</p>
+<p>向量的元蘇被存放在一個連續的heap記憶體裡面。向量的容量是可放入的<strong>最大元素</strong>數量。一般情況下Vec會自動管理容量，例如在需要更多空間時配置更大緩衝區。你可以用以下方法來明確記憶體管理</p>
+<p><code>Vec::with_capacity(n)</code></p>
+<div class="indent-2">
+<p>建立一個新的、空的向量，容量為n</p>
+</div>
+<p><code>vec.capacity()</code></p>
+<div class="indent-2">
+<p>回傳一個usize的容量，其必定大於或等於vec.len()</p>
+</div>
+<p><code>vec.reserve(n)</code></p>
+<div class="indent-2">
+<p>確保向量能至少有足夠的空間可再容納n個元素。也就是說，vec.capacity()至少是vec.len() + n。如果空間足夠，這個函式不做任何事情。如果不夠，則會配置足夠大的緩衝區</p>
+</div>
+<p><code>vec.reserve_exact(n)</code></p>
+<div class="indent-2">
+<p>與vec.reserve(n)相似，但會要求vec不要配置超出n的任何而外空間。之後，vec.capcity()就是vec.len()+n</p>
+</div>
+<p><code>vec.shrink_to_fit()</code></p>
+<div class="indent-2">
+<p>如果vec.capacity()大於vec.len()，則會釋出額外記憶體</p>
+<p>Vec<t>有許多加入與移除元素的方法，都是用mut參考來接受它的self引數。</t></p>
+</div>
+<p><code>vec.push(value)</code></p>
+<div class="indent-2">
+<p>將value加入vec的結尾</p>
+</div>
+<p><code>vec.pop()</code></p>
+<div class="indent-2">
+<p>移除並回傳最後一個元素。它的回傳型態是Option<t>。如果pop出來的元素是x，它會回傳Some(x)</t></p>
+</div>
+<p>要注意，以上兩個方法與接下來的都是以<em>值</em>移出與移入，如push(n)會將n移入，pop()會移出值</p>
+<p>如果你想指定移出與移入元素，考慮insert與remove：</p>
+<p><code>vec.insert(index, value)</code></p>
+<div class="indent-2">
+<p>在vec[index]插入value，其餘元素會後移</p>
+<p>如果index &gt; vec.len()，則會panic</p>
+</div>
+<p><code>vec.remove(index)</code></p>
+<div class="indent-2">
+<p>移除並回傳vec[index]元素，將後面元素前移</p>
+<p>如果index &gt;= vec.len()，則會panic</p>
+<p>當向量元素越來越多，多次remove(n)會讓運行變慢，如果需奧要多次執行可改用<code>VecDequeT&gt;</code></p>
+</div>
+<p>有四個方法可以改變vec的長度：</p>
+<p><code>vec.resize(new_len, value)</code></p>
+<div class="indent-2">
+<p>將長度改為new_len，空餘的空間塞入value，注意value必須實作Clone</p>
+</div>
+<p><code>vec.resize_with(new_len, closure)</code></p>
+<div class="indent-2">
+<p>ㄧ樣將長度改變為new_len，特別用在要傳入的value不是clone type。</p>
+</div>
+<p><code>vec.truncate(new_len)</code></p>
+<div class="indent-2">
+<p>將長度改為new_len，多的元素會被清除</p>
+</div>
+<p><code>vec.clear()</code></p>
+<div class="indent-2">
+<p>會清除所有元素，相當於truncate(0)</p>
+</div>
+<p>如果你想要一次加入或移除多值，考慮：</p>
+<p><code>vec.extend(iterable)</code></p>
+<div class="indent-2">
+<p>在結尾加入iterable的所有項目，它很像多值版本的.push</p>
+</div>
+<p><code>vec.spilt_off(index)</code></p>
+<div class="indent-2">
+<p>與vec.truncate(index)相似，但是回傳一個Vec<t></t></p>
+</div>
+<p><code>vec.append(&amp;mut vec2)</code></p>
+<div class="indent-2">
+<p>它會將vec2的元素傳入vec，vec2在事後會被淨空</p>
+<p>與extend不同的是，vec2的殼會留下來</p>
+</div>
+<p><code>vec.drain(range)</code></p>
+<div class="indent-2">
+<p>將vec[range]從vec移除，並回傳一個迭代被移除的元素的itertor，其中的range是範圍值，如..或0..4</p>
+</div>
+<p>此外還有一些方法能更進階的刪除值</p>
+<p><code>vec.retain(test)</code></p>
+<div class="indent-2">
+<p>移除未通過指定測試的項目，方法會呼叫test(&amp;element)函式或closure，回傳bool的項目留下。</p>
+<p>撇開性能不談，這個方法接近這段程式：</p>
+<div class="sourceCode" id="cb314"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb314-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb314-1" tabindex="-1"></a>vec <span class="op">=</span> vec<span class="op">.</span>into_iter()<span class="op">.</span>filter(test)<span class="op">.</span>collect()<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>vec.dedup()</code></p>
+<div class="indent-2">
+<p>卸除重複的元素：</p>
+<div class="sourceCode" id="cb315"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb315-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb315-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> byte_vec <span class="op">=</span> <span class="st">b"Misssssissippi"</span></span>
+<span id="cb315-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb315-2" tabindex="-1"></a>byte_vec<span class="op">.</span>dedup()<span class="op">;</span></span>
+<span id="cb315-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb315-3" tabindex="-1"></a><span class="pp">assert_eq!</span>(<span class="op">&amp;</span>byte_vec<span class="op">,</span> <span class="st">b"Misisipi"</span>)<span class="op">;</span></span></code></pre></div>
+<p>要注意的是，它只會確認相鄰的元素是否重複，若你要移除所有重複，有三個選項：先排序再呼叫ded_up()、將資料移入集合，或使用.retain技巧(可以保持出現順序)</p>
+<div class="sourceCode" id="cb316"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb316-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb316-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> byte_vec <span class="op">=</span> <span class="st">b"Misssssissippi"</span></span>
+<span id="cb316-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb316-2" tabindex="-1"></a></span>
+<span id="cb316-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb316-3" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> seen <span class="op">=</span> <span class="pp">HashSet::</span>new()<span class="op">;</span></span>
+<span id="cb316-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb316-4" tabindex="-1"></a>byte_vec<span class="op">.</span>retain(<span class="op">|</span>r<span class="op">|</span> seen<span class="op">.</span>insert(<span class="op">*</span>r))<span class="op">;</span></span>
+<span id="cb316-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb316-5" tabindex="-1"></a></span>
+<span id="cb316-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb316-6" tabindex="-1"></a><span class="pp">assert_eq!</span>(<span class="op">&amp;</span>byte_vec<span class="op">,</span> <span class="st">b"Misp"</span>)</span></code></pre></div>
+<p>這個魔法在於，.insert()會在集合已經正在插入的項目時回傳false</p>
+</div>
+<p><code>vec.dedup_by(same)</code></p>
+<div class="indent-2">
+<p>透過same(&amp;mut element1, &amp;mut element2)來檢視兩元素是否相符。</p>
+</div>
+<p><code>vec_dedup_by_key(key)</code></p>
+<p>若key(&amp;mut element1) == key(&amp;mut element2)，將兩個元素視為相等。</p>
+<p>例如，如果errors是Vec&lt;Box<dyn error>&gt;，你可以這樣寫：</dyn></p>
+<div class="sourceCode" id="cb317"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb317-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb317-1" tabindex="-1"></a>errors<span class="op">.</span>dedup_by_key(<span class="op">|</span>err<span class="op">|</span> err<span class="op">.</span>to_string())<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="連接" class="section level3" number="14.1.4">
+<h3>
+<span class="header-section-number">14.1.4</span> 連接<a class="anchor" aria-label="anchor" href="#%E9%80%A3%E6%8E%A5"><i class="fas fa-link"></i></a>
+</h3>
+<p>有兩種方式處理陣列的陣列：</p>
+<p><code>slices.conact()</code></p>
+<div class="indent-2">
+<p>串接所有slice來製作新向量並回傳：</p>
+<div class="sourceCode" id="cb318"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb318-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb318-1" tabindex="-1"></a><span class="pp">assert_eq!</span>([[<span class="dv">1</span><span class="op">,</span><span class="dv">2</span>]<span class="op">,</span> [<span class="dv">3</span><span class="op">,</span><span class="dv">4</span>]<span class="op">,</span> [<span class="dv">5</span><span class="op">,</span><span class="dv">6</span>]]<span class="op">.</span>conact()<span class="op">,</span> </span>
+<span id="cb318-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb318-2" tabindex="-1"></a>           <span class="pp">vec!</span>[<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">6</span>])<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slices.join(&amp;seperator)</code></p>
+<div class="indent-2">
+<p>與conact相同功能，但在slice之間插入一個seperator的副本</p>
+<div class="sourceCode" id="cb319"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb319-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb319-1" tabindex="-1"></a><span class="pp">assert_eq!</span>([[<span class="dv">1</span><span class="op">,</span><span class="dv">2</span>]<span class="op">,</span> [<span class="dv">3</span><span class="op">,</span><span class="dv">4</span>]<span class="op">,</span> [<span class="dv">5</span><span class="op">,</span><span class="dv">6</span>]]<span class="op">.</span>join(<span class="op">&amp;</span><span class="dv">0</span>)<span class="op">,</span> </span>
+<span id="cb319-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb319-2" tabindex="-1"></a>           <span class="pp">vec!</span>[<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">5</span><span class="op">,</span> <span class="dv">6</span>])<span class="op">;</span></span></code></pre></div>
+</div>
+</div>
+<div id="拆分" class="section level3" number="14.1.5">
+<h3>
+<span class="header-section-number">14.1.5</span> 拆分<a class="anchor" aria-label="anchor" href="#%E6%8B%86%E5%88%86"><i class="fas fa-link"></i></a>
+</h3>
+<p>當涉及參考與可變參考時，拆分的動作要更注意。為了安全，所以拆分的方法都有mut與非mut版本。</p>
+<p>這些方法都不直接修改陣列、slice或向量，只回傳裡面部分資料的參考。</p>
+<p><code>slice.iter()</code>、<code>slice.iter_mut()</code></p>
+<div class="indent-2">
+<p>產生slice各個元素的參考</p>
+</div>
+<p><code>slice.split_at(index)</code>、<code>slice.split_at_mut(index)</code></p>
+<div class="indent-2">
+<p>在指定位子拆分成兩個slice，slice.split_at(index)相當於(&amp;slice[..index], &amp;slice[index..])。當index超出邊界，方法會panic，</p>
+</div>
+<p><code>slice.split_first()</code>, <code>slice.spilt_first_mut()</code></p>
+<div class="indent-2">
+<p>回傳一對參考：一個指向第一個元素(slice[0])的參考，另一個是指向其他所有元素的參考(slice[1..])的slice參考</p>
+<p>準確的說，回傳型態是Option&lt;(&amp;T, &amp;[T])&gt;，當slice是空的時，結果是None<br></p>
+</div>
+<p><code>slice.split_last()</code>, <code>slice.spilt_last_mut()</code></p>
+<div class="indent-2">
+<p>與上一對方法相似，只是拆開最後一個元素</p>
+</div>
+<p><code>slice.split(is_sep)</code>, <code>slice.split_mut(is_sep)</code></p>
+<div class="indent-2">
+<p>將slice分成一個或多個子slice，使用函式或closure_is_sep來決定拆開的位子，回傳一個迭代子slice的iterator</p>
+<p>呼叫is_sep(&amp;element)，當回傳true時，該元素會變成<strong>分隔符號</strong>，不加入新的slice</p>
+<div class="sourceCode" id="cb320"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb320-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb320-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-2" tabindex="-1"></a>    </span>
+<span id="cb320-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>split(<span class="op">|&amp;</span>item<span class="op">|</span> item <span class="op">==</span> <span class="dv">0</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb320-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-4" tabindex="-1"></a></span>
+<span id="cb320-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb320-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb320-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb320-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span>]</span>
+<span id="cb320-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">44</span><span class="op">,</span> <span class="dv">55</span>]</span>
+<span id="cb320-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-10" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">2</span><span class="op">:</span> []</span>
+<span id="cb320-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-11" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">3</span><span class="op">:</span> [<span class="dv">66</span>]</span>
+<span id="cb320-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb320-12" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p><code>slice.split_inclusive()</code>, <code>slice.spilt_inclusive_mut()</code></p>
+<div class="indent-2">
+<p>它們的動作與split相似，但是在上一個子slice結尾加上分隔符號，而不是排除它</p>
+<div class="sourceCode" id="cb321"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb321-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb321-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-2" tabindex="-1"></a>    </span>
+<span id="cb321-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>split_inclusive(<span class="op">|&amp;</span>item<span class="op">|</span> item <span class="op">==</span> <span class="dv">0</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb321-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-4" tabindex="-1"></a></span>
+<span id="cb321-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb321-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb321-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb321-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb321-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb321-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-10" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">2</span><span class="op">:</span> [<span class="dv">0</span>]</span>
+<span id="cb321-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-11" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">3</span><span class="op">:</span> [<span class="dv">66</span>]</span>
+<span id="cb321-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb321-12" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p><code>slice.rsplit(is_sep)</code>, <code>slice.rsplit_mut(is_sep)</code></p>
+<div class="indent-2">
+<p>從slice結尾開始</p>
+<div class="sourceCode" id="cb322"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb322-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb322-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-2" tabindex="-1"></a>    </span>
+<span id="cb322-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>rsplit(<span class="op">|&amp;</span>item<span class="op">|</span> item <span class="op">==</span> <span class="dv">0</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb322-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-4" tabindex="-1"></a></span>
+<span id="cb322-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb322-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb322-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb322-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">66</span>]</span>
+<span id="cb322-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> []</span>
+<span id="cb322-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-10" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">2</span><span class="op">:</span> [<span class="dv">44</span><span class="op">,</span> <span class="dv">55</span>]</span>
+<span id="cb322-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-11" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">3</span><span class="op">:</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span>]</span>
+<span id="cb322-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb322-12" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p><code>slice.splitn(n, is_sep)</code>, <code>slice.splitn_mut(n,is_sep)</code></p>
+<div class="indent-2">
+<p>限制分解slice的數量，在找到n-1個slice之後，就不會再呼叫closure，剩下的元素全部塞進最後一個slice</p>
+<div class="sourceCode" id="cb323"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb323-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb323-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-2" tabindex="-1"></a>    </span>
+<span id="cb323-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>splitn(<span class="dv">2</span><span class="op">,</span> <span class="op">|&amp;</span>item<span class="op">|</span> item <span class="op">==</span> <span class="dv">0</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb323-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-4" tabindex="-1"></a></span>
+<span id="cb323-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb323-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb323-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb323-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span>]</span>
+<span id="cb323-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]</span>
+<span id="cb323-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb323-10" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p>:::</p>
+<p><code>slice.rsplitn(n, is_sep)</code>, <code>slice.rsplitn_mut(n,is_sep)</code></p>
+<div class="indent-2">
+<p>反向順序掃描</p>
+<div class="sourceCode" id="cb324"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb324-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb324-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-2" tabindex="-1"></a>    </span>
+<span id="cb324-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>rsplitn(<span class="dv">2</span><span class="op">,</span> <span class="op">|&amp;</span>item<span class="op">|</span> item <span class="op">==</span> <span class="dv">0</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb324-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-4" tabindex="-1"></a></span>
+<span id="cb324-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb324-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb324-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb324-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">66</span>]</span>
+<span id="cb324-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb324-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb324-10" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p><code>slice.chunks(n)</code>, <code>slice.chunks_mut(n)</code></p>
+<div class="indent-2">
+<p>回傳iterator來迭代不重疊且長度為n的子slice，若slice.len()無法被n整除，則最後一個區域將少於n個</p>
+<div class="sourceCode" id="cb325"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb325-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb325-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-2" tabindex="-1"></a>    </span>
+<span id="cb325-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>chunks(<span class="dv">2</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb325-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-4" tabindex="-1"></a></span>
+<span id="cb325-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb325-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb325-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb325-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span>]</span>
+<span id="cb325-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">33</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb325-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-10" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">2</span><span class="op">:</span> [<span class="dv">44</span><span class="op">,</span> <span class="dv">55</span>]</span>
+<span id="cb325-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-11" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">3</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb325-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-12" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">4</span><span class="op">:</span> [<span class="dv">66</span>]</span>
+<span id="cb325-13"><a href="day13-%E9%9B%86%E5%90%88.html#cb325-13" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p><code>slice.rchunks(n)</code>, <code>slice.rchunks_mut(n)</code></p>
+<div class="indent-2">
+<p>從結尾開始分</p>
+<div class="sourceCode" id="cb326"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb326-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> [<span class="dv">11</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">33</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">44</span><span class="op">,</span> <span class="dv">55</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]<span class="op">;</span></span>
+<span id="cb326-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-2" tabindex="-1"></a>    </span>
+<span id="cb326-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-3" tabindex="-1"></a><span class="kw">let</span> parts<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> numbers<span class="op">.</span>rchunks(<span class="dv">2</span>)<span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb326-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-4" tabindex="-1"></a></span>
+<span id="cb326-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-5" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> parts<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb326-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-6" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb326-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-7" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb326-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-8" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">66</span>]</span>
+<span id="cb326-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-9" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">55</span><span class="op">,</span> <span class="dv">0</span>]</span>
+<span id="cb326-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-10" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">2</span><span class="op">:</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">44</span>]</span>
+<span id="cb326-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-11" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">3</span><span class="op">:</span> [<span class="dv">22</span><span class="op">,</span> <span class="dv">33</span>]</span>
+<span id="cb326-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-12" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">4</span><span class="op">:</span> [<span class="dv">11</span>]</span>
+<span id="cb326-13"><a href="day13-%E9%9B%86%E5%90%88.html#cb326-13" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+<p><code>slice.windows(n)</code></p>
+<div class="indent-2">
+<p>回傳跨越連續n個元素的子slice，它產生的第一個值是&amp;slice[0..n]，第二個是&amp;slice[1….n+1]，以此類推</p>
+<p>若n大於slice的長度，此方法不產生slice，若n為0則panic</p>
+<p>如果你想知道探索兩個資料間的關係與變化，大小為2的窗口就很適合：</p>
+<div class="sourceCode" id="cb327"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb327-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-1" tabindex="-1"></a></span>
+<span id="cb327-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-2" tabindex="-1"></a><span class="kw">let</span> temperatures <span class="op">=</span> [<span class="dv">20</span><span class="op">,</span> <span class="dv">22</span><span class="op">,</span> <span class="dv">24</span><span class="op">,</span> <span class="dv">28</span><span class="op">,</span> <span class="dv">26</span><span class="op">,</span> <span class="dv">27</span>]<span class="op">;</span></span>
+<span id="cb327-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-3" tabindex="-1"></a>    </span>
+<span id="cb327-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-4" tabindex="-1"></a><span class="kw">let</span> changes<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> temperatures</span>
+<span id="cb327-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-5" tabindex="-1"></a>    <span class="op">.</span>windows(<span class="dv">2</span>)</span>
+<span id="cb327-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-6" tabindex="-1"></a>    <span class="op">.</span>collect()<span class="op">;</span></span>
+<span id="cb327-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-7" tabindex="-1"></a></span>
+<span id="cb327-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-8" tabindex="-1"></a><span class="cf">for</span> (i<span class="op">,</span> part) <span class="kw">in</span> changes<span class="op">.</span>iter()<span class="op">.</span>enumerate() <span class="op">{</span></span>
+<span id="cb327-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-9" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Part {}: {:?}"</span><span class="op">,</span> i<span class="op">,</span> part)<span class="op">;</span></span>
+<span id="cb327-10"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-10" tabindex="-1"></a>  <span class="pp">rprintln!</span>(<span class="st">"Changes:{}"</span><span class="op">,</span> part[<span class="dv">1</span>] <span class="op">-</span> part[<span class="dv">0</span>])<span class="op">;</span></span>
+<span id="cb327-11"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-11" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb327-12"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-12" tabindex="-1"></a>    </span>
+<span id="cb327-13"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-13" tabindex="-1"></a></span>
+<span id="cb327-14"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-14" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">0</span><span class="op">:</span> [<span class="dv">20</span><span class="op">,</span> <span class="dv">22</span>]</span>
+<span id="cb327-15"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-15" tabindex="-1"></a>#<span class="op">&gt;</span> Changes<span class="op">:</span><span class="dv">2</span></span>
+<span id="cb327-16"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-16" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">1</span><span class="op">:</span> [<span class="dv">22</span><span class="op">,</span> <span class="dv">24</span>]</span>
+<span id="cb327-17"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-17" tabindex="-1"></a>#<span class="op">&gt;</span> Changes<span class="op">:</span><span class="dv">2</span></span>
+<span id="cb327-18"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-18" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">2</span><span class="op">:</span> [<span class="dv">24</span><span class="op">,</span> <span class="dv">28</span>]</span>
+<span id="cb327-19"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-19" tabindex="-1"></a>#<span class="op">&gt;</span> Changes<span class="op">:</span><span class="dv">4</span></span>
+<span id="cb327-20"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-20" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">3</span><span class="op">:</span> [<span class="dv">28</span><span class="op">,</span> <span class="dv">26</span>]</span>
+<span id="cb327-21"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-21" tabindex="-1"></a>#<span class="op">&gt;</span> Changes<span class="op">:-</span><span class="dv">2</span></span>
+<span id="cb327-22"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-22" tabindex="-1"></a>#<span class="op">&gt;</span> Part <span class="dv">4</span><span class="op">:</span> [<span class="dv">26</span><span class="op">,</span> <span class="dv">27</span>]</span>
+<span id="cb327-23"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-23" tabindex="-1"></a>#<span class="op">&gt;</span> Changes<span class="op">:</span><span class="dv">1</span></span>
+<span id="cb327-24"><a href="day13-%E9%9B%86%E5%90%88.html#cb327-24" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+</div>
+</div>
+<div id="對換" class="section level3" number="14.1.6">
+<h3>
+<span class="header-section-number">14.1.6</span> 對換<a class="anchor" aria-label="anchor" href="#%E5%B0%8D%E6%8F%9B"><i class="fas fa-link"></i></a>
+</h3>
+<p>參考以下對換方法：</p>
+<p><code>slice.swap(i, j)</code></p>
+<div class="indent-2">
+<p>將slice[i]與slice[j]元素對換</p>
+<div class="sourceCode" id="cb328"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb328-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb328-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> numbers <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">;</span></span>
+<span id="cb328-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb328-2" tabindex="-1"></a>numbers<span class="op">.</span>swap(<span class="dv">0</span><span class="op">,</span> <span class="dv">2</span>)<span class="op">;</span></span>
+<span id="cb328-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb328-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers)<span class="op">;</span></span>
+<span id="cb328-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb328-4" tabindex="-1"></a></span>
+<span id="cb328-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb328-5" tabindex="-1"></a>#<span class="op">&gt;</span> [<span class="dv">3</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">1</span>]</span></code></pre></div>
+</div>
+<p><code>slice_a.swap_with_slice(&amp;mut slice_b)</code></p>
+<div class="indent-2">
+<p>將slice[i]與slice[j]元素兌換</p>
+<div class="sourceCode" id="cb329"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb329-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb329-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> numbers_a <span class="op">=</span> [<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span>]<span class="op">;</span></span>
+<span id="cb329-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb329-2" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> numbers_b <span class="op">=</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]<span class="op">;</span></span>
+<span id="cb329-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb329-3" tabindex="-1"></a>numbers_a<span class="op">.</span>swap_with_slice(<span class="op">&amp;</span><span class="kw">mut</span> numbers_b)<span class="op">;</span></span>
+<span id="cb329-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb329-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers_a)<span class="op">;</span></span>
+<span id="cb329-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb329-5" tabindex="-1"></a></span>
+<span id="cb329-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb329-6" tabindex="-1"></a>#<span class="op">&gt;</span> [<span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span>]</span></code></pre></div>
+</div>
+</div>
+<div id="排序與搜尋" class="section level3" number="14.1.7">
+<h3>
+<span class="header-section-number">14.1.7</span> 排序與搜尋<a class="anchor" aria-label="anchor" href="#%E6%8E%92%E5%BA%8F%E8%88%87%E6%90%9C%E5%B0%8B"><i class="fas fa-link"></i></a>
+</h3>
+<p>slice有三種排序方式：</p>
+<p><code>slice.sort()</code></p>
+<div class="indent-2">
+<p>按遞增順序來排序元素，元素必須實作Ord。</p>
+</div>
+<p><code>slice.sort_by</code></p>
+<div class="indent-2">
+<p>使用函式或closure cmp來指定排序順序，以排序slice的元素。cmp必須實作<code>Fn(&amp;T, &amp;T) -&gt; std::cmp::Ordering</code>。</p>
+<p>親手撰寫cmp是痛苦的，但你可以善用.cmp()方法。</p>
+<div class="sourceCode" id="cb330"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb330-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb330-1" tabindex="-1"></a>students<span class="op">.</span>sort_by(<span class="op">|</span>a<span class="op">,</span> b<span class="op">|</span> a<span class="op">.</span>last_name<span class="op">.</span>cmp(<span class="op">&amp;</span>b<span class="op">.</span>last_name))<span class="op">;</span></span></code></pre></div>
+<p>若要用一個欄位來排順序，你可以使用第二個欄位作為分界符號(次要比較項目)，比較tuple</p>
+<div class="sourceCode" id="cb331"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb331-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb331-1" tabindex="-1"></a>students<span class="op">.</span>sort_by(<span class="op">|</span>a<span class="op">,</span> b<span class="op">|</span> <span class="op">{</span></span>
+<span id="cb331-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb331-2" tabindex="-1"></a>  <span class="kw">let</span> a_key <span class="op">=</span> (<span class="op">&amp;</span>a<span class="op">.</span>last_name<span class="op">,</span> <span class="op">&amp;</span>a<span class="op">.</span>first_name)<span class="op">;</span></span>
+<span id="cb331-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb331-3" tabindex="-1"></a>  <span class="kw">let</span> b_key <span class="op">=</span> (<span class="op">&amp;</span>b<span class="op">.</span>last_name<span class="op">,</span> <span class="op">&amp;</span>b<span class="op">.</span>first_name)<span class="op">;</span></span>
+<span id="cb331-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb331-4" tabindex="-1"></a>  a_key<span class="op">.</span>cmp(<span class="op">&amp;</span>b_key)</span>
+<span id="cb331-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb331-5" tabindex="-1"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.sort_by_key(key)</code></p>
+<div class="indent-2">
+<p>用函式或closure key提供的排序鍵來將slice元素按遞增順序排列。key的型態必須實作Fn(&amp;T) -&gt; K，其中K; Ord。</p>
+<p>這個方法很適合在T有一個或多個有序欄位，你想用多種方式排序它:</p>
+<div class="sourceCode" id="cb332"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb332-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb332-1" tabindex="-1"></a>students<span class="op">.</span>sort_by_key(<span class="op">|</span>s<span class="op">|</span> s<span class="op">.</span>grade_point_average())<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.reverse()</code></p>
+<div class="indent-2">
+<p>將slice倒過來，如果你想反向排序，可以先用正邏輯sort_by()之後再reverse</p>
+</div>
+<p><code>slice.binary_search(&amp;value)</code></p>
+<div class="indent-2">
+<p>二元查找法用於查找有排序過的資料，可以高效查詢，或是指出新資料的排序位置</p>
+<p>回傳型態是Result&lt;usize, usize&gt;，若slice[index]等於value，則回傳Ok(index)，若無則回傳Err(insertion)，讓後續插入動作能保持順序。</p>
+<div class="sourceCode" id="cb333"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb333-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-1" tabindex="-1"></a><span class="kw">let</span> numbers <span class="op">=</span> <span class="pp">vec!</span>[<span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span><span class="op">,</span> <span class="dv">6</span><span class="op">,</span> <span class="dv">7</span><span class="op">,</span> <span class="dv">8</span><span class="op">,</span> <span class="dv">9</span><span class="op">,</span> <span class="dv">10</span>]<span class="op">;</span></span>
+<span id="cb333-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-2" tabindex="-1"></a></span>
+<span id="cb333-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-3" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers<span class="op">.</span>binary_search(<span class="op">&amp;</span><span class="dv">4</span>))<span class="op">;</span></span>
+<span id="cb333-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-4" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{:?}"</span><span class="op">,</span> numbers<span class="op">.</span>binary_search(<span class="op">&amp;</span><span class="dv">5</span>))<span class="op">;</span></span>
+<span id="cb333-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-5" tabindex="-1"></a></span>
+<span id="cb333-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-6" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Ok</span>(<span class="dv">3</span>)</span>
+<span id="cb333-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb333-7" tabindex="-1"></a>#<span class="op">&gt;</span> <span class="cn">Err</span>(<span class="dv">4</span>)</span></code></pre></div>
+</div>
+<p><code>slice.binary_search_by(cmp)</code></p>
+<div class="indent-2">
+<p>回傳型態與上面相同，只是以回傳Ordering的函式來自訂比較自訂比較</p>
+<div class="sourceCode" id="cb334"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb334-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-1" tabindex="-1"></a>students<span class="op">.</span>binary_search_by(<span class="op">|</span>student<span class="op">|</span> <span class="op">{</span></span>
+<span id="cb334-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-2" tabindex="-1"></a>    <span class="cf">if</span> student<span class="op">.</span>score <span class="op">&lt;</span> target_score <span class="op">{</span></span>
+<span id="cb334-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-3" tabindex="-1"></a>            <span class="pp">Ordering::</span>Less</span>
+<span id="cb334-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-4" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> student<span class="op">.</span>score <span class="op">&gt;</span> target_score <span class="op">{</span></span>
+<span id="cb334-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-5" tabindex="-1"></a>            <span class="pp">Ordering::</span>Greater</span>
+<span id="cb334-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-6" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb334-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-7" tabindex="-1"></a>            <span class="pp">Ordering::</span>Equal</span>
+<span id="cb334-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-8" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb334-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb334-9" tabindex="-1"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.binary_search_by(cmp)</code></p>
+<div class="indent-2">
+<p>回傳型態與上面相同，只是以回傳Ordering的函式來自訂比較自訂比較</p>
+<div class="sourceCode" id="cb335"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb335-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-1" tabindex="-1"></a>students<span class="op">.</span>binary_search_by(<span class="op">|</span>student<span class="op">|</span> <span class="op">{</span></span>
+<span id="cb335-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-2" tabindex="-1"></a>    <span class="cf">if</span> student<span class="op">.</span>score <span class="op">&lt;</span> target_score <span class="op">{</span></span>
+<span id="cb335-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-3" tabindex="-1"></a>            <span class="pp">Ordering::</span>Less</span>
+<span id="cb335-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-4" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="cf">if</span> student<span class="op">.</span>score <span class="op">&gt;</span> target_score <span class="op">{</span></span>
+<span id="cb335-5"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-5" tabindex="-1"></a>            <span class="pp">Ordering::</span>Greater</span>
+<span id="cb335-6"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-6" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb335-7"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-7" tabindex="-1"></a>            <span class="pp">Ordering::</span>Equal</span>
+<span id="cb335-8"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-8" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb335-9"><a href="day13-%E9%9B%86%E5%90%88.html#cb335-9" tabindex="-1"></a><span class="op">}</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.binary_search_by_key(&amp;value, key)</code></p>
+<div class="indent-2">
+<p>多一個指定value來避免手動提取鍵</p>
+</div>
+<p><code>slice.contains(&amp;value)</code></p>
+<div class="indent-2">
+<p>若純粹要確認元素是否存在，可以使用contains，若該元素存在會回傳true</p>
+</div>
+<p>若僅要尋找符合元素的位置，可以使用上一章節提到的position</p>
+<div class="sourceCode" id="cb336"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb336-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb336-1" tabindex="-1"></a>slice<span class="op">.</span>iter()<span class="op">.</span>position(<span class="op">|</span>x<span class="op">|</span> <span class="op">*</span>x <span class="op">==</span> value)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="隨機元素" class="section level3" number="14.1.8">
+<h3>
+<span class="header-section-number">14.1.8</span> 隨機元素<a class="anchor" aria-label="anchor" href="#%E9%9A%A8%E6%A9%9F%E5%85%83%E7%B4%A0"><i class="fas fa-link"></i></a>
+</h3>
+<p>Rust標準程式庫為內建元素，但rand crate有，可以協助從向量中隨機取得元素</p>
+<p>雖然兩種方法都要Rng，所幸用<code>&amp;mut rand::thread_rng()</code>，要記得匯入rand crate。</p>
+<p><code>slice.choose(&amp;mut rng)</code></p>
+<div class="indent-2">
+<p>回傳一個Option&lt;&amp;T&gt;</p>
+<div class="sourceCode" id="cb337"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb337-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb337-1" tabindex="-1"></a><span class="kw">use</span> <span class="pp">rand::seq::</span>SliceRandom<span class="op">;</span> <span class="co">// 0.7.2</span></span>
+<span id="cb337-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb337-2" tabindex="-1"></a></span>
+<span id="cb337-3"><a href="day13-%E9%9B%86%E5%90%88.html#cb337-3" tabindex="-1"></a><span class="kw">let</span> vs <span class="op">=</span> <span class="pp">vec!</span>[<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
+<span id="cb337-4"><a href="day13-%E9%9B%86%E5%90%88.html#cb337-4" tabindex="-1"></a><span class="kw">let</span> rand_num <span class="op">=</span> vs<span class="op">.</span>choose(<span class="op">&amp;</span><span class="kw">mut</span> <span class="pp">rand::</span>thread_rng())<span class="op">;</span></span></code></pre></div>
+</div>
+<p><code>slice.shuffle(&amp;mut rng)</code></p>
+<div class="indent-2">
+<p>將vec重新洗牌</p>
+<div class="sourceCode" id="cb338"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb338-1"><a href="day13-%E9%9B%86%E5%90%88.html#cb338-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> vs <span class="op">=</span> <span class="pp">vec!</span>[<span class="dv">0</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">4</span>]<span class="op">;</span></span>
+<span id="cb338-2"><a href="day13-%E9%9B%86%E5%90%88.html#cb338-2" tabindex="-1"></a>vs<span class="op">.</span>shuffle(<span class="op">&amp;</span><span class="kw">mut</span> <span class="pp">rand::</span>thread_rng())<span class="op">;</span></span></code></pre></div>
+</div>
+
+</div>
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="day12-iterator.html"><span class="header-section-number">13</span> Day12-Iterator</a></div>
+<div class="next"><a href="r_unique.html"><span class="header-section-number">15</span> R_unique</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#day13-%E9%9B%86%E5%90%88"><span class="header-section-number">14</span> Day13-集合</a></li>
+<li>
+<a class="nav-link" href="#vec"><span class="header-section-number">14.1</span> Vec</a><ul class="nav navbar-nav">
+<li><a class="nav-link" href="#%E5%AD%98%E5%8F%96"><span class="header-section-number">14.1.1</span> 存取</a></li>
+<li><a class="nav-link" href="#%E8%BF%AD%E4%BB%A3"><span class="header-section-number">14.1.2</span> 迭代</a></li>
+<li><a class="nav-link" href="#%E5%A2%9E%E9%95%B7%E8%88%87%E6%94%B6%E7%B8%AE%E5%90%91%E9%87%8F"><span class="header-section-number">14.1.3</span> 增長與收縮向量</a></li>
+<li><a class="nav-link" href="#%E9%80%A3%E6%8E%A5"><span class="header-section-number">14.1.4</span> 連接</a></li>
+<li><a class="nav-link" href="#%E6%8B%86%E5%88%86"><span class="header-section-number">14.1.5</span> 拆分</a></li>
+<li><a class="nav-link" href="#%E5%B0%8D%E6%8F%9B"><span class="header-section-number">14.1.6</span> 對換</a></li>
+<li><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E8%88%87%E6%90%9C%E5%B0%8B"><span class="header-section-number">14.1.7</span> 排序與搜尋</a></li>
+<li><a class="nav-link" href="#%E9%9A%A8%E6%A9%9F%E5%85%83%E7%B4%A0"><span class="header-section-number">14.1.8</span> 隨機元素</a></li>
+</ul>
+</li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/13-%E9%9B%86%E5%90%88.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/13-%E9%9B%86%E5%90%88.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-08-14.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

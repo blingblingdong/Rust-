@@ -1,0 +1,375 @@
+# Day08 - 結構
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(distill)
+xaringanExtra::use_panelset()
+library(rmarkdown)
+library(rextendr)
+```
+
+
+## 具名欄位結構
+
+```{Rust}
+struct GrayscaleMap{
+  pixels: Vec<u8>,
+  size: (usize, usize)
+}
+```
+
+這段程式宣告一個GrayscaleMap結構，其具備兩個具體型態欄位，分別是pixels和size。根據慣例，Rust的**型態名稱**使用大寫字母，而欄位與方法則使用小寫字母。
+
+你可以用**結構運算式**來建立這個型態：
+
+```{Rust}
+let width = 1024;
+let height = 576;
+let image = GrayscaleMap{
+  pixels: vec![0; width * height],
+  size: (width, height)
+};
+```
+
+結構運算式是`GrayscaleMap{pixels, size}`，因此你可以用同名的引數和區域變數來設定欄位：
+
+```{Rust}
+struct GrayscaleMap{
+  pixels: Vec<u8>,
+  size: (usize, usize)
+}
+
+
+fn new_map(size: (usize, usize), pixels: Vec<u8>) -> GrayscaleMap{
+  assert_eq!(size.0 * size.1, pixels.len());
+  GrayscaleMap{pixels, size}
+}
+```
+
+你可以用`.`來存取結構欄位：
+
+```{Rust}
+let image = new_map((1024, 576), vec![0; 1024 * 576]);
+assert_eq!(image.size, (1024, 576));
+```
+
+欄位也有公開與私有的概念，如果你只有將結構設為公開，則欄位仍是私有的：
+
+```{Rust}
+pub struct GrayscaleMap{
+  pixels: Vec<u8>,
+  size: (usize, usize)
+}
+```
+
+在這個情況下，其他模組可以使用這個結構與任何關聯函式，但無法用名稱來存取私用欄位，或使用結構與算式建立新的結構。這就是為什麼你不能用結構運算式來建立新的String或Vec，你必須使用`String::new()`或`Vec::new()`。
+
+`..`可以用來複製欄位，但要注意所有權的問題，我們用<<魔法巫師學徒>>的例子說明：
+
+
+根據故事，有一位菜鳥魔法師，施法讓掃帚幫你忙工作，但他忘了怎麼讓它停下。即使將他切成兩半，它仍然不會停下：
+
+```{extendr chunk-2, eval=FALSE}
+
+struct Broom {
+  name: String,
+  height: u32,
+  health: u32,
+  position: (f32, f32, f32),
+  intent: BroomIntent
+}
+
+#[derive(Copy, Clone)]
+enum BroomIntent { FetchWater, DumpWater }
+
+// 參數取得Broom的所有權
+fn chop(b: Broom) -> (Broom, Broom) {
+  // 在這裡Broom除了name外，其他欄位都是複製
+  // 因此broom1取得b的name型態所有權
+  let mut broom1 = Broom { height: b.height / 2, ..b };
+  
+  // 我們想要掃帚2使用掃軸I的所有參數
+  // 但是name是String，所以必須複製一份
+  // 其他都可以直接複製
+  let mut broom2 = Broom { name: broom1.name.clone(), ..b};
+  
+  broom1.name.push_str(" I");
+  broom2.name.push_str(" II");
+  
+  (broom1, broom2)
+}
+```
+
+完成定義後，我們來看看結果如何：
+
+```{extendr, preamble = c("chunk-1", "chunk-2")}
+let hokey = Broom {
+  name: "Hokey".to_string(),
+  height: 60,
+  health: 100,
+  position: (100.0, 200.0, 0.0),
+  intent: BroomIntent::FetchWater
+};
+
+
+let (hokey1, hokey2) = chop(hokey);
+rprintln!("{} 的長度：{}", hokey1.name, hokey1.height);
+rprintln!("{} 的長度：{}", hokey2.name, hokey2.height);
+```
+
+## 類tuple結構
+
+第二種結構很類似tuple，事實上，它長相就是有名字的tuple，取值的方式與tuple一模ㄧ樣：
+
+```{extendr}
+struct Bounds(usize, usize);
+
+let image_bounds = Bounds(1024, 768);
+
+rprintln!("image bounds: {} x {}", image_bounds.0, image_bounds.1);
+```
+
+
+它與具名結構在底層幾乎ㄧ樣，兩者之間的差別僅取於你想如何表達。例如你想讓程式更加清晰，使用具名欄位無可厚非。相較之下，若你通常使用模式比對來尋找元素，類tuple結構可能更適合。
+
+類tuple元素很適合來製作newtype，因為只有一個組件，不會有清晰度的問題，反之，當你需要對型態做嚴格檢查，用類tuple可以幫助你檢查問題與提供更多資訊。
+
+```{Rust}
+struct Ascii(Vec<u8>);
+```
+
+相較於Vec<u8>，Ascii型態更好表達它的用途。
+
+## impl定義方法
+
+過去的範例中，我們曾經使用v.push(e)來將元素推入向量，用v.len()來取得長度...等等。你也可以為你的結構定義方法，但與Java和C++不同，Rust的方法寫在單獨的impl區塊中。
+
+
+```{Rust}
+pub struct Quene {
+  older: Vec<char>,
+  younger: Vec<char>
+}
+
+
+impl Quene {
+  pub fn push(&mut self, c:char){
+    self.younger.push(c);
+  }
+  
+  pub fn pop(&mut self) -> Option<char> {
+    if self.older.is_empty(){
+      if self.younger.is_empty(){
+        return None;
+      }
+  
+      use std::mem::swap;
+      swap(&mut self.older, &mut self.younger);
+      self.older.reverse();
+    }
+    
+    self.older.pop()
+    
+  }
+  
+  
+}
+```
+
+在impl定義的函式叫做**關聯函式**，他們都會與行形態有關。相反，外部的函式叫自由函式。
+
+Rust會預設你的第一個參數是你呼叫參數的值，又稱**self**，self就是impl上面的型態，因此你可以省略型態寫法。有點類似Java與C++的this，但他們的this成員是unqualified identifer，可以直接看見，但Rust的方法必須明確以self稱呼，與Python和JavaScript的方法中使用this類似。
+
+再者，例子中因為pusn與pop方法都會修改Quene結構，所以都是以&mut self當作參數結構，但你在使用時無需寫出，Rust會私下處理，如：
+
+```{Rust}
+let mut q = Quene { older : Vec::new(), younger:: Vec::new() };
+
+q.push('0');
+q.push('1');
+assert_eq!(q.pop(), Some('0'));
+
+q.push('3');
+assert_eq!(q.pop(), some('1'));
+assert_eq!(q.pop(), some('3'));
+```
+
+
+如果你不需要修改它，可以只接收共享參考
+
+```{Rust}
+impl Quene {
+  pub fn is_empty(&self) -> bool {
+    self.older.is_empty() && self.younger.is_empty()
+  }
+}
+
+assert!(q.is_empty());
+```
+
+
+你也可以直接要走所有權，就是直接寫`self`，有時候這樣還不夠，所以Rust允許你用聰明指標型態來傳遞self。
+
+## 用Box、Rc或Arc傳遞self
+
+如果需要的話，方法的self也可以使用`Box<self>`、`Rc<self>`或`Arc<self>`，一旦使用了，你只能對特定指標型態呼叫這種方法，呼叫方法會將指標的所有權傳給他。
+
+通常你不會用到這種作法，大多數時間你將聰明型態指標的self傳給參數為self、&self或& mut self都不太會有問題。
+
+但若真的需要這種指標當參數，你必須明確寫出self的型態，如同它是普通參數：
+
+```{Rust}
+
+impl Node {
+  fn append_to(self: Rc<self>, parent: &mut Node) {
+    parent.children.push(self);
+  }
+}
+
+```
+
+## 型態關聯函式
+
+型態關聯函式與上述不同的是，它不接受self引數函式，他們仍是函式，但不是方法：
+
+它們通常用來建構函式，如：
+
+```{Rust}
+impl Quene {
+  pub fn new() -> Queue {
+  Quene { older: Vec::new(), younger: Vec::new() }
+  }
+}
+
+fn main() {
+  let mut q = Queue::new()
+}
+```
+
+
+## 關聯常數
+
+關聯常數是「與形態有關的值」，類似的概念來自C#與Java，顧名思義，他是ㄧ個常數，讀取他們的方法與關聯函式很像：
+
+```{Rust}
+pub struct Vector2 {
+  x: f32,
+  y: f32,
+}
+
+impl Vector2 {
+  const ZERO: Vector2 = Vector2 {x: 0.0, y: 0.0};
+  const UNIT: Vector2 = Vector2 {x: 1.0, y:0.0};
+}
+
+fn main{
+  let scaled = Vector2::UNIT.scaled_by(2.0);
+}
+```
+
+關聯常數的型太也不必與相關型態相同，你可以利用這個特性，替型態加入ID或名稱，例如你有類似Vector2的型態需要寫入檔案並在稍後載入記憶體，你可以用關聯常數加入名稱與數字ID，寫在資料旁邊來指出它的型態：
+
+```{Rust}
+impl Vector2 {
+  const NAME: &'static str = "Vector2";
+  const ID: u32 = 18;
+}
+```
+
+## 泛型結構
+
+前面的Queue結構中，我們將它設定為專門處理字元的結構，但如果你想將這個結構普通到幾乎所有類型，你應該使用泛型結構：
+
+```{Rust}
+pub struct Queue<T> {
+  older: Vec<T>,
+  younger: Vec<T>
+}
+```
+
+如此以來，你就不用每個型態都寫一遍結構，接著將impl改寫：
+
+```{extendr}
+
+pub struct Queue<T> {
+  older: Vec<T>,
+  younger: Vec<T>
+}
+
+impl<T> Queue<T> {
+  pub fn new() -> Self {
+    Queue { older: Vec::new(), younger: Vec::new() } 
+  }
+  
+  pub fn push(&mut self, t:T){
+    self.younger.push(t);
+  }
+  
+  pub fn is_empty(&self) -> bool {
+    self.older.is_empty() && self.younger.is_empty()
+  }
+}
+```
+
+注意到了嗎，我們將原本的`pub fn new() -> Queue<T>`改寫成`pub fn new() -> Self`，兩者沒有實際的區別，只是可以幫助你更好閱讀。
+
+在運作程式的部分，當結構是泛型，Rust會為你自動推動型態，你無需明確的指出，但若無法推斷，Rust就會強制你指定一種型態。
+
+```{Rust}
+let mut q1 = Queue {
+  older: Vec::new(), 
+  younger: Vec::new()
+};
+
+// 也可以寫做：let mut q2 = Queue::<i32>::new();
+let mut q2 = Queue::new();
+
+q2.push(2);
+q1.push(3);
+```
+
+
+## 有常數參數的泛型結構
+
+常數也可以做結構的參數，參考下例：
+
+```{Rust}
+/// N-1度的多項式
+struct Polynomial<const N: usize> {
+  /// 多項式的係數
+  ///
+  /// 多項式a+bx...
+  /// 多i個元素是...
+  cofficients: [f64; N]
+}
+```
+
+## 為struct型態衍生trait
+
+有的結構很容易寫，但隨之程式碼的擴展，你會發現用起來有點痛苦，因為它既不能複製(copy或clone)，也不能用print!("{:?}", point)印出來，也無法支援運算子比較。
+
+```{Rust}
+struct Point{
+  x: f64,
+  y: f64
+}
+```
+
+這些功能在Rust裡都有名稱：Copy、Clone、Debug與PatrialEq，他們叫做**trait**，再未來會講到如何親自撰寫trait，但一些標準的trait你不需要實作，只需加上#[derive]屬性即可
+
+```{Rust}
+#[derive(Copy, Clone, Debug, PartialEq)]
+struct Point {
+  x: f64,
+  y: f64
+}
+```
+
+當你貼上這些屬性，Rust會幫結構自動實作這些trait，前提是每個欄位都實用了該trait。例如，因為兩個欄位都是f64，而f64實作PpatrialEq，所以我們可以要求Rust也為Point衍生該trait。
+
+
+
+
+
+
+

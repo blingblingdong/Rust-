@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Chapter 9 Day08 - 結構 | Rust之書</title>
+<meta name="author" content="董宸賓">
+<meta name="description" content="9.1 具名欄位結構 struct GrayscaleMap{  pixels: Vec&lt;u8&gt;,  size: (usize, usize) } 這段程式宣告一個GrayscaleMap結構，其具備兩個具體型態欄位，分別是pixels和size。根據慣例，Rust的型態名稱使用大寫字母，而欄位與方法則使用小寫字母。 你可以用結構運算式來建立這個型態： let width = 1024;...">
+<meta name="generator" content="bookdown 0.36.2 with bs4_book()">
+<meta property="og:title" content="Chapter 9 Day08 - 結構 | Rust之書">
+<meta property="og:type" content="book">
+<meta property="og:description" content="9.1 具名欄位結構 struct GrayscaleMap{  pixels: Vec&lt;u8&gt;,  size: (usize, usize) } 這段程式宣告一個GrayscaleMap結構，其具備兩個具體型態欄位，分別是pixels和size。根據慣例，Rust的型態名稱使用大寫字母，而欄位與方法則使用小寫字母。 你可以用結構運算式來建立這個型態： let width = 1024;...">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter 9 Day08 - 結構 | Rust之書">
+<meta name="twitter:description" content="9.1 具名欄位結構 struct GrayscaleMap{  pixels: Vec&lt;u8&gt;,  size: (usize, usize) } 這段程式宣告一個GrayscaleMap結構，其具備兩個具體型態欄位，分別是pixels和size。根據慣例，Rust的型態名稱使用大寫字母，而欄位與方法則使用小寫字母。 你可以用結構運算式來建立這個型態： let width = 1024;...">
+<!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
+<script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.5.1/transition.js"></script><script src="libs/bs3compat-0.5.1/tabs.js"></script><script src="libs/bs3compat-0.5.1/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
+<script src="libs/bs4_book-1.0.0/bs4_book.js"></script><link href="libs/panelset-0.2.6/panelset.css" rel="stylesheet">
+<script src="libs/panelset-0.2.6/panelset.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- CSS --><style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book"><a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Rust之書</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+</form>
+
+      <nav aria-label="Table of contents"><h2>Table of contents</h2>
+        <ul class="book-toc list-unstyled">
+<li><a class="" href="index.html"><span class="header-section-number">1</span> About</a></li>
+<li><a class="" href="day1---%E5%88%B0%E8%99%95%E7%9C%8B%E7%9C%8B.html"><span class="header-section-number">2</span> Day1 - 到處看看</a></li>
+<li><a class="" href="day2---%E5%9E%8B%E6%85%8B.html"><span class="header-section-number">3</span> Day2 - 型態</a></li>
+<li><a class="" href="%E6%89%80%E6%9C%89%E6%AC%8A%E8%88%87%E7%A7%BB%E5%8B%95.html"><span class="header-section-number">4</span> 所有權與移動</a></li>
+<li><a class="" href="%E5%8F%83%E8%80%83.html"><span class="header-section-number">5</span> 參考</a></li>
+<li><a class="" href="day5-%E9%81%8B%E7%AE%97%E5%BC%8F.html"><span class="header-section-number">6</span> Day5-運算式</a></li>
+<li><a class="" href="day06---%E9%8C%AF%E8%AA%A4.html"><span class="header-section-number">7</span> Day06 - 錯誤</a></li>
+<li><a class="" href="day07---crate%E8%88%87%E6%A8%A1%E7%B5%84.html"><span class="header-section-number">8</span> Day07 - crate與模組</a></li>
+<li><a class="active" href="day08---%E7%B5%90%E6%A7%8B.html"><span class="header-section-number">9</span> Day08 - 結構</a></li>
+<li><a class="" href="day09---enum%E8%88%87%E6%A8%A1%E5%BC%8F.html"><span class="header-section-number">10</span> Day09 - enum與模式</a></li>
+<li><a class="" href="day10-tarit%E8%88%87%E6%B3%9B%E5%9E%8B.html"><span class="header-section-number">11</span> Day10-tarit與泛型</a></li>
+<li><a class="" href="day11-closure.html"><span class="header-section-number">12</span> Day11-closure</a></li>
+<li><a class="" href="day12-iterator.html"><span class="header-section-number">13</span> Day12-Iterator</a></li>
+<li><a class="" href="day13-%E9%9B%86%E5%90%88.html"><span class="header-section-number">14</span> Day13-集合</a></li>
+<li><a class="" href="r_unique.html"><span class="header-section-number">15</span> R_unique</a></li>
+</ul>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="https://github.com/rstudio/bookdown-demo">View book source <i class="fab fa-github"></i></a></p>
+        </div>
+      </nav>
+</div>
+  </header><main class="col-sm-12 col-md-9 col-lg-7" id="content"><div id="day08---結構" class="section level1" number="9">
+<h1>
+<span class="header-section-number">9</span> Day08 - 結構<a class="anchor" aria-label="anchor" href="#day08---%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h1>
+<div id="具名欄位結構" class="section level2" number="9.1">
+<h2>
+<span class="header-section-number">9.1</span> 具名欄位結構<a class="anchor" aria-label="anchor" href="#%E5%85%B7%E5%90%8D%E6%AC%84%E4%BD%8D%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h2>
+<div class="sourceCode" id="cb173"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb173-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb173-1" tabindex="-1"></a><span class="kw">struct</span> GrayscaleMap<span class="op">{</span></span>
+<span id="cb173-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb173-2" tabindex="-1"></a>  pixels<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;,</span></span>
+<span id="cb173-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb173-3" tabindex="-1"></a>  size<span class="op">:</span> (<span class="dt">usize</span><span class="op">,</span> <span class="dt">usize</span>)</span>
+<span id="cb173-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb173-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>這段程式宣告一個GrayscaleMap結構，其具備兩個具體型態欄位，分別是pixels和size。根據慣例，Rust的<strong>型態名稱</strong>使用大寫字母，而欄位與方法則使用小寫字母。</p>
+<p>你可以用<strong>結構運算式</strong>來建立這個型態：</p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb174-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb174-1" tabindex="-1"></a><span class="kw">let</span> width <span class="op">=</span> <span class="dv">1024</span><span class="op">;</span></span>
+<span id="cb174-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb174-2" tabindex="-1"></a><span class="kw">let</span> height <span class="op">=</span> <span class="dv">576</span><span class="op">;</span></span>
+<span id="cb174-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb174-3" tabindex="-1"></a><span class="kw">let</span> image <span class="op">=</span> GrayscaleMap<span class="op">{</span></span>
+<span id="cb174-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb174-4" tabindex="-1"></a>  pixels<span class="op">:</span> <span class="pp">vec!</span>[<span class="dv">0</span><span class="op">;</span> width <span class="op">*</span> height]<span class="op">,</span></span>
+<span id="cb174-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb174-5" tabindex="-1"></a>  size<span class="op">:</span> (width<span class="op">,</span> height)</span>
+<span id="cb174-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb174-6" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>結構運算式是<code>GrayscaleMap{pixels, size}</code>，因此你可以用同名的引數和區域變數來設定欄位：</p>
+<div class="sourceCode" id="cb175"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb175-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-1" tabindex="-1"></a><span class="kw">struct</span> GrayscaleMap<span class="op">{</span></span>
+<span id="cb175-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-2" tabindex="-1"></a>  pixels<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;,</span></span>
+<span id="cb175-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-3" tabindex="-1"></a>  size<span class="op">:</span> (<span class="dt">usize</span><span class="op">,</span> <span class="dt">usize</span>)</span>
+<span id="cb175-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb175-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-5" tabindex="-1"></a></span>
+<span id="cb175-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-6" tabindex="-1"></a></span>
+<span id="cb175-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-7" tabindex="-1"></a><span class="kw">fn</span> new_map(size<span class="op">:</span> (<span class="dt">usize</span><span class="op">,</span> <span class="dt">usize</span>)<span class="op">,</span> pixels<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> GrayscaleMap<span class="op">{</span></span>
+<span id="cb175-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-8" tabindex="-1"></a>  <span class="pp">assert_eq!</span>(size<span class="op">.</span><span class="dv">0</span> <span class="op">*</span> size<span class="op">.</span><span class="dv">1</span><span class="op">,</span> pixels<span class="op">.</span>len())<span class="op">;</span></span>
+<span id="cb175-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-9" tabindex="-1"></a>  GrayscaleMap<span class="op">{</span>pixels<span class="op">,</span> size<span class="op">}</span></span>
+<span id="cb175-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb175-10" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>你可以用<code>.</code>來存取結構欄位：</p>
+<div class="sourceCode" id="cb176"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb176-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb176-1" tabindex="-1"></a><span class="kw">let</span> image <span class="op">=</span> new_map((<span class="dv">1024</span><span class="op">,</span> <span class="dv">576</span>)<span class="op">,</span> <span class="pp">vec!</span>[<span class="dv">0</span><span class="op">;</span> <span class="dv">1024</span> <span class="op">*</span> <span class="dv">576</span>])<span class="op">;</span></span>
+<span id="cb176-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb176-2" tabindex="-1"></a><span class="pp">assert_eq!</span>(image<span class="op">.</span>size<span class="op">,</span> (<span class="dv">1024</span><span class="op">,</span> <span class="dv">576</span>))<span class="op">;</span></span></code></pre></div>
+<p>欄位也有公開與私有的概念，如果你只有將結構設為公開，則欄位仍是私有的：</p>
+<div class="sourceCode" id="cb177"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb177-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb177-1" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> GrayscaleMap<span class="op">{</span></span>
+<span id="cb177-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb177-2" tabindex="-1"></a>  pixels<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;,</span></span>
+<span id="cb177-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb177-3" tabindex="-1"></a>  size<span class="op">:</span> (<span class="dt">usize</span><span class="op">,</span> <span class="dt">usize</span>)</span>
+<span id="cb177-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb177-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>在這個情況下，其他模組可以使用這個結構與任何關聯函式，但無法用名稱來存取私用欄位，或使用結構與算式建立新的結構。這就是為什麼你不能用結構運算式來建立新的String或Vec，你必須使用<code>String::new()</code>或<code>Vec::new()</code>。</p>
+<p><code>..</code>可以用來複製欄位，但要注意所有權的問題，我們用&lt;&gt;的例子說明：</p>
+<p>根據故事，有一位菜鳥魔法師，施法讓掃帚幫你忙工作，但他忘了怎麼讓它停下。即使將他切成兩半，它仍然不會停下：</p>
+<div class="sourceCode" id="cb178"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb178-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-1" tabindex="-1"></a></span>
+<span id="cb178-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-2" tabindex="-1"></a><span class="kw">struct</span> Broom <span class="op">{</span></span>
+<span id="cb178-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-3" tabindex="-1"></a>  name<span class="op">:</span> <span class="dt">String</span><span class="op">,</span></span>
+<span id="cb178-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-4" tabindex="-1"></a>  height<span class="op">:</span> <span class="dt">u32</span><span class="op">,</span></span>
+<span id="cb178-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-5" tabindex="-1"></a>  health<span class="op">:</span> <span class="dt">u32</span><span class="op">,</span></span>
+<span id="cb178-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-6" tabindex="-1"></a>  position<span class="op">:</span> (<span class="dt">f32</span><span class="op">,</span> <span class="dt">f32</span><span class="op">,</span> <span class="dt">f32</span>)<span class="op">,</span></span>
+<span id="cb178-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-7" tabindex="-1"></a>  intent<span class="op">:</span> BroomIntent</span>
+<span id="cb178-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-8" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb178-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-9" tabindex="-1"></a></span>
+<span id="cb178-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-10" tabindex="-1"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Copy</span><span class="op">,</span> <span class="bu">Clone</span><span class="at">)]</span></span>
+<span id="cb178-11"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-11" tabindex="-1"></a><span class="kw">enum</span> BroomIntent <span class="op">{</span> FetchWater<span class="op">,</span> DumpWater <span class="op">}</span></span>
+<span id="cb178-12"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-12" tabindex="-1"></a></span>
+<span id="cb178-13"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-13" tabindex="-1"></a><span class="co">// 參數取得Broom的所有權</span></span>
+<span id="cb178-14"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-14" tabindex="-1"></a><span class="kw">fn</span> chop(b<span class="op">:</span> Broom) <span class="op">-&gt;</span> (Broom<span class="op">,</span> Broom) <span class="op">{</span></span>
+<span id="cb178-15"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-15" tabindex="-1"></a>  <span class="co">// 在這裡Broom除了name外，其他欄位都是複製</span></span>
+<span id="cb178-16"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-16" tabindex="-1"></a>  <span class="co">// 因此broom1取得b的name型態所有權</span></span>
+<span id="cb178-17"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-17" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> broom1 <span class="op">=</span> Broom <span class="op">{</span> height<span class="op">:</span> b<span class="op">.</span>height <span class="op">/</span> <span class="dv">2</span><span class="op">,</span> <span class="op">..</span>b <span class="op">};</span></span>
+<span id="cb178-18"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-18" tabindex="-1"></a>  </span>
+<span id="cb178-19"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-19" tabindex="-1"></a>  <span class="co">// 我們想要掃帚2使用掃軸I的所有參數</span></span>
+<span id="cb178-20"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-20" tabindex="-1"></a>  <span class="co">// 但是name是String，所以必須複製一份</span></span>
+<span id="cb178-21"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-21" tabindex="-1"></a>  <span class="co">// 其他都可以直接複製</span></span>
+<span id="cb178-22"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-22" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> broom2 <span class="op">=</span> Broom <span class="op">{</span> name<span class="op">:</span> broom1<span class="op">.</span>name<span class="op">.</span>clone()<span class="op">,</span> <span class="op">..</span>b<span class="op">};</span></span>
+<span id="cb178-23"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-23" tabindex="-1"></a>  </span>
+<span id="cb178-24"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-24" tabindex="-1"></a>  broom1<span class="op">.</span>name<span class="op">.</span>push_str(<span class="st">" I"</span>)<span class="op">;</span></span>
+<span id="cb178-25"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-25" tabindex="-1"></a>  broom2<span class="op">.</span>name<span class="op">.</span>push_str(<span class="st">" II"</span>)<span class="op">;</span></span>
+<span id="cb178-26"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-26" tabindex="-1"></a>  </span>
+<span id="cb178-27"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-27" tabindex="-1"></a>  (broom1<span class="op">,</span> broom2)</span>
+<span id="cb178-28"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb178-28" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>完成定義後，我們來看看結果如何：</p>
+<div class="sourceCode" id="cb179"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb179-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-1" tabindex="-1"></a><span class="kw">let</span> hokey <span class="op">=</span> Broom <span class="op">{</span></span>
+<span id="cb179-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-2" tabindex="-1"></a>  name<span class="op">:</span> <span class="st">"Hokey"</span><span class="op">.</span>to_string()<span class="op">,</span></span>
+<span id="cb179-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-3" tabindex="-1"></a>  height<span class="op">:</span> <span class="dv">60</span><span class="op">,</span></span>
+<span id="cb179-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-4" tabindex="-1"></a>  health<span class="op">:</span> <span class="dv">100</span><span class="op">,</span></span>
+<span id="cb179-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-5" tabindex="-1"></a>  position<span class="op">:</span> (<span class="dv">100.0</span><span class="op">,</span> <span class="dv">200.0</span><span class="op">,</span> <span class="dv">0.0</span>)<span class="op">,</span></span>
+<span id="cb179-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-6" tabindex="-1"></a>  intent<span class="op">:</span> <span class="pp">BroomIntent::</span>FetchWater</span>
+<span id="cb179-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-7" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb179-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-8" tabindex="-1"></a></span>
+<span id="cb179-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-9" tabindex="-1"></a></span>
+<span id="cb179-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-10" tabindex="-1"></a><span class="kw">let</span> (hokey1<span class="op">,</span> hokey2) <span class="op">=</span> chop(hokey)<span class="op">;</span></span>
+<span id="cb179-11"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-11" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{} 的長度：{}"</span><span class="op">,</span> hokey1<span class="op">.</span>name<span class="op">,</span> hokey1<span class="op">.</span>height)<span class="op">;</span></span>
+<span id="cb179-12"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-12" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"{} 的長度：{}"</span><span class="op">,</span> hokey2<span class="op">.</span>name<span class="op">,</span> hokey2<span class="op">.</span>height)<span class="op">;</span></span>
+<span id="cb179-13"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-13" tabindex="-1"></a>#<span class="op">&gt;</span> Hokey I 的長度：<span class="dv">30</span></span>
+<span id="cb179-14"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb179-14" tabindex="-1"></a>#<span class="op">&gt;</span> Hokey II 的長度：<span class="dv">60</span></span></code></pre></div>
+</div>
+<div id="類tuple結構" class="section level2" number="9.2">
+<h2>
+<span class="header-section-number">9.2</span> 類tuple結構<a class="anchor" aria-label="anchor" href="#%E9%A1%9Etuple%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h2>
+<p>第二種結構很類似tuple，事實上，它長相就是有名字的tuple，取值的方式與tuple一模ㄧ樣：</p>
+<div class="sourceCode" id="cb180"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb180-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb180-1" tabindex="-1"></a><span class="kw">struct</span> Bounds(<span class="dt">usize</span><span class="op">,</span> <span class="dt">usize</span>)<span class="op">;</span></span>
+<span id="cb180-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb180-2" tabindex="-1"></a></span>
+<span id="cb180-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb180-3" tabindex="-1"></a><span class="kw">let</span> image_bounds <span class="op">=</span> Bounds(<span class="dv">1024</span><span class="op">,</span> <span class="dv">768</span>)<span class="op">;</span></span>
+<span id="cb180-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb180-4" tabindex="-1"></a></span>
+<span id="cb180-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb180-5" tabindex="-1"></a><span class="pp">rprintln!</span>(<span class="st">"image bounds: {} x {}"</span><span class="op">,</span> image_bounds<span class="op">.</span><span class="dv">0</span><span class="op">,</span> image_bounds<span class="op">.</span><span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb180-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb180-6" tabindex="-1"></a>#<span class="op">&gt;</span> image bounds<span class="op">:</span> <span class="dv">1024</span> x <span class="dv">768</span></span></code></pre></div>
+<p>它與具名結構在底層幾乎ㄧ樣，兩者之間的差別僅取於你想如何表達。例如你想讓程式更加清晰，使用具名欄位無可厚非。相較之下，若你通常使用模式比對來尋找元素，類tuple結構可能更適合。</p>
+<p>類tuple元素很適合來製作newtype，因為只有一個組件，不會有清晰度的問題，反之，當你需要對型態做嚴格檢查，用類tuple可以幫助你檢查問題與提供更多資訊。</p>
+<div class="sourceCode" id="cb181"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb181-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb181-1" tabindex="-1"></a><span class="kw">struct</span> Ascii(<span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">u8</span><span class="op">&gt;</span>)<span class="op">;</span></span></code></pre></div>
+<p>相較於Vec<u8>，Ascii型態更好表達它的用途。</u8></p>
+</div>
+<div id="impl定義方法" class="section level2" number="9.3">
+<h2>
+<span class="header-section-number">9.3</span> impl定義方法<a class="anchor" aria-label="anchor" href="#impl%E5%AE%9A%E7%BE%A9%E6%96%B9%E6%B3%95"><i class="fas fa-link"></i></a>
+</h2>
+<p>過去的範例中，我們曾經使用v.push(e)來將元素推入向量，用v.len()來取得長度…等等。你也可以為你的結構定義方法，但與Java和C++不同，Rust的方法寫在單獨的impl區塊中。</p>
+<div class="sourceCode" id="cb182"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb182-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-1" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> Quene <span class="op">{</span></span>
+<span id="cb182-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-2" tabindex="-1"></a>  older<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">&gt;,</span></span>
+<span id="cb182-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-3" tabindex="-1"></a>  younger<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">&gt;</span></span>
+<span id="cb182-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb182-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-5" tabindex="-1"></a></span>
+<span id="cb182-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-6" tabindex="-1"></a></span>
+<span id="cb182-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-7" tabindex="-1"></a><span class="kw">impl</span> Quene <span class="op">{</span></span>
+<span id="cb182-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-8" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> push(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">,</span> c<span class="op">:</span><span class="dt">char</span>)<span class="op">{</span></span>
+<span id="cb182-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-9" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>younger<span class="op">.</span>push(c)<span class="op">;</span></span>
+<span id="cb182-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-10" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb182-11"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-11" tabindex="-1"></a>  </span>
+<span id="cb182-12"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-12" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> pop(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">Option</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb182-13"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-13" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">self</span><span class="op">.</span>older<span class="op">.</span>is_empty()<span class="op">{</span></span>
+<span id="cb182-14"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-14" tabindex="-1"></a>      <span class="cf">if</span> <span class="kw">self</span><span class="op">.</span>younger<span class="op">.</span>is_empty()<span class="op">{</span></span>
+<span id="cb182-15"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-15" tabindex="-1"></a>        <span class="cf">return</span> <span class="cn">None</span><span class="op">;</span></span>
+<span id="cb182-16"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-16" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb182-17"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-17" tabindex="-1"></a>  </span>
+<span id="cb182-18"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-18" tabindex="-1"></a>      <span class="kw">use</span> <span class="pp">std::mem::</span>swap<span class="op">;</span></span>
+<span id="cb182-19"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-19" tabindex="-1"></a>      swap(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>older<span class="op">,</span> <span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">.</span>younger)<span class="op">;</span></span>
+<span id="cb182-20"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-20" tabindex="-1"></a>      <span class="kw">self</span><span class="op">.</span>older<span class="op">.</span>reverse()<span class="op">;</span></span>
+<span id="cb182-21"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-21" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb182-22"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-22" tabindex="-1"></a>    </span>
+<span id="cb182-23"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-23" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>older<span class="op">.</span>pop()</span>
+<span id="cb182-24"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-24" tabindex="-1"></a>    </span>
+<span id="cb182-25"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-25" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb182-26"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-26" tabindex="-1"></a>  </span>
+<span id="cb182-27"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-27" tabindex="-1"></a>  </span>
+<span id="cb182-28"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb182-28" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>在impl定義的函式叫做<strong>關聯函式</strong>，他們都會與行形態有關。相反，外部的函式叫自由函式。</p>
+<p>Rust會預設你的第一個參數是你呼叫參數的值，又稱<strong>self</strong>，self就是impl上面的型態，因此你可以省略型態寫法。有點類似Java與C++的this，但他們的this成員是unqualified identifer，可以直接看見，但Rust的方法必須明確以self稱呼，與Python和JavaScript的方法中使用this類似。</p>
+<p>再者，例子中因為pusn與pop方法都會修改Quene結構，所以都是以&amp;mut self當作參數結構，但你在使用時無需寫出，Rust會私下處理，如：</p>
+<div class="sourceCode" id="cb183"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb183-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> q <span class="op">=</span> Quene <span class="op">{</span> older <span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">,</span> <span class="pp">younger::</span> <span class="dt">Vec</span><span class="pp">::</span>new() <span class="op">};</span></span>
+<span id="cb183-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-2" tabindex="-1"></a></span>
+<span id="cb183-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-3" tabindex="-1"></a>q<span class="op">.</span>push(<span class="ch">'0'</span>)<span class="op">;</span></span>
+<span id="cb183-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-4" tabindex="-1"></a>q<span class="op">.</span>push(<span class="ch">'1'</span>)<span class="op">;</span></span>
+<span id="cb183-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-5" tabindex="-1"></a><span class="pp">assert_eq!</span>(q<span class="op">.</span>pop()<span class="op">,</span> <span class="cn">Some</span>(<span class="ch">'0'</span>))<span class="op">;</span></span>
+<span id="cb183-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-6" tabindex="-1"></a></span>
+<span id="cb183-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-7" tabindex="-1"></a>q<span class="op">.</span>push(<span class="ch">'3'</span>)<span class="op">;</span></span>
+<span id="cb183-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-8" tabindex="-1"></a><span class="pp">assert_eq!</span>(q<span class="op">.</span>pop()<span class="op">,</span> some(<span class="ch">'1'</span>))<span class="op">;</span></span>
+<span id="cb183-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb183-9" tabindex="-1"></a><span class="pp">assert_eq!</span>(q<span class="op">.</span>pop()<span class="op">,</span> some(<span class="ch">'3'</span>))<span class="op">;</span></span></code></pre></div>
+<p>如果你不需要修改它，可以只接收共享參考</p>
+<div class="sourceCode" id="cb184"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb184-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-1" tabindex="-1"></a><span class="kw">impl</span> Quene <span class="op">{</span></span>
+<span id="cb184-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-2" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> is_empty(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">bool</span> <span class="op">{</span></span>
+<span id="cb184-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-3" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>older<span class="op">.</span>is_empty() <span class="op">&amp;&amp;</span> <span class="kw">self</span><span class="op">.</span>younger<span class="op">.</span>is_empty()</span>
+<span id="cb184-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-4" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb184-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb184-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-6" tabindex="-1"></a></span>
+<span id="cb184-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb184-7" tabindex="-1"></a><span class="pp">assert!</span>(q<span class="op">.</span>is_empty())<span class="op">;</span></span></code></pre></div>
+<p>你也可以直接要走所有權，就是直接寫<code>self</code>，有時候這樣還不夠，所以Rust允許你用聰明指標型態來傳遞self。</p>
+</div>
+<div id="用boxrc或arc傳遞self" class="section level2" number="9.4">
+<h2>
+<span class="header-section-number">9.4</span> 用Box、Rc或Arc傳遞self<a class="anchor" aria-label="anchor" href="#%E7%94%A8boxrc%E6%88%96arc%E5%82%B3%E9%81%9Eself"><i class="fas fa-link"></i></a>
+</h2>
+<p>如果需要的話，方法的self也可以使用<code>Box&lt;self&gt;</code>、<code>Rc&lt;self&gt;</code>或<code>Arc&lt;self&gt;</code>，一旦使用了，你只能對特定指標型態呼叫這種方法，呼叫方法會將指標的所有權傳給他。</p>
+<p>通常你不會用到這種作法，大多數時間你將聰明型態指標的self傳給參數為self、&amp;self或&amp; mut self都不太會有問題。</p>
+<p>但若真的需要這種指標當參數，你必須明確寫出self的型態，如同它是普通參數：</p>
+<div class="sourceCode" id="cb185"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb185-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb185-1" tabindex="-1"></a></span>
+<span id="cb185-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb185-2" tabindex="-1"></a><span class="kw">impl</span> Node <span class="op">{</span></span>
+<span id="cb185-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb185-3" tabindex="-1"></a>  <span class="kw">fn</span> append_to(<span class="kw">self</span><span class="op">:</span> Rc<span class="op">&lt;</span><span class="kw">self</span><span class="op">&gt;,</span> parent<span class="op">:</span> <span class="op">&amp;</span><span class="kw">mut</span> Node) <span class="op">{</span></span>
+<span id="cb185-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb185-4" tabindex="-1"></a>    parent<span class="op">.</span>children<span class="op">.</span>push(<span class="kw">self</span>)<span class="op">;</span></span>
+<span id="cb185-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb185-5" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb185-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb185-6" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="型態關聯函式" class="section level2" number="9.5">
+<h2>
+<span class="header-section-number">9.5</span> 型態關聯函式<a class="anchor" aria-label="anchor" href="#%E5%9E%8B%E6%85%8B%E9%97%9C%E8%81%AF%E5%87%BD%E5%BC%8F"><i class="fas fa-link"></i></a>
+</h2>
+<p>型態關聯函式與上述不同的是，它不接受self引數函式，他們仍是函式，但不是方法：</p>
+<p>它們通常用來建構函式，如：</p>
+<div class="sourceCode" id="cb186"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb186-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-1" tabindex="-1"></a><span class="kw">impl</span> Quene <span class="op">{</span></span>
+<span id="cb186-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-2" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> new() <span class="op">-&gt;</span> Queue <span class="op">{</span></span>
+<span id="cb186-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-3" tabindex="-1"></a>  Quene <span class="op">{</span> older<span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">,</span> younger<span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new() <span class="op">}</span></span>
+<span id="cb186-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-4" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb186-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb186-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-6" tabindex="-1"></a></span>
+<span id="cb186-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-7" tabindex="-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb186-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-8" tabindex="-1"></a>  <span class="kw">let</span> <span class="kw">mut</span> q <span class="op">=</span> <span class="pp">Queue::</span>new()</span>
+<span id="cb186-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb186-9" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="關聯常數" class="section level2" number="9.6">
+<h2>
+<span class="header-section-number">9.6</span> 關聯常數<a class="anchor" aria-label="anchor" href="#%E9%97%9C%E8%81%AF%E5%B8%B8%E6%95%B8"><i class="fas fa-link"></i></a>
+</h2>
+<p>關聯常數是「與形態有關的值」，類似的概念來自C#與Java，顧名思義，他是ㄧ個常數，讀取他們的方法與關聯函式很像：</p>
+<div class="sourceCode" id="cb187"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb187-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-1" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> Vector2 <span class="op">{</span></span>
+<span id="cb187-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-2" tabindex="-1"></a>  x<span class="op">:</span> <span class="dt">f32</span><span class="op">,</span></span>
+<span id="cb187-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-3" tabindex="-1"></a>  y<span class="op">:</span> <span class="dt">f32</span><span class="op">,</span></span>
+<span id="cb187-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-4" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb187-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-5" tabindex="-1"></a></span>
+<span id="cb187-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-6" tabindex="-1"></a><span class="kw">impl</span> Vector2 <span class="op">{</span></span>
+<span id="cb187-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-7" tabindex="-1"></a>  <span class="kw">const</span> ZERO<span class="op">:</span> Vector2 <span class="op">=</span> Vector2 <span class="op">{</span>x<span class="op">:</span> <span class="dv">0.0</span><span class="op">,</span> y<span class="op">:</span> <span class="dv">0.0</span><span class="op">};</span></span>
+<span id="cb187-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-8" tabindex="-1"></a>  <span class="kw">const</span> UNIT<span class="op">:</span> Vector2 <span class="op">=</span> Vector2 <span class="op">{</span>x<span class="op">:</span> <span class="dv">1.0</span><span class="op">,</span> y<span class="op">:</span><span class="dv">0.0</span><span class="op">};</span></span>
+<span id="cb187-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-9" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb187-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-10" tabindex="-1"></a></span>
+<span id="cb187-11"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-11" tabindex="-1"></a><span class="kw">fn</span> main{</span>
+<span id="cb187-12"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-12" tabindex="-1"></a>  let scaled = Vector2::UNIT.scaled_by(<span class="dv">2.0</span>)<span class="op">;</span></span>
+<span id="cb187-13"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb187-13" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>關聯常數的型太也不必與相關型態相同，你可以利用這個特性，替型態加入ID或名稱，例如你有類似Vector2的型態需要寫入檔案並在稍後載入記憶體，你可以用關聯常數加入名稱與數字ID，寫在資料旁邊來指出它的型態：</p>
+<div class="sourceCode" id="cb188"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb188-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb188-1" tabindex="-1"></a><span class="kw">impl</span> Vector2 <span class="op">{</span></span>
+<span id="cb188-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb188-2" tabindex="-1"></a>  <span class="kw">const</span> NAME<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'static</span> <span class="dt">str</span> <span class="op">=</span> <span class="st">"Vector2"</span><span class="op">;</span></span>
+<span id="cb188-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb188-3" tabindex="-1"></a>  <span class="kw">const</span> ID<span class="op">:</span> <span class="dt">u32</span> <span class="op">=</span> <span class="dv">18</span><span class="op">;</span></span>
+<span id="cb188-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb188-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="泛型結構" class="section level2" number="9.7">
+<h2>
+<span class="header-section-number">9.7</span> 泛型結構<a class="anchor" aria-label="anchor" href="#%E6%B3%9B%E5%9E%8B%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h2>
+<p>前面的Queue結構中，我們將它設定為專門處理字元的結構，但如果你想將這個結構普通到幾乎所有類型，你應該使用泛型結構：</p>
+<div class="sourceCode" id="cb189"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb189-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb189-1" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> Queue<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb189-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb189-2" tabindex="-1"></a>  older<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>T<span class="op">&gt;,</span></span>
+<span id="cb189-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb189-3" tabindex="-1"></a>  younger<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>T<span class="op">&gt;</span></span>
+<span id="cb189-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb189-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>如此以來，你就不用每個型態都寫一遍結構，接著將impl改寫：</p>
+<div class="sourceCode" id="cb190"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb190-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-1" tabindex="-1"></a></span>
+<span id="cb190-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-2" tabindex="-1"></a><span class="kw">pub</span> <span class="kw">struct</span> Queue<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb190-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-3" tabindex="-1"></a>  older<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>T<span class="op">&gt;,</span></span>
+<span id="cb190-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-4" tabindex="-1"></a>  younger<span class="op">:</span> <span class="dt">Vec</span><span class="op">&lt;</span>T<span class="op">&gt;</span></span>
+<span id="cb190-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-5" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb190-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-6" tabindex="-1"></a></span>
+<span id="cb190-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-7" tabindex="-1"></a><span class="kw">impl</span><span class="op">&lt;</span>T<span class="op">&gt;</span> Queue<span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb190-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-8" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> new() <span class="op">-&gt;</span> <span class="dt">Self</span> <span class="op">{</span></span>
+<span id="cb190-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-9" tabindex="-1"></a>    Queue <span class="op">{</span> older<span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">,</span> younger<span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new() <span class="op">}</span> </span>
+<span id="cb190-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-10" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb190-11"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-11" tabindex="-1"></a>  </span>
+<span id="cb190-12"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-12" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> push(<span class="op">&amp;</span><span class="kw">mut</span> <span class="kw">self</span><span class="op">,</span> t<span class="op">:</span>T)<span class="op">{</span></span>
+<span id="cb190-13"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-13" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>younger<span class="op">.</span>push(t)<span class="op">;</span></span>
+<span id="cb190-14"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-14" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb190-15"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-15" tabindex="-1"></a>  </span>
+<span id="cb190-16"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-16" tabindex="-1"></a>  <span class="kw">pub</span> <span class="kw">fn</span> is_empty(<span class="op">&amp;</span><span class="kw">self</span>) <span class="op">-&gt;</span> <span class="dt">bool</span> <span class="op">{</span></span>
+<span id="cb190-17"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-17" tabindex="-1"></a>    <span class="kw">self</span><span class="op">.</span>older<span class="op">.</span>is_empty() <span class="op">&amp;&amp;</span> <span class="kw">self</span><span class="op">.</span>younger<span class="op">.</span>is_empty()</span>
+<span id="cb190-18"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-18" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb190-19"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-19" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb190-20"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb190-20" tabindex="-1"></a>#<span class="op">&gt;</span> NULL</span></code></pre></div>
+<p>注意到了嗎，我們將原本的<code>pub fn new() -&gt; Queue&lt;T&gt;</code>改寫成<code>pub fn new() -&gt; Self</code>，兩者沒有實際的區別，只是可以幫助你更好閱讀。</p>
+<p>在運作程式的部分，當結構是泛型，Rust會為你自動推動型態，你無需明確的指出，但若無法推斷，Rust就會強制你指定一種型態。</p>
+<div class="sourceCode" id="cb191"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb191-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-1" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> q1 <span class="op">=</span> Queue <span class="op">{</span></span>
+<span id="cb191-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-2" tabindex="-1"></a>  older<span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new()<span class="op">,</span> </span>
+<span id="cb191-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-3" tabindex="-1"></a>  younger<span class="op">:</span> <span class="dt">Vec</span><span class="pp">::</span>new()</span>
+<span id="cb191-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-4" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb191-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-5" tabindex="-1"></a></span>
+<span id="cb191-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-6" tabindex="-1"></a><span class="co">// 也可以寫做：let mut q2 = Queue::&lt;i32&gt;::new();</span></span>
+<span id="cb191-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-7" tabindex="-1"></a><span class="kw">let</span> <span class="kw">mut</span> q2 <span class="op">=</span> <span class="pp">Queue::</span>new()<span class="op">;</span></span>
+<span id="cb191-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-8" tabindex="-1"></a></span>
+<span id="cb191-9"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-9" tabindex="-1"></a>q2<span class="op">.</span>push(<span class="dv">2</span>)<span class="op">;</span></span>
+<span id="cb191-10"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb191-10" tabindex="-1"></a>q1<span class="op">.</span>push(<span class="dv">3</span>)<span class="op">;</span></span></code></pre></div>
+</div>
+<div id="有常數參數的泛型結構" class="section level2" number="9.8">
+<h2>
+<span class="header-section-number">9.8</span> 有常數參數的泛型結構<a class="anchor" aria-label="anchor" href="#%E6%9C%89%E5%B8%B8%E6%95%B8%E5%8F%83%E6%95%B8%E7%9A%84%E6%B3%9B%E5%9E%8B%E7%B5%90%E6%A7%8B"><i class="fas fa-link"></i></a>
+</h2>
+<p>常數也可以做結構的參數，參考下例：</p>
+<div class="sourceCode" id="cb192"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb192-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-1" tabindex="-1"></a><span class="co">/// N-1度的多項式</span></span>
+<span id="cb192-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-2" tabindex="-1"></a><span class="kw">struct</span> Polynomial<span class="op">&lt;</span><span class="kw">const</span> N<span class="op">:</span> <span class="dt">usize</span><span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb192-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-3" tabindex="-1"></a>  <span class="co">/// 多項式的係數</span></span>
+<span id="cb192-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-4" tabindex="-1"></a>  <span class="co">///</span></span>
+<span id="cb192-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-5" tabindex="-1"></a>  <span class="co">/// 多項式a+bx...</span></span>
+<span id="cb192-6"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-6" tabindex="-1"></a>  <span class="co">/// 多i個元素是...</span></span>
+<span id="cb192-7"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-7" tabindex="-1"></a>  cofficients<span class="op">:</span> [<span class="dt">f64</span><span class="op">;</span> N]</span>
+<span id="cb192-8"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb192-8" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</div>
+<div id="為struct型態衍生trait" class="section level2" number="9.9">
+<h2>
+<span class="header-section-number">9.9</span> 為struct型態衍生trait<a class="anchor" aria-label="anchor" href="#%E7%82%BAstruct%E5%9E%8B%E6%85%8B%E8%A1%8D%E7%94%9Ftrait"><i class="fas fa-link"></i></a>
+</h2>
+<p>有的結構很容易寫，但隨之程式碼的擴展，你會發現用起來有點痛苦，因為它既不能複製(copy或clone)，也不能用print!(“{:?}”, point)印出來，也無法支援運算子比較。</p>
+<div class="sourceCode" id="cb193"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb193-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb193-1" tabindex="-1"></a><span class="kw">struct</span> Point<span class="op">{</span></span>
+<span id="cb193-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb193-2" tabindex="-1"></a>  x<span class="op">:</span> <span class="dt">f64</span><span class="op">,</span></span>
+<span id="cb193-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb193-3" tabindex="-1"></a>  y<span class="op">:</span> <span class="dt">f64</span></span>
+<span id="cb193-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb193-4" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>這些功能在Rust裡都有名稱：Copy、Clone、Debug與PatrialEq，他們叫做<strong>trait</strong>，再未來會講到如何親自撰寫trait，但一些標準的trait你不需要實作，只需加上#[derive]屬性即可</p>
+<div class="sourceCode" id="cb194"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb194-1"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb194-1" tabindex="-1"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Copy</span><span class="op">,</span> <span class="bu">Clone</span><span class="op">,</span> <span class="bu">Debug</span><span class="op">,</span> <span class="bu">PartialEq</span><span class="at">)]</span></span>
+<span id="cb194-2"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb194-2" tabindex="-1"></a><span class="kw">struct</span> Point <span class="op">{</span></span>
+<span id="cb194-3"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb194-3" tabindex="-1"></a>  x<span class="op">:</span> <span class="dt">f64</span><span class="op">,</span></span>
+<span id="cb194-4"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb194-4" tabindex="-1"></a>  y<span class="op">:</span> <span class="dt">f64</span></span>
+<span id="cb194-5"><a href="day08---%E7%B5%90%E6%A7%8B.html#cb194-5" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>當你貼上這些屬性，Rust會幫結構自動實作這些trait，前提是每個欄位都實用了該trait。例如，因為兩個欄位都是f64，而f64實作PpatrialEq，所以我們可以要求Rust也為Point衍生該trait。</p>
+
+</div>
+</div>
+  <div class="chapter-nav">
+<div class="prev"><a href="day07---crate%E8%88%87%E6%A8%A1%E7%B5%84.html"><span class="header-section-number">8</span> Day07 - crate與模組</a></div>
+<div class="next"><a href="day09---enum%E8%88%87%E6%A8%A1%E5%BC%8F.html"><span class="header-section-number">10</span> Day09 - enum與模式</a></div>
+</div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
+      <ul class="nav navbar-nav">
+<li><a class="nav-link" href="#day08---%E7%B5%90%E6%A7%8B"><span class="header-section-number">9</span> Day08 - 結構</a></li>
+<li><a class="nav-link" href="#%E5%85%B7%E5%90%8D%E6%AC%84%E4%BD%8D%E7%B5%90%E6%A7%8B"><span class="header-section-number">9.1</span> 具名欄位結構</a></li>
+<li><a class="nav-link" href="#%E9%A1%9Etuple%E7%B5%90%E6%A7%8B"><span class="header-section-number">9.2</span> 類tuple結構</a></li>
+<li><a class="nav-link" href="#impl%E5%AE%9A%E7%BE%A9%E6%96%B9%E6%B3%95"><span class="header-section-number">9.3</span> impl定義方法</a></li>
+<li><a class="nav-link" href="#%E7%94%A8boxrc%E6%88%96arc%E5%82%B3%E9%81%9Eself"><span class="header-section-number">9.4</span> 用Box、Rc或Arc傳遞self</a></li>
+<li><a class="nav-link" href="#%E5%9E%8B%E6%85%8B%E9%97%9C%E8%81%AF%E5%87%BD%E5%BC%8F"><span class="header-section-number">9.5</span> 型態關聯函式</a></li>
+<li><a class="nav-link" href="#%E9%97%9C%E8%81%AF%E5%B8%B8%E6%95%B8"><span class="header-section-number">9.6</span> 關聯常數</a></li>
+<li><a class="nav-link" href="#%E6%B3%9B%E5%9E%8B%E7%B5%90%E6%A7%8B"><span class="header-section-number">9.7</span> 泛型結構</a></li>
+<li><a class="nav-link" href="#%E6%9C%89%E5%B8%B8%E6%95%B8%E5%8F%83%E6%95%B8%E7%9A%84%E6%B3%9B%E5%9E%8B%E7%B5%90%E6%A7%8B"><span class="header-section-number">9.8</span> 有常數參數的泛型結構</a></li>
+<li><a class="nav-link" href="#%E7%82%BAstruct%E5%9E%8B%E6%85%8B%E8%A1%8D%E7%94%9Ftrait"><span class="header-section-number">9.9</span> 為struct型態衍生trait</a></li>
+</ul>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+<li><a id="book-source" href="https://github.com/rstudio/bookdown-demo/blob/master/08-%E7%B5%90%E6%A7%8B.Rmd">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="https://github.com/rstudio/bookdown-demo/edit/master/08-%E7%B5%90%E6%A7%8B.Rmd">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+</div>
+    </nav>
+</div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Rust之書</strong>" was written by 董宸賓. It was last built on 2024-08-14.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer><!-- dynamically load mathjax for compatibility with self-contained --><script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script><script type="text/x-mathjax-config">const popovers = document.querySelectorAll('a.footnote-ref[data-toggle="popover"]');
+for (let popover of popovers) {
+  const div = document.createElement('div');
+  div.setAttribute('style', 'position: absolute; top: 0, left:0; width:0, height:0, overflow: hidden; visibility: hidden;');
+  div.innerHTML = popover.getAttribute('data-content');
+
+  var has_math = div.querySelector("span.math");
+  if (has_math) {
+    document.body.appendChild(div);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, div]);
+    MathJax.Hub.Queue(function() {
+      popover.setAttribute('data-content', div.innerHTML);
+      document.body.removeChild(div);
+    })
+  }
+}
+</script>
+</body>
+</html>

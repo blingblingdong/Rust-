@@ -1,0 +1,837 @@
+# Day13-集合
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(distill)
+xaringanExtra::use_panelset()
+library(rmarkdown)
+library(rextendr)
+```
+
+Rust的集合大多行為與其他語言相同，有所差異的在於我們重複強調的安全與性能：
+
+1.移動與借用
+
+在前面章節提到，Rust以移動避免深度複製，如在過去章節中提到Vec<T>::push(item)以值接受引數，而不是以參考接受引數的原因。以此，不只省去複製字元資料的時間，也確保所有權始終明確。
+
+2.沒有失效錯誤：
+
+失效錯誤是一種懸空指標的bug，當集合被改變大小或以其他方式改變，但程式仍然持有指向它資料的指標。
+
+3.沒有null
+
+Rust沒有null，而是以Option取代
+
+## Vec
+
+建立向量最簡單的方式是用vec!巨集：
+
+```{Rust}
+// 建立空向量
+let mut numbers:Vec<i32> = vec![];
+
+
+// 指定內容建立向量
+let words = vec!["step", "on", "no", "pets"];
+let mut buffer = vec![0u8; 1024]; // 1024個歸零的bytes
+```
+
+
+向量有三個欄位：長度、容量、儲存元素的heap指標。
+
+空向量numbers的初始向量是0，在沒有實際元素前不會配置heap記憶體。
+
+
+所有集合都實作了`std::iter::FromIterator`，所以你可以用`.collect()`方法來建立向量。
+
+```{Rust}
+let my_vec = my_set.into_iter().collect::<Vec<String>>();
+```
+
+### 存取
+
+```{Rust}
+// 取得元素的參考
+let first_line = &lines[0];
+
+// 取得副本
+let fifth_number = numbers[4];
+let second_line = lines[1].clone();
+
+// 取得一個slice的參考
+let my_ref = &buffer[4..12];
+
+// 取得一個slice的副本
+let my_copy = buffer[4..12].to_vec();//需要Clone
+```
+
+當索引超出邊界時，這些寫法會panic。
+
+所有索引都必須是usize，適當的`n as usize`是必須的。
+
+下面幾種方法也是取得向量元素的好做法：
+
+`slice.first()`、`slice.last()`：
+
+::: indent-2
+回傳slice的第一個、最後一個元素的參考，型態是Option<t>，空回傳`None`，不是空的則回傳Some(&slice[0])
+
+```{rust}
+if let Some(item) = v.first() {
+  println!("We got one {item}");
+}
+```
+:::
+
+`slice.get(index)`：
+
+::: indent-2
+回傳slice[index]的Some參考，型態是Option<t>，當索引元素是空的會回傳None
+
+```{rust}
+let slice = [0,1,2,3];
+assert_eq!(slice.get(2), Some(&2));
+assert_eq!(slice.get(4), None);
+```
+:::
+
+`slice.first_mut()`、`slice.last_mut()`、`slice.get_mut(index)`
+
+::: indent-2
+類似上面的方法，只是借用值可變參考
+
+```{rust}
+let mut slice = [0, 1, 2, 3];
+{
+  let last = slice.last_mut().unwrap(); // last的型態是: &mut i32
+  assert_eq!(*last, 3);
+  *last = 100;
+}
+assert_eq!(slice, [0, 1, 2, 100]);
+```
+:::
+
+`slice.to_vec()`
+
+::: indent-2
+複製整個slice，回傳一個新向量
+
+```{rust}
+let mut slice = [0, 1, 2, 3];
+assert_eq!(slice.to_vec(), [0, 1, 2, 3]);
+assert_eq!(slice[0..2].to_vec(), [0, 1]);
+```
+
+這個方法只能用在元素都是cloneable時
+
+:::
+
+
+### 迭代
+
+向量、陣列與slice都是iterable，無論是以值還是以參考，都遵循上一章節所講的模式：
+
+- 迭代Vec<T>或陣列[T; N]會產生T型態的N個項目，元素會被一個接一個移出向量或陣列並耗用
+
+- 迭代&[T; N]、&[T]或&Vec<T>型態的值(也就是陣列、slice或向量的參考)會產生&T型態的項目，即指向個個元素的參考，它們不會被移除
+
+- 迭代&mut [T; N]、&mut[T]或&mut Vec<T>型態的值會產生&mut T型態的參考
+
+要創建產生參考的iterator可以用`.iter()`與`iter_mut`方法
+
+### 增長與收縮向量
+
+陣列、slice與向量的長度是他們裡面元素的數量
+
+`slice.len()`
+
+::: indent-2
+
+回傳slice的長度，單位是usize
+
+:::
+
+`slice.is_empty()`
+
+::: indent-2
+
+若slice裡面沒有元素，回傳true。
+
+:::
+
+因為只有向量可以增長與收縮，建立之後就無法改變大小的slice與陣列都沒有這些方法。
+
+向量的元蘇被存放在一個連續的heap記憶體裡面。向量的容量是可放入的**最大元素**數量。一般情況下Vec會自動管理容量，例如在需要更多空間時配置更大緩衝區。你可以用以下方法來明確記憶體管理
+
+
+`Vec::with_capacity(n)`
+
+::: indent-2
+
+建立一個新的、空的向量，容量為n
+
+:::
+
+
+`vec.capacity()`
+
+::: indent-2
+
+回傳一個usize的容量，其必定大於或等於vec.len()
+
+:::
+
+`vec.reserve(n)`
+
+::: indent-2
+
+確保向量能至少有足夠的空間可再容納n個元素。也就是說，vec.capacity()至少是vec.len() + n。如果空間足夠，這個函式不做任何事情。如果不夠，則會配置足夠大的緩衝區
+
+:::
+
+`vec.reserve_exact(n)`
+
+::: indent-2
+
+與vec.reserve(n)相似，但會要求vec不要配置超出n的任何而外空間。之後，vec.capcity()就是vec.len()+n
+
+:::
+
+`vec.shrink_to_fit()`
+
+::: indent-2
+
+如果vec.capacity()大於vec.len()，則會釋出額外記憶體
+
+Vec<T>有許多加入與移除元素的方法，都是用mut參考來接受它的self引數。
+
+:::
+
+`vec.push(value)`
+
+::: indent-2
+將value加入vec的結尾
+:::
+
+`vec.pop()`
+
+::: indent-2
+移除並回傳最後一個元素。它的回傳型態是Option<T>。如果pop出來的元素是x，它會回傳Some(x)
+:::
+
+要注意，以上兩個方法與接下來的都是以*值*移出與移入，如push(n)會將n移入，pop()會移出值
+
+如果你想指定移出與移入元素，考慮insert與remove：
+
+`vec.insert(index, value)`
+
+::: indent-2
+
+在vec[index]插入value，其餘元素會後移
+
+如果index > vec.len()，則會panic
+
+:::
+
+
+`vec.remove(index)`
+
+::: indent-2
+
+移除並回傳vec[index]元素，將後面元素前移
+
+如果index >= vec.len()，則會panic
+
+當向量元素越來越多，多次remove(n)會讓運行變慢，如果需奧要多次執行可改用`VecDequeT>`
+
+:::
+
+有四個方法可以改變vec的長度：
+
+`vec.resize(new_len, value)`
+
+::: indent-2
+
+將長度改為new_len，空餘的空間塞入value，注意value必須實作Clone
+
+:::
+
+
+`vec.resize_with(new_len, closure)`
+
+::: indent-2
+
+ㄧ樣將長度改變為new_len，特別用在要傳入的value不是clone type。
+
+:::
+
+
+`vec.truncate(new_len)`
+
+::: indent-2
+
+將長度改為new_len，多的元素會被清除
+
+:::
+
+
+`vec.clear()`
+
+::: indent-2
+
+會清除所有元素，相當於truncate(0)
+
+:::
+
+如果你想要一次加入或移除多值，考慮：
+
+
+`vec.extend(iterable)`
+
+::: indent-2
+
+在結尾加入iterable的所有項目，它很像多值版本的.push
+
+:::
+
+
+`vec.spilt_off(index)`
+
+::: indent-2
+
+與vec.truncate(index)相似，但是回傳一個Vec<T>
+
+:::
+
+
+`vec.append(&mut vec2)`
+
+::: indent-2
+
+它會將vec2的元素傳入vec，vec2在事後會被淨空
+
+與extend不同的是，vec2的殼會留下來
+
+:::
+
+`vec.drain(range)`
+
+::: indent-2
+
+將vec[range]從vec移除，並回傳一個迭代被移除的元素的itertor，其中的range是範圍值，如..或0..4
+
+:::
+
+
+此外還有一些方法能更進階的刪除值
+
+
+`vec.retain(test)`
+
+::: indent-2
+
+移除未通過指定測試的項目，方法會呼叫test(&element)函式或closure，回傳bool的項目留下。
+
+撇開性能不談，這個方法接近這段程式：
+
+```{Rust}
+vec = vec.into_iter().filter(test).collect();
+```
+
+:::
+
+`vec.dedup()`
+
+::: indent-2
+
+卸除重複的元素：
+
+```{Rust}
+let mut byte_vec = b"Misssssissippi"
+byte_vec.dedup();
+assert_eq!(&byte_vec, b"Misisipi");
+```
+
+要注意的是，它只會確認相鄰的元素是否重複，若你要移除所有重複，有三個選項：先排序再呼叫ded_up()、將資料移入集合，或使用.retain技巧(可以保持出現順序)
+
+```{Rust}
+let mut byte_vec = b"Misssssissippi"
+
+let mut seen = HashSet::new();
+byte_vec.retain(|r| seen.insert(*r));
+
+assert_eq!(&byte_vec, b"Misp")
+```
+
+這個魔法在於，.insert()會在集合已經正在插入的項目時回傳false
+
+:::
+
+`vec.dedup_by(same)`
+
+::: indent-2
+
+透過same(&mut element1, &mut element2)來檢視兩元素是否相符。
+
+:::
+
+`vec_dedup_by_key(key)`
+
+若key(&mut element1) == key(&mut element2)，將兩個元素視為相等。
+
+例如，如果errors是Vec<Box<dyn Error>>，你可以這樣寫：
+
+```{Rust}
+errors.dedup_by_key(|err| err.to_string());
+```
+
+### 連接
+
+有兩種方式處理陣列的陣列：
+
+`slices.conact()`
+
+::: indent-2
+
+串接所有slice來製作新向量並回傳：
+
+```{Rust}
+assert_eq!([[1,2], [3,4], [5,6]].conact(), 
+           vec![1, 2, 3, 4, 5, 6]);
+```
+
+:::
+
+`slices.join(&seperator)`
+
+::: indent-2
+
+與conact相同功能，但在slice之間插入一個seperator的副本
+
+```{Rust}
+assert_eq!([[1,2], [3,4], [5,6]].join(&0), 
+           vec![1, 2, 0, 3, 4, 0, 5, 6]);
+```
+
+
+:::
+
+### 拆分
+
+當涉及參考與可變參考時，拆分的動作要更注意。為了安全，所以拆分的方法都有mut與非mut版本。
+
+這些方法都不直接修改陣列、slice或向量，只回傳裡面部分資料的參考。
+
+`slice.iter()`、`slice.iter_mut()`
+
+::: indent-2
+
+產生slice各個元素的參考
+
+:::
+
+
+`slice.split_at(index)`、`slice.split_at_mut(index)`
+
+::: indent-2
+
+在指定位子拆分成兩個slice，slice.split_at(index)相當於(&slice[..index], &slice[index..])。當index超出邊界，方法會panic，
+
+:::
+
+
+`slice.split_first()`, `slice.spilt_first_mut()`
+
+::: indent-2
+
+回傳一對參考：一個指向第一個元素(slice[0])的參考，另一個是指向其他所有元素的參考(slice[1..])的slice參考
+
+準確的說，回傳型態是Option<(&T, &[T])>，當slice是空的時，結果是None\
+
+:::
+
+`slice.split_last()`, `slice.spilt_last_mut()`
+
+::: indent-2
+
+與上一對方法相似，只是拆開最後一個元素
+
+:::
+
+`slice.split(is_sep)`, `slice.split_mut(is_sep)`
+
+::: indent-2
+
+將slice分成一個或多個子slice，使用函式或closure_is_sep來決定拆開的位子，回傳一個迭代子slice的iterator
+
+呼叫is_sep(&element)，當回傳true時，該元素會變成**分隔符號**，不加入新的slice
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.split(|&item| item == 0).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+:::
+
+`slice.split_inclusive()`, `slice.spilt_inclusive_mut()`
+
+::: indent-2
+
+它們的動作與split相似，但是在上一個子slice結尾加上分隔符號，而不是排除它
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.split_inclusive(|&item| item == 0).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+
+:::
+
+`slice.rsplit(is_sep)`, `slice.rsplit_mut(is_sep)`
+
+::: indent-2
+
+從slice結尾開始
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.rsplit(|&item| item == 0).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+
+:::
+
+`slice.splitn(n, is_sep)`, `slice.splitn_mut(n,is_sep)`
+
+::: indent-2
+
+限制分解slice的數量，在找到n-1個slice之後，就不會再呼叫closure，剩下的元素全部塞進最後一個slice
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.splitn(2, |&item| item == 0).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+
+:::
+
+
+:::
+
+`slice.rsplitn(n, is_sep)`, `slice.rsplitn_mut(n,is_sep)`
+
+::: indent-2
+
+反向順序掃描
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.rsplitn(2, |&item| item == 0).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+
+:::
+
+`slice.chunks(n)`, `slice.chunks_mut(n)`
+
+::: indent-2
+
+回傳iterator來迭代不重疊且長度為n的子slice，若slice.len()無法被n整除，則最後一個區域將少於n個
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.chunks(2).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+
+:::
+
+`slice.rchunks(n)`, `slice.rchunks_mut(n)`
+
+::: indent-2
+
+從結尾開始分
+
+
+```{extendr}
+let numbers = [11, 22, 33, 0, 44, 55, 0, 0, 66];
+    
+let parts: Vec<_> = numbers.rchunks(2).collect();
+
+for (i, part) in parts.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+}
+```
+
+:::
+
+`slice.windows(n)`
+
+::: indent-2
+
+回傳跨越連續n個元素的子slice，它產生的第一個值是&slice[0..n]，第二個是&slice[1....n+1]，以此類推
+
+若n大於slice的長度，此方法不產生slice，若n為0則panic
+
+如果你想知道探索兩個資料間的關係與變化，大小為2的窗口就很適合：
+
+```{extendr}
+
+let temperatures = [20, 22, 24, 28, 26, 27];
+    
+let changes: Vec<_> = temperatures
+    .windows(2)
+    .collect();
+
+for (i, part) in changes.iter().enumerate() {
+  rprintln!("Part {}: {:?}", i, part);
+  rprintln!("Changes:{}", part[1] - part[0]);
+}
+    
+
+```
+
+:::
+
+### 對換
+
+參考以下對換方法：
+
+
+
+`slice.swap(i, j)`
+
+::: indent-2
+
+將slice[i]與slice[j]元素對換
+
+```{extendr}
+let mut numbers = [1, 2, 3];
+numbers.swap(0, 2);
+rprintln!("{:?}", numbers);
+
+```
+:::
+
+
+`slice_a.swap_with_slice(&mut slice_b)`
+
+::: indent-2
+
+將slice[i]與slice[j]元素兌換
+
+```{extendr}
+let mut numbers_a = [1, 2, 3];
+let mut numbers_b = [0, 0, 0];
+numbers_a.swap_with_slice(&mut numbers_b);
+rprintln!("{:?}", numbers_a);
+
+```
+:::
+
+### 排序與搜尋
+
+slice有三種排序方式：
+
+`slice.sort()`
+
+::: indent-2
+
+按遞增順序來排序元素，元素必須實作Ord。
+
+:::
+
+`slice.sort_by`
+
+::: indent-2
+
+使用函式或closure cmp來指定排序順序，以排序slice的元素。cmp必須實作`Fn(&T, &T) -> std::cmp::Ordering`。
+
+親手撰寫cmp是痛苦的，但你可以善用.cmp()方法。
+
+```{Rust}
+students.sort_by(|a, b| a.last_name.cmp(&b.last_name));
+```
+
+若要用一個欄位來排順序，你可以使用第二個欄位作為分界符號(次要比較項目)，比較tuple
+
+```{Rust}
+students.sort_by(|a, b| {
+  let a_key = (&a.last_name, &a.first_name);
+  let b_key = (&b.last_name, &b.first_name);
+  a_key.cmp(&b_key)
+});
+```
+
+:::
+
+
+`slice.sort_by_key(key)`
+
+::: indent-2
+
+用函式或closure key提供的排序鍵來將slice元素按遞增順序排列。key的型態必須實作Fn(&T) -> K，其中K; Ord。
+
+這個方法很適合在T有一個或多個有序欄位，你想用多種方式排序它:
+
+```{Rust}
+students.sort_by_key(|s| s.grade_point_average());
+```
+
+:::
+
+
+`slice.reverse()`
+
+::: indent-2
+
+將slice倒過來，如果你想反向排序，可以先用正邏輯sort_by()之後再reverse
+
+:::
+
+`slice.binary_search(&value)`
+
+::: indent-2
+
+二元查找法用於查找有排序過的資料，可以高效查詢，或是指出新資料的排序位置
+
+回傳型態是Result<usize, usize>，若slice[index]等於value，則回傳Ok(index)，若無則回傳Err(insertion)，讓後續插入動作能保持順序。
+
+```{extendr}
+let numbers = vec![1, 2, 3, 4, 6, 7, 8, 9, 10];
+
+rprintln!("{:?}", numbers.binary_search(&4));
+rprintln!("{:?}", numbers.binary_search(&5));
+
+```
+:::
+
+`slice.binary_search_by(cmp)`
+
+::: indent-2
+
+回傳型態與上面相同，只是以回傳Ordering的函式來自訂比較自訂比較
+
+```{Rust}
+students.binary_search_by(|student| {
+    if student.score < target_score {
+            Ordering::Less
+    } else if student.score > target_score {
+            Ordering::Greater
+    } else {
+            Ordering::Equal
+  }
+});
+```
+
+:::
+
+`slice.binary_search_by(cmp)`
+
+::: indent-2
+
+回傳型態與上面相同，只是以回傳Ordering的函式來自訂比較自訂比較
+
+```{Rust}
+students.binary_search_by(|student| {
+    if student.score < target_score {
+            Ordering::Less
+    } else if student.score > target_score {
+            Ordering::Greater
+    } else {
+            Ordering::Equal
+  }
+});
+```
+
+:::
+
+
+`slice.binary_search_by_key(&value, key)`
+
+::: indent-2
+
+
+多一個指定value來避免手動提取鍵
+
+:::
+
+
+`slice.contains(&value)`
+
+::: indent-2
+
+若純粹要確認元素是否存在，可以使用contains，若該元素存在會回傳true
+
+:::
+
+
+若僅要尋找符合元素的位置，可以使用上一章節提到的position
+
+```{Rust}
+slice.iter().position(|x| *x == value);
+```
+
+### 隨機元素
+
+Rust標準程式庫為內建元素，但rand crate有，可以協助從向量中隨機取得元素
+
+雖然兩種方法都要Rng，所幸用`&mut rand::thread_rng()`，要記得匯入rand crate。
+
+`slice.choose(&mut rng)`
+
+::: indent-2
+
+回傳一個Option<&T>
+
+```{Rust}
+use rand::seq::SliceRandom; // 0.7.2
+
+let vs = vec![0, 1, 2, 3, 4];
+let rand_num = vs.choose(&mut rand::thread_rng());
+
+```
+
+:::
+
+`slice.shuffle(&mut rng)`
+
+::: indent-2
+
+將vec重新洗牌
+
+```{Rust}
+let mut vs = vec![0, 1, 2, 3, 4];
+vs.shuffle(&mut rand::thread_rng());
+```
+
+:::
+
+
+
+
+

@@ -1,4 +1,5 @@
 use actix_web::{web, App, HttpResponse, HttpServer};
+use serde::Deserialize;
 use rand::Rng;
 use std::cmp::Ordering;
 
@@ -36,7 +37,7 @@ async fn get_index() -> HttpResponse {
         )
 }
 
-use serde::Deserialize;
+
 #[derive(Deserialize)]
 struct guessor {
     n: u32,

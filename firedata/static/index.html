@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Items</title>
+</head>
+<body>
+  <ul>
+    <li><a class="active" href="#home">ome</a></li>
+    <li><a href="#news">News</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="container">
+    <form id="item-form">
+        <h2>支出表單</h2>
+        <label for="ID">ID</label>
+        <input type="text" name="ID"><br>
+        備註: <input type="text" name="備註"><br>
+        價格: <input type="text" name="價格"><br>
+        品名: <input type="text" name="品名"><br>
+        時間: <input type="text" name="時間"><br>
+        種類: <input type="text" name="種類"><br>
+        <input type="button" value="Add Item" onclick="sendForm()">
+    </form>
+    <div id="item-table">
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
